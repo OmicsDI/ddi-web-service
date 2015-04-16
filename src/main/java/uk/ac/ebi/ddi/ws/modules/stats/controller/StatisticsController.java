@@ -48,4 +48,15 @@ public class StatisticsController {
 
         return RepoStatsToWsStatsMapper.asDomainStatsList(domain);
     }
+
+    @ApiOperation(value = "Return general statistics values about the service", position = 1, notes = "retrieve general statistics")
+    @RequestMapping(value = "/general", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    List<DomainStats> getGeneralStats() {
+
+        DomainList domain = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+
+        return RepoStatsToWsStatsMapper.asGeneralStatsList(domain);
+    }
 }

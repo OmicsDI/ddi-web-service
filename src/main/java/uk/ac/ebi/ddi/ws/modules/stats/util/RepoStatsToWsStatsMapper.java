@@ -18,6 +18,11 @@ import java.util.List;
  */
 public final class RepoStatsToWsStatsMapper {
 
+    /**
+     * Convert the Domain statistics List
+     * @param domainList Domain List it can be seen as a repository each domain
+     * @return List<DomainStats> Domain statistics
+     */
     public static List<DomainStats> asDomainStatsList(DomainList domainList) {
 
         List<DomainStats> domains = new ArrayList<DomainStats>();
@@ -30,6 +35,11 @@ public final class RepoStatsToWsStatsMapper {
         return domains;
     }
 
+    /**
+     * Domain statistics conversion
+     * @param domain
+     * @return
+     */
     public static DomainStats domainStats(Domain domain){
         DomainStats domainStasts = null;
         if(domain != null){
@@ -54,5 +64,19 @@ public final class RepoStatsToWsStatsMapper {
         return domainStasts;
     }
 
+    /**
+     * Return General statistics about the Datasets, the number of entries, the number of different manuscripts, etc
+     * @param domain
+     * @return
+     */
 
+    public static List<StatRecord> asGeneralStatsList(DomainList domain) {
+        List<StatRecord> general = new ArrayList<StatRecord>();
+        List<DomainStats> domainStatses = asDomainStatsList(domain);
+        int count = 0;
+        for(DomainStats domainStats: domainStatses)
+        general.add(new StatRecord(Constants.REPOSITORY_TAG, String.valueOf(count)));
+        return general;
+
+    }
 }
