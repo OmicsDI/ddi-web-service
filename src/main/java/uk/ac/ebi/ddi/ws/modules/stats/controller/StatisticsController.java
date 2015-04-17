@@ -13,10 +13,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
+import uk.ac.ebi.ddi.ebe.ws.dao.client.facet.FacetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.facet.FacetList;
 import uk.ac.ebi.ddi.ws.modules.stats.model.DomainStats;
+import uk.ac.ebi.ddi.ws.modules.stats.model.StatRecord;
 import uk.ac.ebi.ddi.ws.modules.stats.util.RepoStatsToWsStatsMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
+import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 
 import java.util.List;
@@ -38,6 +42,9 @@ public class StatisticsController {
     @Autowired
     DomainWsClient domainWsClient;
 
+    @Autowired
+    FacetWsClient facetWsClient;
+
     @ApiOperation(value = "returns the general statistics for the entire repository", position = 1, notes = "retrieve general statistics")
     @RequestMapping(value = "/domains", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -50,13 +57,17 @@ public class StatisticsController {
     }
 
     @ApiOperation(value = "Return general statistics values about the service", position = 1, notes = "retrieve general statistics")
-    @RequestMapping(value = "/general", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/organisms", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
-    List<DomainStats> getGeneralStats() {
+    List<StatRecord> getTaxonomies() {
 
-        DomainList domain = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+        DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
-        return RepoStatsToWsStatsMapper.asGeneralStatsList(domain);
+        String[] dubdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
+
+        FacetList taxonomies = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.TAXONOMY_FIELD, 20);
+
+        return RepoStatsToWsStatsMapper.asTaxonomy(taxonomies);
     }
 }

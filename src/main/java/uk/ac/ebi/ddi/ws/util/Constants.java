@@ -7,6 +7,8 @@ public class Constants {
 
     public static final String ENTRY_COUNT           = "Number of entries";
 
+    public static final String TAXONOMY_FIELD        = "TAXONOMY";
+
     public static final String MAIN_DOMAIN           = "omics";
 
     public static final String REPOSITORY_TAG        = "Repositories";

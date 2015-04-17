@@ -3,6 +3,9 @@ package uk.ac.ebi.ddi.ws.modules.stats.util;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.IndexInfo;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.Domain;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.facet.Facet;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.facet.FacetList;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.facet.FacetValue;
 import uk.ac.ebi.ddi.ws.modules.stats.model.DomainStats;
 import uk.ac.ebi.ddi.ws.modules.stats.model.StatRecord;
 import uk.ac.ebi.ddi.ws.util.Constants;
@@ -78,5 +81,18 @@ public final class RepoStatsToWsStatsMapper {
         general.add(new StatRecord(Constants.REPOSITORY_TAG, String.valueOf(count)));
         return general;
 
+    }
+
+    public static List<StatRecord> asTaxonomy(FacetList taxonomies) {
+        List<StatRecord> records = new ArrayList<StatRecord>();
+        if(taxonomies != null && taxonomies.getFacets().length != 0){
+            records.add(new StatRecord("Total", taxonomies.getHitCount()));
+            for(Facet facet: taxonomies.getFacets())
+                if(facet.getId().equalsIgnoreCase(Constants.TAXONOMY_FIELD))
+                    for(FacetValue facetValue: facet.getFacetValues()){
+                        records.add(new StatRecord(facetValue.getLabel(), facetValue.getCount()));
+                    }
+        }
+        return records;
     }
 }
