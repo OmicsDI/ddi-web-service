@@ -72,7 +72,6 @@ public final class RepoStatsToWsStatsMapper {
      * @param domain
      * @return
      */
-
     public static List<StatRecord> asGeneralStatsList(DomainList domain) {
         List<StatRecord> general = new ArrayList<StatRecord>();
         List<DomainStats> domainStatses = asDomainStatsList(domain);
@@ -83,16 +82,23 @@ public final class RepoStatsToWsStatsMapper {
 
     }
 
-    public static List<StatRecord> asTaxonomy(FacetList taxonomies) {
+    /**
+     * Retirve the facet count for every field
+     * @param facets The facets values
+     * @param field The field
+     * @return The list of stats by Field type
+     */
+    public static List<StatRecord> asFacetCount(FacetList facets, String field) {
         List<StatRecord> records = new ArrayList<StatRecord>();
-        if(taxonomies != null && taxonomies.getFacets().length != 0){
-            records.add(new StatRecord("Total", taxonomies.getHitCount()));
-            for(Facet facet: taxonomies.getFacets())
-                if(facet.getId().equalsIgnoreCase(Constants.TAXONOMY_FIELD))
+        if(facets != null && facets.getFacets().length != 0){
+            records.add(new StatRecord("Total", facets.getHitCount()));
+            for(Facet facet: facets.getFacets())
+                if(facet.getId().equalsIgnoreCase(field))
                     for(FacetValue facetValue: facet.getFacetValues()){
                         records.add(new StatRecord(facetValue.getLabel(), facetValue.getCount()));
                     }
         }
         return records;
     }
+
 }

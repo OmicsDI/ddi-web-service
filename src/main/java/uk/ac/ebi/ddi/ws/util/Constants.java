@@ -21,4 +21,5 @@ public class Constants {
 
     public static final String MANUSCRIPT_TAG        = "Manuscripts";
 
+    public static final String TISSUE_FIELD          = "tissue" ;
 }

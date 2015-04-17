@@ -68,6 +68,21 @@ public class StatisticsController {
 
         FacetList taxonomies = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.TAXONOMY_FIELD, 20);
 
-        return RepoStatsToWsStatsMapper.asTaxonomy(taxonomies);
+        return RepoStatsToWsStatsMapper.asFacetCount(taxonomies, Constants.TAXONOMY_FIELD);
+    }
+
+    @ApiOperation(value = "Return general statistics values about the service", position = 1, notes = "retrieve general statistics")
+    @RequestMapping(value = "/tissues", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    List<StatRecord> getTissues() {
+
+        DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+
+        String[] dubdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
+
+        FacetList tissues = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.TISSUE_FIELD, 20);
+
+        return RepoStatsToWsStatsMapper.asFacetCount(tissues, Constants.TISSUE_FIELD);
     }
 }
