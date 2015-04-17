@@ -22,4 +22,8 @@ public class Constants {
     public static final String MANUSCRIPT_TAG        = "Manuscripts";
 
     public static final String TISSUE_FIELD          = "tissue" ;
+
+    public static final String OMICS_TYPE_FIELD      = "omics_type";
+
+    public static final String DISEASE_FIELD         = "disease";
 }

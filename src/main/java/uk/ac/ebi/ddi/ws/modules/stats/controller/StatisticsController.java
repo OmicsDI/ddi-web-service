@@ -45,7 +45,7 @@ public class StatisticsController {
     @Autowired
     FacetWsClient facetWsClient;
 
-    @ApiOperation(value = "returns the general statistics for the entire repository", position = 1, notes = "retrieve general statistics")
+    @ApiOperation(value = "Return statistics about the number of datasets per Repository", position = 1, notes = "Return statistics about the number of datasets per Repository")
     @RequestMapping(value = "/domains", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
@@ -56,7 +56,7 @@ public class StatisticsController {
         return RepoStatsToWsStatsMapper.asDomainStatsList(domain);
     }
 
-    @ApiOperation(value = "Return general statistics values about the service", position = 1, notes = "retrieve general statistics")
+    @ApiOperation(value = "Return statistics about the number of datasets per Organisms", position = 1, notes = "Return statistics about the number of datasets per Organisms")
     @RequestMapping(value = "/organisms", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
@@ -71,11 +71,11 @@ public class StatisticsController {
         return RepoStatsToWsStatsMapper.asFacetCount(taxonomies, Constants.TAXONOMY_FIELD);
     }
 
-    @ApiOperation(value = "Return general statistics values about the service", position = 1, notes = "retrieve general statistics")
-    @RequestMapping(value = "/tissues", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public @ResponseBody
-    List<StatRecord> getTissues() {
+    @ApiOperation(value = "Return statistics about the number of datasets per Tissue", position = 1, notes = "Return statistics about the number of datasets per Tissue")
+     @RequestMapping(value = "/tissues", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+     @ResponseStatus(HttpStatus.OK) // 200
+     public @ResponseBody
+     List<StatRecord> getTissues() {
 
         DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
@@ -85,4 +85,36 @@ public class StatisticsController {
 
         return RepoStatsToWsStatsMapper.asFacetCount(tissues, Constants.TISSUE_FIELD);
     }
+
+     @ApiOperation(value = "Return statistics about the number of datasets per Omics Type", position = 1, notes = "Return statistics about the number of datasets per Omics Type")
+     @RequestMapping(value = "/omicsType", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+     @ResponseStatus(HttpStatus.OK) // 200
+     public @ResponseBody
+     List<StatRecord> getOmics() {
+
+        DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+
+        String[] dubdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
+
+        FacetList tissues = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.OMICS_TYPE_FIELD, 20);
+
+        return RepoStatsToWsStatsMapper.asFacetCount(tissues, Constants.OMICS_TYPE_FIELD);
+    }
+
+    @ApiOperation(value = "Return statistics about the number of datasets per dieases", position = 1, notes = "Return statistics about the number of datasets per diseases")
+    @RequestMapping(value = "/diseases", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    List<StatRecord> getDiseases() {
+
+        DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+
+        String[] dubdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
+
+        FacetList tissues = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.DISEASE_FIELD, 20);
+
+        return RepoStatsToWsStatsMapper.asFacetCount(tissues, Constants.DISEASE_FIELD);
+    }
+
+
 }
