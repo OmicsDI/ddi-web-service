@@ -4,7 +4,6 @@ import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.Domain;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**

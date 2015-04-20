@@ -24,5 +24,8 @@
         <constructor-arg ref="ebeyeWsConfig"/>
     </bean>
 
+    <bean id="dataWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient">
+        <constructor-arg ref="ebeyeWsConfig"/>
+    </bean>
 
 </beans>
