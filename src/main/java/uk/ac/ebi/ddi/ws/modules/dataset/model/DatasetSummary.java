@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * This is the summary dataset entry for all the omics experiments. Using the current ws data model we fill the information of
- * this DatasetSummary to be use by the clientes.
+ * this DatasetSummary to be use by the clients.
  *
  * @author ypriverol
  */

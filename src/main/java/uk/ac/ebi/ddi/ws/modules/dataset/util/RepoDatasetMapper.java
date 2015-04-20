@@ -1,9 +1,12 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.util;
 
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
-import uk.ac.ebi.ddi.ebe.ws.dao.model.result.QueryResult;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.Organism;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
 import uk.ac.ebi.ddi.ws.util.Constants;
 
 
@@ -80,7 +83,7 @@ public class RepoDatasetMapper {
 
                 if(entry.getFields().containsKey(Constants.SUBMITTER_KEY_FIELD))
                     if(entry.getFields().get(Constants.SUBMITTER_KEY_FIELD) != null && entry.getFields().get(Constants.SUBMITTER_KEY_FIELD).length > 0)
-                        keywords.addAll(Arrays.asList(entry.getFields().get("submitter_keywords")));
+                        keywords.addAll(Arrays.asList(entry.getFields().get(Constants.SUBMITTER_KEY_FIELD)));
 
                 if(keywords.size() > 0){
                     String[] arrayKeywords = new String[keywords.size()];
@@ -88,10 +91,34 @@ public class RepoDatasetMapper {
                         arrayKeywords[i] = keywords.get(i);
                     datasetSummary.setKeywords(arrayKeywords);
                 }
+
+                List<Organism> organisms = new ArrayList<Organism>();
+
+                //Todo: get the organisms
+
+//                if(entry.getFields().containsKey(Constants.TAXONOMY_FIELD))
+//                    if(entry.getFields().get(Constants.TAXONOMY_FIELD) != null && entry.getFields().get(Constants.TAXONOMY_FIELD).length > 0){
+//
+//                    }
+//                        organisms.addAll(Arrays.asList(entry.getFields().get(Constants.TAXONOMY_FIELD)));
+
             }
         }
         return datasetSummary;
 
     }
 
+    /**
+     * Returns the Terms frequency List
+     * @param termResult terms from the web service
+     * @return List of terms
+     */
+    public static List<Term> asTermResults(TermResult termResult) {
+        List<Term> terms = new ArrayList<Term>();
+        if(termResult != null && termResult.getTerms() != null && termResult.getTerms().length > 0){
+            for(uk.ac.ebi.ddi.ebe.ws.dao.model.common.Term oldTerm: termResult.getTerms())
+                terms.add(new Term(oldTerm.getText(), oldTerm.getFrecuency()));
+        }
+        return terms;
+    }
 }

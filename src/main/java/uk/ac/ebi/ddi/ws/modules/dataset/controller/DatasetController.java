@@ -15,14 +15,16 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
-import uk.ac.ebi.ddi.ebe.ws.dao.model.result.QueryResult;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 
+import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
 
 import java.util.List;
+
 
 @Api(value = "dataset", description = "Retrieve the information about the dataset including search functionalities", position = 0)
 @Controller
@@ -54,4 +56,20 @@ public class DatasetController {
         return RepoDatasetMapper.asDataSummary(queryResult);
 
     }
+
+    @ApiOperation(value = "Retrieve frequently terms from the Repo", position = 1, notes = "Retrieve frequently terms from the Repo")
+    @RequestMapping(value = "/terms", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    List<Term> frequentTerms(
+            @ApiParam(value = "Number of terms to be retrieved: maximum 100")
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+
+        TermResult termResult = dataWsClient.getFrequentlyTerms(Constants.MAIN_DOMAIN, Constants.DESCRIPTION_FIELD, Constants.EXCLUSION_WORDS, size);
+
+        return RepoDatasetMapper.asTermResults(termResult);
+
+    }
+
+
 }
