@@ -44,14 +44,18 @@ public class DatasetController {
     DataSetResult search(
             @ApiParam(value = "general search term against multiple fields including: cancer human")
             @RequestParam(value = "query", required = false, defaultValue = "") String query,
+            @ApiParam(value = "field to sort the output of the search results: e.g description")
+            @RequestParam(value = "sortfield", required = false, defaultValue = "") String sortfield,
+            @ApiParam(value = "type of sorting ascending or descending: default: ascending")
+            @RequestParam(value = "order", required = false, defaultValue = "") String order,
             @ApiParam(value = "the starting point for the search: 0")
             @RequestParam(value = "start", required = false, defaultValue = "0") int start,
             @ApiParam(value = "the number of records to be retrieved: maximum 100")
             @RequestParam(value = "size", required = false, defaultValue = "20") int size,
             @ApiParam(value = "the starting point for the search: 0")
-            @RequestParam(value = "start", required = false, defaultValue = "20") int facetCount) {
+            @RequestParam(value = "faceCount", required = false, defaultValue = "20") int facetCount) {
 
-        QueryResult queryResult = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, start, size, facetCount);
+        QueryResult queryResult = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
 
         return RepoDatasetMapper.asDataSummary(queryResult);
 
