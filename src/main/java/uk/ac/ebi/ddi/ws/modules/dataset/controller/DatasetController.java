@@ -91,18 +91,61 @@ public class DatasetController {
     }
 
     @ApiOperation(value = "Retrieve frequently terms from the Repo", position = 1, notes = "Retrieve frequently terms from the Repo")
-    @RequestMapping(value = "/terms", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public @ResponseBody
-    List<Term> frequentTerms(
-            @ApiParam(value = "Number of terms to be retrieved: maximum 100")
-            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+     @RequestMapping(value = "/terms", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+     @ResponseStatus(HttpStatus.OK) // 200
+     public @ResponseBody
+     List<Term> frequentTerms(
+                    @ApiParam(value = "Number of terms to be retrieved: maximum 100")
+                    @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
 
         TermResult termResult = dataWsClient.getFrequentlyTerms(Constants.MAIN_DOMAIN, Constants.DESCRIPTION_FIELD, Constants.EXCLUSION_WORDS, size);
 
         return RepoDatasetMapper.asTermResults(termResult);
 
     }
+
+    @ApiOperation(value = "Retrieve the latest datasets in the repository", position = 1, notes = "Retrieve the latest datasets in the repository")
+    @RequestMapping(value = "/latest", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    DataSetResult latest(
+            @ApiParam(value = "Number of terms to be retrieved: maximum 100, default 20")
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+
+
+        String query = "*:*";
+
+        QueryResult queryResult = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, Constants.PUB_DATE_FIELD, "descending", 0, size, 10);
+
+        QueryResult taxonomies = null;
+
+        Set<String> taxonomyIds    = RepoDatasetMapper.getTaxonomyIds(queryResult);
+        /*
+         * The number of queries should be controlled using the maximun QUERY threshold in this case 100 entries for the EBE web service.
+         */
+
+        if(taxonomyIds.size() > Constants.HIGH_QUERY_THRESHOLD){
+            List<QueryResult> resultList = new ArrayList<QueryResult>();
+            List<String> list = new ArrayList<String>(taxonomyIds);
+            int count = 0;
+            for(int i=0 ; i < taxonomyIds.size(); i += Constants.HIGH_QUERY_THRESHOLD){
+                Set<String> currentIds = new HashSet<String>(list.subList(i, Constants.HIGH_QUERY_THRESHOLD));
+                resultList.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, currentIds));
+                count = i;
+            }
+            Set<String> currentIds = new HashSet<String>(list.subList(count, taxonomyIds.size()-1));
+            resultList.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, currentIds));
+            taxonomies = RepoDatasetMapper.mergeQueryResult(resultList);
+
+        }else if(taxonomyIds.size() > 0){
+            taxonomies   = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, taxonomyIds);
+        }
+
+        return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
+
+    }
+
+
 
 
 }

@@ -29,21 +29,25 @@ public class Constants {
 
     public static final String DISEASE_FIELD         = "disease";
 
-    public static String DESCRIPTION_FIELD           = "description";
+    public static final String DESCRIPTION_FIELD     = "description";
 
-    public static String NAME_FIELD                  = "name";
+    public static final String NAME_FIELD            = "name";
 
-    public static String SUBMITTER_KEY_FIELD         = "submitter_keywords";
+    public static final String SUBMITTER_KEY_FIELD   = "submitter_keywords";
 
-    public static String CURATOR_KEY_FIELD           = "curator_keywords";
+    public static final String CURATOR_KEY_FIELD     = "curator_keywords";
 
-    public static String PUB_DATE_FIELD              = "publication_date";
+    public static final String PUB_DATE_FIELD        = "publication_date";
 
-    public static String[] DATASET_SUMMARY           = {Constants.DESCRIPTION_FIELD,
+    public static final String[] DATASET_SUMMARY     = {Constants.DESCRIPTION_FIELD,
                                                         Constants.NAME_FIELD,
                                                         Constants.SUBMITTER_KEY_FIELD,Constants.CURATOR_KEY_FIELD,
                                                         Constants.PUB_DATE_FIELD,
                                                         Constants.TAXONOMY_FIELD};
+
+    public static final String  NOT_AVAILABLE        = "Not available";
+
+    public static final String  NOT_APPLICABLE       = "not applicable";
 
     public static String TAXONOMY_NAME               = "name";
 

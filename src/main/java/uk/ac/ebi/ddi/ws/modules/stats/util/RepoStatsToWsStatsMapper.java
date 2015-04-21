@@ -90,13 +90,25 @@ public final class RepoStatsToWsStatsMapper {
      */
     public static List<StatRecord> asFacetCount(FacetList facets, String field) {
         List<StatRecord> records = new ArrayList<StatRecord>();
+
         if(facets != null && facets.getFacets().length != 0){
             records.add(new StatRecord("Total", facets.getHitCount()));
-            for(Facet facet: facets.getFacets())
-                if(facet.getId().equalsIgnoreCase(field))
+            StatRecord unknowRecord = new StatRecord(Constants.NOT_AVAILABLE, "0");
+            int countNotAvailable = 0;
+            for(Facet facet: facets.getFacets()){
+                if(facet.getId().equalsIgnoreCase(field)){
                     for(FacetValue facetValue: facet.getFacetValues()){
-                        records.add(new StatRecord(facetValue.getLabel(), facetValue.getCount()));
+                        if(facetValue.getLabel().equalsIgnoreCase(Constants.NOT_AVAILABLE) || facetValue.getLabel().contains(Constants.NOT_APPLICABLE)){
+                            countNotAvailable = countNotAvailable + Integer.parseInt(facetValue.getCount());
+                        }else{
+                            records.add(new StatRecord(facetValue.getLabel(), facetValue.getCount()));
+                        }
+
                     }
+                }
+            }
+            unknowRecord.setValue(String.valueOf(countNotAvailable));
+            records.add(unknowRecord);
         }
         return records;
     }
