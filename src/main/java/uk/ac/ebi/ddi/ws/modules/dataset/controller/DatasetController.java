@@ -45,7 +45,7 @@ public class DatasetController {
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     DataSetResult search(
-            @ApiParam(value = "general search term against multiple fields including: cancer human")
+            @ApiParam(value = "general search term against multiple fields including: cancer human, default is *:* ")
             @RequestParam(value = "query", required = false, defaultValue = "") String query,
             @ApiParam(value = "field to sort the output of the search results: e.g description")
             @RequestParam(value = "sortfield", required = false, defaultValue = "") String sortfield,
@@ -57,6 +57,8 @@ public class DatasetController {
             @RequestParam(value = "size", required = false, defaultValue = "20") int size,
             @ApiParam(value = "the starting point for the search: 0")
             @RequestParam(value = "faceCount", required = false, defaultValue = "20") int facetCount) {
+
+        query = (query == null || query.isEmpty() || query.length() == 0)? "*:*": query;
 
         QueryResult queryResult = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
 
@@ -80,11 +82,9 @@ public class DatasetController {
             resultList.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, currentIds));
             taxonomies = RepoDatasetMapper.mergeQueryResult(resultList);
 
-        }else{
+        }else if(taxonomyIds.size() > 0){
            taxonomies   = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, taxonomyIds);
         }
-
-
 
         return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
 
