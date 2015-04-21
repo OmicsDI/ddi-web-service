@@ -23,7 +23,10 @@ import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Api(value = "dataset", description = "Retrieve the information about the dataset including search functionalities", position = 0)
@@ -57,7 +60,33 @@ public class DatasetController {
 
         QueryResult queryResult = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
 
-        return RepoDatasetMapper.asDataSummary(queryResult);
+        QueryResult taxonomies = null;
+
+        Set<String> taxonomyIds    = RepoDatasetMapper.getTaxonomyIds(queryResult);
+        /*
+         * The number of queries should be controlled using the maximun QUERY threshold in this case 100 entries for the EBE web service.
+         */
+
+        if(taxonomyIds.size() > Constants.HIGH_QUERY_THRESHOLD){
+            List<QueryResult> resultList = new ArrayList<QueryResult>();
+            List<String> list = new ArrayList<String>(taxonomyIds);
+            int count = 0;
+            for(int i=0 ; i < taxonomyIds.size(); i += Constants.HIGH_QUERY_THRESHOLD){
+               Set<String> currentIds = new HashSet<String>(list.subList(i, Constants.HIGH_QUERY_THRESHOLD));
+               resultList.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, currentIds));
+               count = i;
+            }
+            Set<String> currentIds = new HashSet<String>(list.subList(count, taxonomyIds.size()-1));
+            resultList.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, currentIds));
+            taxonomies = RepoDatasetMapper.mergeQueryResult(resultList);
+
+        }else{
+           taxonomies   = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, taxonomyIds);
+        }
+
+
+
+        return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
 
     }
 

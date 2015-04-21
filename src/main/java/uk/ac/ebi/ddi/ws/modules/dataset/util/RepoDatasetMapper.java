@@ -10,9 +10,7 @@ import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
 import uk.ac.ebi.ddi.ws.util.Constants;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Yasset Perez-Riverol ypriverol
@@ -25,7 +23,9 @@ public class RepoDatasetMapper {
      * @param queryResults The original results from the Query
      * @return             The set of datasets form the query
      */
-    public static DataSetResult asDataSummary(QueryResult queryResults){
+    public static DataSetResult asDataSummary(QueryResult queryResults, QueryResult taxonomies){
+
+        Map<String, String> taxonomyMap = RepoDatasetMapper.getTaxonomyMap(taxonomies);
 
         DataSetResult dataset = new DataSetResult();
 
@@ -38,7 +38,7 @@ public class RepoDatasetMapper {
 
         if(queryResults.getEntries() != null && queryResults.getEntries().length > 0){
           for(Entry entry: queryResults.getEntries())
-              datasets.add(RepoDatasetMapper.transformDatasetSummary(entry));
+              datasets.add(RepoDatasetMapper.transformDatasetSummary(entry, taxonomyMap));
         }
         dataset.setDatasets(datasets);
 
@@ -46,11 +46,31 @@ public class RepoDatasetMapper {
     }
 
     /**
+     * Retrieve the information of each taxonomy as id + name
+     * @param taxonomies A list of taxonomies
+     * @return The map of the taxonomies as Map<id, name>
+     */
+    private static Map<String, String> getTaxonomyMap(QueryResult taxonomies) {
+        Map<String, String> taxonomyMap  = new HashMap<String, String>();
+
+        if(taxonomies != null && taxonomies.getEntries() != null && taxonomies.getEntries().length > 0){
+            for(Entry entry: taxonomies.getEntries()){
+                if(entry != null && entry.getFields() != null && entry.getFields().containsKey(Constants.TAXONOMY_NAME)
+                        && entry.getFields().get(Constants.TAXONOMY_NAME).length > 0 && entry.getFields().get(Constants.TAXONOMY_NAME)[0] != null){
+                    taxonomyMap.put(entry.getId(), entry.getFields().get(Constants.TAXONOMY_NAME)[0]);
+                }
+            }
+        }
+        return taxonomyMap;
+    }
+
+    /**
      * Transform a web-service entry to a DatasetSummary
      * @param entry the original entry from the dataset
-     * @return
+     * @param taxonomyMap The map of all taxonomies included in this query
+     * @return a Dataset Summary
      */
-    private static DatasetSummary transformDatasetSummary(Entry entry){
+    private static DatasetSummary transformDatasetSummary(Entry entry, Map<String, String> taxonomyMap){
 
         DatasetSummary datasetSummary = new DatasetSummary();
 
@@ -94,18 +114,17 @@ public class RepoDatasetMapper {
 
                 List<Organism> organisms = new ArrayList<Organism>();
 
-                //Todo: get the organisms
-
-//                if(entry.getFields().containsKey(Constants.TAXONOMY_FIELD))
-//                    if(entry.getFields().get(Constants.TAXONOMY_FIELD) != null && entry.getFields().get(Constants.TAXONOMY_FIELD).length > 0){
-//
-//                    }
-//                        organisms.addAll(Arrays.asList(entry.getFields().get(Constants.TAXONOMY_FIELD)));
-
+                if(entry.getFields().containsKey(Constants.TAXONOMY_FIELD)){
+                    if(entry.getFields().get(Constants.TAXONOMY_FIELD) != null && entry.getFields().get(Constants.TAXONOMY_FIELD).length > 0){
+                        for(String taxonomyId: entry.getFields().get(Constants.TAXONOMY_FIELD)){
+                            organisms.add(new Organism(taxonomyId, taxonomyMap.get(taxonomyId)));
+                        }
+                    }
+                }
+                datasetSummary.setOrganisms(organisms);
             }
         }
         return datasetSummary;
-
     }
 
     /**
@@ -120,5 +139,49 @@ public class RepoDatasetMapper {
                 terms.add(new Term(oldTerm.getText(), oldTerm.getFrecuency()));
         }
         return terms;
+    }
+
+    /**
+     * Return a set of taxonomy ids from the Dataset List
+     * @param queryResult the datasets to be anaylzed
+     * @return a list of taxonomy ids
+     */
+    public static Set<String> getTaxonomyIds(QueryResult queryResult){
+        Set<String> ids = new HashSet<String>();
+        if(queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0){
+            for(Entry entry: queryResult.getEntries()){
+               if(entry.getFields() != null && entry.getFields().containsKey(Constants.TAXONOMY_FIELD)){
+                   for(String taxonomy: entry.getFields().get(Constants.TAXONOMY_FIELD))
+                       ids.add(taxonomy);
+               }
+            }
+        }
+        return ids;
+    }
+
+    /**
+     * Merge a set of queries and retrieve only one query. This function is specially interesting when you have more than the limits of the entries to be query (100).
+     * We are not merging the facets now because it is not interesting but in the future we can do it.
+     * @param resultList List of QueryResult to be merge
+     * @return One big QueryResult
+     */
+    public static QueryResult mergeQueryResult(List<QueryResult> resultList) {
+        QueryResult result = new QueryResult();
+
+        List<Entry> entries = new ArrayList<Entry>();
+
+        for(QueryResult query: resultList)
+            entries.addAll(Arrays.asList(query.getEntries()));
+
+        Entry[] entryArray = new Entry[entries.size()];
+
+        for(int i=0; i < entries.size(); i++)
+           entryArray[i] = entries.get(i);
+
+        result.setEntries(entryArray);
+
+        result.setCount(entryArray.length);
+
+        return result;
     }
 }
