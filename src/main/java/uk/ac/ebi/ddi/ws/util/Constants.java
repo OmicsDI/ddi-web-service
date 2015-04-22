@@ -69,4 +69,7 @@ public class Constants {
     public static String TAXONOMY_DOMAIN             = "taxonomy";
 
     public static int HIGH_QUERY_THRESHOLD           = 100;
+
+    public static String PRIDE_DOMAIN                = "pride";
+
 }

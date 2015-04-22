@@ -98,7 +98,7 @@ public class DatasetController {
                     @ApiParam(value = "Number of terms to be retrieved: maximum 100")
                     @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
 
-        TermResult termResult = dataWsClient.getFrequentlyTerms(Constants.MAIN_DOMAIN, Constants.DESCRIPTION_FIELD, Constants.EXCLUSION_WORDS, size);
+        TermResult termResult = dataWsClient.getFrequentlyTerms(Constants.PRIDE_DOMAIN, Constants.DESCRIPTION_FIELD, Constants.EXCLUSION_WORDS, size);
 
         return RepoDatasetMapper.asTermResults(termResult);
 
