@@ -23,6 +23,7 @@ import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -101,20 +102,72 @@ public class StatisticsController {
         return RepoStatsToWsStatsMapper.asFacetCount(tissues, Constants.OMICS_TYPE_FIELD);
     }
 
-    @ApiOperation(value = "Return statistics about the number of datasets per dieases", position = 1, notes = "Return statistics about the number of datasets per diseases")
-    @RequestMapping(value = "/diseases", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public @ResponseBody
-    List<StatRecord> getDiseases() {
+     @ApiOperation(value = "Return statistics about the number of datasets per dieases", position = 1, notes = "Return statistics about the number of datasets per diseases")
+     @RequestMapping(value = "/diseases", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+     @ResponseStatus(HttpStatus.OK) // 200
+     public @ResponseBody
+     List<StatRecord> getDiseases() {
 
         DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
-        String[] dubdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
+        String[] subdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
 
-        FacetList tissues = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.DISEASE_FIELD, 20);
+        FacetList diseases = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.DISEASE_FIELD, 20);
 
-        return RepoStatsToWsStatsMapper.asFacetCount(tissues, Constants.DISEASE_FIELD);
+        return RepoStatsToWsStatsMapper.asFacetCount(diseases, Constants.DISEASE_FIELD);
     }
+
+    @ApiOperation(value = "Return General statistics about the Services", position = 1, notes = "Return General statistics about the Services")
+    @RequestMapping(value = "/general", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    List<StatRecord> getGeneral() {
+
+        DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+
+        String[] subdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
+
+        List<StatRecord> resultStat = new ArrayList<StatRecord>();
+
+        resultStat.add(new StatRecord("Different Repositories/Databases", String.valueOf(subdomains.length)));
+
+        Integer numberOfDatasets = WsUtilities.getNumberofEntries(Constants.MAIN_DOMAIN, domain);
+
+        resultStat.add(new StatRecord("Different Datasets", String.valueOf(numberOfDatasets)));
+
+        FacetList facet = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.DISEASE_FIELD, 100);
+
+        if(facet.getFacets() != null && facet.getFacets()[0] != null && facet.getFacets()[0].getFacetValues()!= null){
+            if(facet.getFacets()[0].getFacetValues().length >= 100){
+                resultStat.add(new StatRecord("More than 100 Diseases", null));
+            }else{
+                resultStat.add(new StatRecord("Different Diseases", String.valueOf(facet.getFacets()[0].getFacetValues().length)));
+            }
+        }
+
+        facet = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.TISSUE_FIELD, 100);
+
+        if(facet.getFacets() != null && facet.getFacets()[0] != null && facet.getFacets()[0].getFacetValues()!= null){
+            if(facet.getFacets()[0].getFacetValues().length >= 100){
+                resultStat.add(new StatRecord("More than 100 Tissues", null));
+            }else{
+                resultStat.add(new StatRecord("Different Tissues", String.valueOf(facet.getFacets()[0].getFacetValues().length)));
+            }
+        }
+
+        facet = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.TAXONOMY_FIELD, 100);
+
+        if(facet.getFacets() != null && facet.getFacets()[0] != null && facet.getFacets()[0].getFacetValues()!= null){
+            if(facet.getFacets()[0].getFacetValues().length >= 100){
+                resultStat.add(new StatRecord("More than 100 Species/Organisms", null));
+            }else{
+                resultStat.add(new StatRecord("Different Species/Organisms", String.valueOf(facet.getFacets()[0].getFacetValues().length)));
+            }
+        }
+
+        return resultStat;
+    }
+
 
 
 }

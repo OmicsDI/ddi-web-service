@@ -1,5 +1,6 @@
 package uk.ac.ebi.ddi.ws.util;
 
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.IndexInfo;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.Domain;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
 
@@ -33,5 +34,22 @@ public class WsUtilities {
         for(int i = 0; i < domainList.size(); i++)
             records[i] = domainList.get(i);
         return records;
+    }
+
+    public static Integer getNumberofEntries(String mainDomain, DomainList domain) {
+        List<String> domainList = new ArrayList<String>();
+        int count = 0;
+        if(domain != null && domain.list.length > 0 && mainDomain != null){
+            for(Domain domainInfo: domain.list){
+                if(domainInfo.getName().equalsIgnoreCase(mainDomain)){
+                    for(Domain subdomainInfo: domainInfo.getSubDomains()){
+                        for(IndexInfo info: subdomainInfo.getIndexInfo())
+                            if(info.getName().equalsIgnoreCase(Constants.ENTRY_COUNT))
+                                count += Integer.parseInt(info.getValue());
+                    }
+                }
+            }
+        }
+        return count;
     }
 }
