@@ -37,7 +37,6 @@ public class WsUtilities {
     }
 
     public static Integer getNumberofEntries(String mainDomain, DomainList domain) {
-        List<String> domainList = new ArrayList<String>();
         int count = 0;
         if(domain != null && domain.list.length > 0 && mainDomain != null){
             for(Domain domainInfo: domain.list){

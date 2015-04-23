@@ -16,8 +16,6 @@
 
     <!--
         To build, require the following maven profiles
-
-
     -->
 
     <properties>

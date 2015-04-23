@@ -2,16 +2,14 @@ package uk.ac.ebi.ddi.ws.modules.stats.controller;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.facet.FacetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
@@ -61,13 +59,14 @@ public class StatisticsController {
     @RequestMapping(value = "/organisms", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
-    List<StatRecord> getTaxonomies() {
+    List<StatRecord> getTaxonomies(@ApiParam(value = "Organisms to be retrieved: maximum 100")
+                                   @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
 
         DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
         String[] dubdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
 
-        FacetList taxonomies = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.TAXONOMY_FIELD, 20);
+        FacetList taxonomies = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.TAXONOMY_FIELD, 100);
 
         return RepoStatsToWsStatsMapper.asFacetCount(taxonomies, Constants.TAXONOMY_FIELD);
     }
@@ -76,13 +75,15 @@ public class StatisticsController {
      @RequestMapping(value = "/tissues", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
      @ResponseStatus(HttpStatus.OK) // 200
      public @ResponseBody
-     List<StatRecord> getTissues() {
+     List<StatRecord> getTissues(
+            @ApiParam(value = "Tissues to be retrieved: maximum 100")
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
 
         DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
         String[] dubdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
 
-        FacetList tissues = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.TISSUE_FIELD, 20);
+        FacetList tissues = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.TISSUE_FIELD, size);
 
         return RepoStatsToWsStatsMapper.asFacetCount(tissues, Constants.TISSUE_FIELD);
     }
@@ -97,7 +98,7 @@ public class StatisticsController {
 
         String[] dubdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
 
-        FacetList tissues = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.OMICS_TYPE_FIELD, 20);
+        FacetList tissues = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.OMICS_TYPE_FIELD, 100);
 
         return RepoStatsToWsStatsMapper.asFacetCount(tissues, Constants.OMICS_TYPE_FIELD);
     }
@@ -106,13 +107,14 @@ public class StatisticsController {
      @RequestMapping(value = "/diseases", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
      @ResponseStatus(HttpStatus.OK) // 200
      public @ResponseBody
-     List<StatRecord> getDiseases() {
+     List<StatRecord> getDiseases(@ApiParam(value = "Dieseases to be retrieved: maximum 100")
+                                  @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
 
         DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
         String[] subdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
 
-        FacetList diseases = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.DISEASE_FIELD, 20);
+        FacetList diseases = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.DISEASE_FIELD, size);
 
         return RepoStatsToWsStatsMapper.asFacetCount(diseases, Constants.DISEASE_FIELD);
     }

@@ -23,10 +23,7 @@ import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 @Api(value = "dataset", description = "Retrieve the information about the dataset including search functionalities", position = 0)
@@ -144,6 +141,31 @@ public class DatasetController {
         return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
 
     }
+
+    @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
+    @RequestMapping(value = "/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    DataSetResult latest(
+            @ApiParam(value = "Accession of the Dataset in the resource")
+            @RequestParam(value = "acc", required = true) String acc,
+            @ApiParam(value = "Database accession id")
+            @RequestParam(value = "datatabase", required = true) String domain
+
+    ) {
+
+        Date date = new Date();
+        logger.info("#DTA\t|" + acc + "\t|" + domain + "\t|" + date.toString());
+
+
+        return null;
+
+    }
+
+
+
+
+
+
 
 
 
