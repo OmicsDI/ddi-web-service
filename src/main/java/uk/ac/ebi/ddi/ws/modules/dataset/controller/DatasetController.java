@@ -21,11 +21,14 @@ import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
 import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
+import uk.ac.ebi.ddi.service.db.utils.Tuple;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
+import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -171,26 +174,41 @@ public class DatasetController {
 
     ) {
 
-
-
-
         DatasetResource resource = resourceService.read(acc, domain);
         if(resource == null){
             resource = new DatasetResource("http://www.ebi.ac.uk/ddi/" + domain + "/" + acc,acc,domain);
             resource = resourceService.save(resource);
         }
-
-        HttpEvent event = new HttpEvent();
-        event.setAccessDate(new Date());
-        event.setHost(httpServletRequest.getRemoteHost());
-        event.setUser(httpServletRequest.getRemoteUser());
-        event.setRawMessage(httpServletRequest.toString());
+        HttpEvent event = WsUtilities.tranformServletResquestToEvent(httpServletRequest);
         event.setResource(resource);
-
         eventService.save(event);
 
         return null;
     }
+
+    @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
+    @RequestMapping(value = "/mostAccessed", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    DataSetResult getMostAccessed(
+            @ApiParam(value = "The most accessed datasets size")
+            @RequestParam(value = "size", required = true, defaultValue = "20") int size
+    ) {
+
+        DataSetResult result = new DataSetResult();
+        List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
+        Map<Tuple<String, String>, Integer> mostAccesedIds = eventService.moreAccessedResource(5);
+        for(Tuple<String, String> dataset: mostAccesedIds.keySet()){
+            DatasetSummary datatsetSummary = new DatasetSummary();
+            datatsetSummary.setId(dataset.getKey());
+            datatsetSummary.setSource(dataset.getValue());
+            datasetSummaryList.add(datatsetSummary);
+        }
+        result.setDatasets(datasetSummaryList);
+        result.setCount(datasetSummaryList.size());
+        return result;
+    }
+
 
 
 

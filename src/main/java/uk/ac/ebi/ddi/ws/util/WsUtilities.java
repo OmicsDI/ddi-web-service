@@ -3,8 +3,11 @@ package uk.ac.ebi.ddi.ws.util;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.IndexInfo;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.Domain;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
+import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -50,5 +53,15 @@ public class WsUtilities {
             }
         }
         return count;
+    }
+
+    public static HttpEvent tranformServletResquestToEvent(HttpServletRequest httpServletRequest){
+        HttpEvent event = new HttpEvent();
+        event.setAccessDate(new Date());
+        event.setHost(httpServletRequest.getRemoteHost());
+        event.setUser(httpServletRequest.getRemoteUser());
+        event.setRawMessage(httpServletRequest.toString());
+        event.setUserAgent(httpServletRequest.getHeader("User-Agent"));
+        return event;
     }
 }
