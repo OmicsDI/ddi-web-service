@@ -10,15 +10,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.facet.FacetWsClient;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.FacetValue;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Facet;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.facet.FacetList;
 import uk.ac.ebi.ddi.ws.modules.stats.model.DomainStats;
 import uk.ac.ebi.ddi.ws.modules.stats.model.StatRecord;
 import uk.ac.ebi.ddi.ws.modules.stats.util.RepoStatsToWsStatsMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
+
 
 
 import java.util.ArrayList;
@@ -40,6 +45,9 @@ public class StatisticsController {
 
     @Autowired
     DomainWsClient domainWsClient;
+
+    @Autowired
+    DatasetWsClient dataWsClient;
 
     @Autowired
     FacetWsClient facetWsClient;
@@ -170,6 +178,70 @@ public class StatisticsController {
         return resultStat;
     }
 
+    @ApiOperation(value = "Return statistics about the number of datasets per OmicsType on recent 5 years ", position = 1, notes = "Return statistics about the number of datasets per OmicsType on recent 5 years ")
+    @RequestMapping(value = "/omicsType_annual", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    List<StatRecord> getDiseases(@ApiParam(value = "OmicsTypes to be retrieved: \"genomics\"/\"metabolomics\"/\"proteomics\"")
+                                 @RequestParam(value = "omicstype", required = true, defaultValue = "proteomics") String omicstype) {
 
+        List<StatRecord> resultStat = new ArrayList<StatRecord>();
+
+        String sortfield = "";
+        String order = "";
+        int start = 0;
+        int size = 1;
+        int facetCount = 20;
+
+        String proteomicsQuery =  "*:* AND omics_type:\"Proteomics\"";
+        String metabolomicsQuery =  "*:* AND omics_type:\"Metabolomics\"";
+        String genomicsQuery =  "*:* AND omics_type:\"Genomics\"";
+
+        String query;
+
+        int intOmicsType = 0;
+        if (omicstype.equals("genomics")) intOmicsType = 1;
+        if (omicstype.equals("metabolomics")) intOmicsType = 2;
+        if (omicstype.equals("proteomics")) intOmicsType = 3;
+        switch (intOmicsType){
+            case 1:
+                query = genomicsQuery;
+                break;
+            case 2:
+                query = metabolomicsQuery;
+                break;
+            case 3:
+                query = proteomicsQuery;
+                break;
+            default:
+                StatRecord record = new StatRecord("","");
+                record.setName("omics type Error");
+                record.setValue("omics type Error");
+                resultStat.add(record);
+                return resultStat;
+        }
+
+
+
+        QueryResult queryResult = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
+        Facet[]  facets = new Facet[100];
+        facets = queryResult.getFacets();
+        FacetValue[] publicationDateFacetValue = facets[2].getFacetValues();
+        String label = "";
+        String value = "";
+
+
+        for(int i=0; i<publicationDateFacetValue.length; i++){
+            label = publicationDateFacetValue[i].getLabel();
+            value  = publicationDateFacetValue[i].getCount();
+            StatRecord record = new StatRecord(label,value);
+            record.setName(label);
+            record.setValue(value);
+            resultStat.add(record);
+        }
+
+
+        return resultStat;
+    }
 
 }
