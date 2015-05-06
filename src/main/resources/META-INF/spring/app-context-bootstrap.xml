@@ -4,8 +4,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+	    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
     <!-- Root Context: defines shared resources visible to all other web components -->
     <!-- property files -->
@@ -27,5 +28,23 @@
     <bean id="dataWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient">
         <constructor-arg ref="ebeyeWsConfig"/>
     </bean>
+
+    <!-- Maven information an autowired classes -->
+
+    <mongo:repositories base-package="uk.ac.ebi.ddi.service.db.repo" />
+    <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
+
+    <!-- Default bean name is 'mongo' -->
+    <mongo:mongo host="127.0.0.1" port="27017" />
+
+    <!-- Offers convenience methods and automatic mapping between MongoDB JSON
+        documents and your domain classes. -->
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg ref="mongo" />
+        <constructor-arg name="databaseName" value="ddiDB" />
+    </bean>
+
+    <bean id="resourceService" class="uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService"/>
+    <bean id="eventService" class="uk.ac.ebi.ddi.service.db.service.logger.HttpEventService"/>
 
 </beans>

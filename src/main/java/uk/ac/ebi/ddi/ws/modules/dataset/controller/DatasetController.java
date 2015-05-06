@@ -17,12 +17,17 @@ import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
+import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
+import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
+import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
+import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 
 import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 
@@ -36,6 +41,13 @@ public class DatasetController {
 
     @Autowired
     DatasetWsClient dataWsClient;
+
+    @Autowired
+    private DatasetResourceService resourceService;
+
+    @Autowired
+    HttpEventService eventService;
+
 
     @ApiOperation(value = "Search for datasets in the resource", position = 1, notes = "retrieve datasets in the resource using different queries")
     @RequestMapping(value = "/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -53,7 +65,10 @@ public class DatasetController {
             @ApiParam(value = "the number of records to be retrieved: maximum 100")
             @RequestParam(value = "size", required = false, defaultValue = "20") int size,
             @ApiParam(value = "the starting point for the search: 0")
-            @RequestParam(value = "faceCount", required = false, defaultValue = "20") int facetCount) {
+            @RequestParam(value = "faceCount", required = false, defaultValue = "20") int facetCount,
+            HttpServletRequest httpServletRequest) {
+
+
 
         query = (query == null || query.isEmpty() || query.length() == 0)? "*:*": query;
 
@@ -93,7 +108,8 @@ public class DatasetController {
      public @ResponseBody
      List<Term> frequentTerms(
                     @ApiParam(value = "Number of terms to be retrieved: maximum 100")
-                    @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+                    @RequestParam(value = "size", required = false, defaultValue = "20") int size,
+                    HttpServletRequest httpServletRequest) {
 
         TermResult termResult = dataWsClient.getFrequentlyTerms(Constants.PRIDE_DOMAIN, Constants.DESCRIPTION_FIELD, Constants.EXCLUSION_WORDS, size);
 
@@ -107,7 +123,8 @@ public class DatasetController {
     public @ResponseBody
     DataSetResult latest(
             @ApiParam(value = "Number of terms to be retrieved: maximum 100, default 20")
-            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size,
+            HttpServletRequest httpServletRequest) {
 
 
         String query = "*:*";
@@ -145,21 +162,38 @@ public class DatasetController {
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
     @RequestMapping(value = "/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    DataSetResult latest(
+    DataSetResult get(
             @ApiParam(value = "Accession of the Dataset in the resource")
             @RequestParam(value = "acc", required = true) String acc,
             @ApiParam(value = "Database accession id")
-            @RequestParam(value = "datatabase", required = true) String domain
+            @RequestParam(value = "datatabase", required = true) String domain,
+            HttpServletRequest httpServletRequest
 
     ) {
 
-        Date date = new Date();
-        logger.info("#DTA\t|" + acc + "\t|" + domain + "\t|" + date.toString());
 
+
+
+        DatasetResource resource = resourceService.read(acc, domain);
+        if(resource == null){
+            resource = new DatasetResource("http://www.ebi.ac.uk/ddi/" + domain + "/" + acc,acc,domain);
+            resource = resourceService.save(resource);
+        }
+
+        HttpEvent event = new HttpEvent();
+        event.setAccessDate(new Date());
+        event.setHost(httpServletRequest.getRemoteHost());
+        event.setUser(httpServletRequest.getRemoteUser());
+        event.setRawMessage(httpServletRequest.toString());
+        event.setResource(resource);
+
+        eventService.save(event);
 
         return null;
-
     }
+
+
+
 
 
 
