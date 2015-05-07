@@ -1,19 +1,21 @@
 package uk.ac.ebi.ddi.ws.util;
 
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.IndexInfo;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.Domain;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author ypriverol
  */
 public class WsUtilities {
+
 
     /**
      * Covet elements from a domain
@@ -64,4 +66,30 @@ public class WsUtilities {
         event.setUserAgent(httpServletRequest.getHeader("User-Agent"));
         return event;
     }
+
+    public static List<DatasetSummary> transformDatasetSummary(QueryResult queryResult, String domain){
+
+        if(queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0){
+            List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
+            for(Entry entry: queryResult.getEntries()) {
+                DatasetSummary datasetSummary = new DatasetSummary();
+                Map<String, String[]> fields = entry.getFields();
+                String[] names = fields.get(Constants.NAME_FIELD);
+                String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
+                String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
+
+                datasetSummary.setId(entry.getId());
+                datasetSummary.setTitle(names[0]);
+                datasetSummary.setDescription(descriptions[0]);
+                datasetSummary.setPublicationDate(publication_dates[0]);
+                datasetSummary.setSource(domain);
+                datasetSummaryList.add(datasetSummary);
+            }
+            return datasetSummaryList;
+        }
+        return Collections.emptyList();
+    }
+
+
+
 }

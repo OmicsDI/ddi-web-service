@@ -9,8 +9,7 @@ import java.util.List;
  * @author ypriverol
  */
 public class DatasetDetail {
-    public DatasetDetail() {
-    }
+
 
     /**
      * Id of an Entry
@@ -68,6 +67,10 @@ public class DatasetDetail {
      * Sample Protocol of the dataset
      */
     String sample_protocol = null;
+
+    public DatasetDetail() {
+    }
+
 
 
     public String getId() {

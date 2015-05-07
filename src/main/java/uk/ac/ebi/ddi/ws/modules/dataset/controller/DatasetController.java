@@ -24,24 +24,18 @@ import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.utils.Tuple;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
-
-<<<<<<< HEAD
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
-=======
+
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.PubmedPublication;
->>>>>>> c834715ab520d8c8381c188302ffda66140e26a1
 import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
-<<<<<<< HEAD
 import javax.servlet.http.HttpServletRequest;
-=======
 import uk.ac.ebi.ddi.ws.modules.dataset.util.PubmedUtil;
 
->>>>>>> c834715ab520d8c8381c188302ffda66140e26a1
 import java.util.*;
 
 
@@ -176,22 +170,14 @@ public class DatasetController {
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
     @RequestMapping(value = "/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-<<<<<<< HEAD
-    DataSetResult get(
+    public @ResponseBody
+    DatasetDetail get(
             @ApiParam(value = "Accession of the Dataset in the resource")
             @RequestParam(value = "acc", required = true) String acc,
             @ApiParam(value = "Database accession id")
             @RequestParam(value = "datatabase", required = true) String domain,
-            HttpServletRequest httpServletRequest
-=======
-    public @ResponseBody DatasetDetail get(
-            @ApiParam(value = "Accession of the Dataset in the resource")
-            @RequestParam(value = "acc", required = true) String acc,
-            @ApiParam(value = "Database")
-            @RequestParam(value = "database", required = true) String domain
->>>>>>> c834715ab520d8c8381c188302ffda66140e26a1
+            HttpServletRequest httpServletRequest){
 
-    ) {
         acc = acc.replaceAll("\\s","");
         DatasetDetail datasetDetail= new DatasetDetail();
         Set<String> currentIds =  new HashSet(Arrays.asList(new String[] {acc}));
@@ -203,13 +189,13 @@ public class DatasetController {
         Entry entry1 = entries[0];
         Map<String, String[]> fields = entry1.getFields();
 
-        String[] names = fields.get("name");
-        String[] descriptions = fields.get("description");
-        String[] publication_dates = fields.get("publication_date");
-        String[] full_dataset_links = fields.get("full_dataset_link");
-        String[] data_protocols = fields.get("data_protocol");
-        String[] sample_protocols = fields.get("sample_protocol");
-        String[] pubmedids = fields.get("PUBMED");
+        String[] names = fields.get(Constants.NAME_FIELD);
+        String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
+        String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
+        String[] full_dataset_links = fields.get(Constants.DATASET_LINK_FIELD);
+        String[] data_protocols = fields.get(Constants.DATA_PROTOCOL_FIELD);
+        String[] sample_protocols = fields.get(Constants.SAMPLE_PROTOCOL_FIELD);
+        String[] pubmedids = fields.get(Constants.PUBMED_FIELD);
 
         datasetDetail.setId(acc);
         datasetDetail.setName(names[0]);
@@ -227,7 +213,9 @@ public class DatasetController {
             }
         }
 
-<<<<<<< HEAD
+        /**
+         * Trace the access to the dataset
+         */
         DatasetResource resource = resourceService.read(acc, domain);
         if(resource == null){
             resource = new DatasetResource("http://www.ebi.ac.uk/ddi/" + domain + "/" + acc,acc,domain);
@@ -237,7 +225,8 @@ public class DatasetController {
         event.setResource(resource);
         eventService.save(event);
 
-        return null;
+        return datasetDetail;
+
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
@@ -252,33 +241,22 @@ public class DatasetController {
         DataSetResult result = new DataSetResult();
         List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
         Map<Tuple<String, String>, Integer> mostAccesedIds = eventService.moreAccessedDatasetResource(5);
+        Map<String, Set<String>> currentIds = new HashMap<String, Set<String>>();
+
         for(Tuple<String, String> dataset: mostAccesedIds.keySet()){
-            DatasetSummary datatsetSummary = new DatasetSummary();
-            datatsetSummary.setId(dataset.getKey());
-            datatsetSummary.setSource(dataset.getValue());
-            datasetSummaryList.add(datatsetSummary);
+            Set<String> ids = currentIds.get(dataset.getValue());
+            if(ids == null)
+                ids = new HashSet<String>();
+            ids.add(dataset.getKey());
+            currentIds.put(dataset.getValue(), ids);
+        }
+        for(String domain: currentIds.keySet()){
+            QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds.get(domain));
+            datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult,domain));
         }
         result.setDatasets(datasetSummaryList);
         result.setCount(datasetSummaryList.size());
+
         return result;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-=======
-        return datasetDetail;
-    }
-
->>>>>>> c834715ab520d8c8381c188302ffda66140e26a1
 }
