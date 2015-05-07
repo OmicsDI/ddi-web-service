@@ -15,13 +15,18 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.PubmedPublication;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
+
+import uk.ac.ebi.ddi.ws.modules.dataset.util.PubmedUtil;
 
 import java.util.*;
 
@@ -145,29 +150,49 @@ public class DatasetController {
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
     @RequestMapping(value = "/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    DataSetResult latest(
+    public @ResponseBody DatasetDetail get(
             @ApiParam(value = "Accession of the Dataset in the resource")
             @RequestParam(value = "acc", required = true) String acc,
-            @ApiParam(value = "Database accession id")
-            @RequestParam(value = "datatabase", required = true) String domain
+            @ApiParam(value = "Database")
+            @RequestParam(value = "database", required = true) String domain
 
     ) {
+        acc = acc.replaceAll("\\s","");
+        DatasetDetail datasetDetail= new DatasetDetail();
+        Set<String> currentIds =  new HashSet(Arrays.asList(new String[] {acc}));
+        List <PubmedPublication> pubmedPublications;
 
-        Date date = new Date();
-        logger.info("#DTA\t|" + acc + "\t|" + domain + "\t|" + date.toString());
+        QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds);
+        Entry[] entries = datasetResult.getEntries();
+        if(entries.length<=0) return null;
+        Entry entry1 = entries[0];
+        Map<String, String[]> fields = entry1.getFields();
 
+        String[] names = fields.get("name");
+        String[] descriptions = fields.get("description");
+        String[] publication_dates = fields.get("publication_date");
+        String[] full_dataset_links = fields.get("full_dataset_link");
+        String[] data_protocols = fields.get("data_protocol");
+        String[] sample_protocols = fields.get("sample_protocol");
+        String[] pubmedids = fields.get("PUBMED");
 
-        return null;
+        datasetDetail.setId(acc);
+        datasetDetail.setName(names[0]);
+        datasetDetail.setDescription(descriptions[0]);
+        datasetDetail.setPublicationDate(publication_dates[0]);
+        datasetDetail.setData_protocol(data_protocols[0]);
+        datasetDetail.setSample_protocol(sample_protocols[0]);
 
+        if ((pubmedids!=null) && (pubmedids.length > 0)) {
+            try {
+                pubmedPublications = PubmedUtil.getPubmedList(pubmedids);
+                datasetDetail.setPublications(pubmedPublications);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return datasetDetail;
     }
-
-
-
-
-
-
-
-
-
 
 }

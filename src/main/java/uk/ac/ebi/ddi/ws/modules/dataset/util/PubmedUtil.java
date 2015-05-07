@@ -1,6 +1,7 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.util;
 
 
+import com.google.gson.JsonObject;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.PubmedPublication;
 
 import java.io.BufferedReader;
@@ -23,9 +24,20 @@ private static final Logger logger = LoggerFactory.getLogger(PubmedUtil.class);
         List<PubmedPublication> pubmedList =  new ArrayList<PubmedPublication>();
         Gson gson = new Gson();
         for(int i=0; i<pubmedids.length; i++){
-            String jsonText = readUrl("http://www.ebi.ac.uk/europepmc/webservices/rest/search/query="+pubmedids[i]+"&format=json");
-            PubmedPublication pubmedPublication = gson.fromJson(jsonText,PubmedPublication.class);
-            logger.info(pubmedPublication.getId());
+            if(pubmedids[i]==null) break;
+            String jsonText = readUrl("http://www.ebi.ac.uk/europepmc/webservices/rest/search/query="+pubmedids[i]+"&resulttype=core&format=json");
+            JsonObject jsonObject= gson.fromJson(jsonText,JsonObject.class);
+            JsonObject resultList = jsonObject.get("resultList").getAsJsonObject();
+            JsonObject entry = resultList.get("result").getAsJsonArray().get(0).getAsJsonObject();
+
+            PubmedPublication pubmeditem = new PubmedPublication();
+            pubmeditem.setId(pubmedids[i]);
+            pubmeditem.setTitle(entry.get("title").toString().replace("\"",""));
+            pubmeditem.setPubabstract(entry.get("abstractText").toString().replace("\"",""));
+            pubmeditem.setPublicationDate(entry.get("firstPublicationDate").toString().replace("\"",""));
+            pubmeditem.setCycle("testcyclehere");
+
+            pubmedList.add(pubmeditem);
         }
 
         return pubmedList;

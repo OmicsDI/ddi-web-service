@@ -39,11 +39,26 @@ public class Constants {
 
     public static final String PUB_DATE_FIELD        = "publication_date";
 
+    public static final String DATA_PROTOCOL_FIELD        = "data_protocol";
+
+    public static final String SAMPLE_PROTOCOL_FIELD        = "sample_protocol";
+
+    public static final String PUBMED_FIELD        = "PUBMED";
+
+    public static final String DATASET_LINK_FIELD        = "full_dataset_link";
+
     public static final String[] DATASET_SUMMARY     = {Constants.DESCRIPTION_FIELD,
                                                         Constants.NAME_FIELD,
                                                         Constants.SUBMITTER_KEY_FIELD,Constants.CURATOR_KEY_FIELD,
                                                         Constants.PUB_DATE_FIELD,
                                                         Constants.TAXONOMY_FIELD};
+    public static final String[] DATASET_DETAIL     = {Constants.NAME_FIELD,
+                                                       Constants.DESCRIPTION_FIELD,
+                                                       Constants.PUB_DATE_FIELD,
+                                                       Constants.DATASET_LINK_FIELD,
+                                                       Constants.DATA_PROTOCOL_FIELD,
+                                                       Constants.SAMPLE_PROTOCOL_FIELD,
+                                                       Constants.PUBMED_FIELD};
 
     public static final String  NOT_AVAILABLE        = "Not available";
 

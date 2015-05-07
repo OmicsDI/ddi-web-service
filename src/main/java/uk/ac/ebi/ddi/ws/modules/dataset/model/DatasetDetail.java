@@ -9,6 +9,8 @@ import java.util.List;
  * @author ypriverol
  */
 public class DatasetDetail {
+    public DatasetDetail() {
+    }
 
     /**
      * Id of an Entry
@@ -21,9 +23,9 @@ public class DatasetDetail {
     String source = null;
 
     /**
-     * Title of the entry
+     * Name of the entry
      */
-    String title = null;
+    String name = null;
 
     /**
      * Publication date of the dataset
@@ -52,10 +54,20 @@ public class DatasetDetail {
 
 
     /*
-     * List of Related Datasets for this dataset, can be one or more than one publications
+     * List of Related Datasets for this dataset, can be one or more than one related datasets
      */
     List<DatasetSummary> relatedDatasets;
 
+
+    /*
+     * Data Protocol of the dataset
+     */
+   String data_protocol = null;
+
+    /*
+     * Sample Protocol of the dataset
+     */
+    String sample_protocol = null;
 
 
     public String getId() {
@@ -66,12 +78,12 @@ public class DatasetDetail {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -90,13 +102,13 @@ public class DatasetDetail {
         this.keywords = keywords;
     }
 
-    public List<Organism> getOrganisms() {
-        return organisms;
-    }
-
-    public void setOrganisms(List<Organism> organisms) {
-        this.organisms = organisms;
-    }
+//    public List<Organism> getOrganisms() {
+//        return organisms;
+//    }
+//
+//    public void setOrganisms(List<Organism> organisms) {
+//        this.organisms = organisms;
+//    }
 
     public String getPublicationDate() {
         return publicationDate;
@@ -106,11 +118,43 @@ public class DatasetDetail {
         this.publicationDate = publicationDate;
     }
 
-    public String getSource() {
-        return source;
+//    public String getSource() {
+//        return source;
+//    }
+//
+//    public void setSource(String source) {
+//        this.source = source;
+//    }
+
+    public List<PubmedPublication> getPublications() {
+        return publications;
     }
 
-    public void setSource(String source) {
-        this.source = source;
+    public void setPublications(List<PubmedPublication> publications) {
+        this.publications = publications;
+    }
+
+    public List<DatasetSummary> getRelatedDatasets() {
+        return relatedDatasets;
+    }
+
+    public void setRelatedDatasets(List<DatasetSummary> relatedDatasets) {
+        this.relatedDatasets = relatedDatasets;
+    }
+
+    public String getData_protocol() {
+        return data_protocol;
+    }
+
+    public void setData_protocol(String data_protocol) {
+        this.data_protocol = data_protocol;
+    }
+
+    public String getSample_protocol() {
+        return sample_protocol;
+    }
+
+    public void setSample_protocol(String sample_protocol) {
+        this.sample_protocol = sample_protocol;
     }
 }
