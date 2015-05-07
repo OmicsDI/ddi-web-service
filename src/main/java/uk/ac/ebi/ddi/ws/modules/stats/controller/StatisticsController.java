@@ -19,6 +19,7 @@ import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Facet;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.facet.FacetList;
 import uk.ac.ebi.ddi.ws.modules.stats.model.DomainStats;
+import uk.ac.ebi.ddi.ws.modules.stats.model.StatOmicsRecord;
 import uk.ac.ebi.ddi.ws.modules.stats.model.StatRecord;
 import uk.ac.ebi.ddi.ws.modules.stats.util.RepoStatsToWsStatsMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
@@ -182,10 +183,9 @@ public class StatisticsController {
     @RequestMapping(value = "/omicsType_annual", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
-    List<StatRecord> getDiseases(@ApiParam(value = "OmicsTypes to be retrieved: \"genomics\"/\"metabolomics\"/\"proteomics\"")
-                                 @RequestParam(value = "omicstype", required = true, defaultValue = "proteomics") String omicstype) {
+    List<StatOmicsRecord> getOmicsNo() {
 
-        List<StatRecord> resultStat = new ArrayList<StatRecord>();
+        List<StatOmicsRecord> resultStat = new ArrayList<StatOmicsRecord>();
 
         String sortfield = "";
         String order = "";
@@ -197,46 +197,58 @@ public class StatisticsController {
         String metabolomicsQuery =  "*:* AND omics_type:\"Metabolomics\"";
         String genomicsQuery =  "*:* AND omics_type:\"Genomics\"";
 
-        String query;
-
-        int intOmicsType = 0;
-        if (omicstype.equals("genomics")) intOmicsType = 1;
-        if (omicstype.equals("metabolomics")) intOmicsType = 2;
-        if (omicstype.equals("proteomics")) intOmicsType = 3;
-        switch (intOmicsType){
-            case 1:
-                query = genomicsQuery;
-                break;
-            case 2:
-                query = metabolomicsQuery;
-                break;
-            case 3:
-                query = proteomicsQuery;
-                break;
-            default:
-                StatRecord record = new StatRecord("","");
-                record.setName("omics type Error");
-                record.setValue("omics type Error");
-                resultStat.add(record);
-                return resultStat;
-        }
-
-
-
-        QueryResult queryResult = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
-        Facet[]  facets = new Facet[100];
-        facets = queryResult.getFacets();
-        FacetValue[] publicationDateFacetValue = facets[2].getFacetValues();
-        String label = "";
-        String value = "";
+//        String query;
+//
+//        int intOmicsType = 0;
+//        if (omicstype.equals("genomics")) intOmicsType = 1;
+//        if (omicstype.equals("metabolomics")) intOmicsType = 2;
+//        if (omicstype.equals("proteomics")) intOmicsType = 3;
+//        switch (intOmicsType){
+//            case 1:
+//                query = genomicsQuery;
+//                break;
+//            case 2:
+//                query = metabolomicsQuery;
+//                break;
+//            case 3:
+//                query = proteomicsQuery;
+//                break;
+//            default:
+//                StatRecord record = new StatOmicsRecord("","","","");
+//                record.setName("omics type Error");
+//                record.setValue("omics type Error");
+//                resultStat.add(record);
+//                return resultStat;
+//        }
 
 
-        for(int i=0; i<publicationDateFacetValue.length; i++){
-            label = publicationDateFacetValue[i].getLabel();
-            value  = publicationDateFacetValue[i].getCount();
-            StatRecord record = new StatRecord(label,value);
-            record.setName(label);
-            record.setValue(value);
+
+        QueryResult queryResultOfGenomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, genomicsQuery, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
+        QueryResult queryResultOfMetabolomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, metabolomicsQuery, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
+        QueryResult queryResultOfProteomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, proteomicsQuery, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
+
+        Facet[] facetsG = queryResultOfGenomics.getFacets();
+        Facet[]  facetsM = queryResultOfMetabolomics.getFacets();
+        Facet[]  facetsP = queryResultOfProteomics.getFacets();
+
+        FacetValue[] publicationDateFacetValueOfG = facetsM[2].getFacetValues(); //use metabolomics now, need to be changed
+        FacetValue[] publicationDateFacetValueOfM = facetsM[2].getFacetValues();
+        FacetValue[] publicationDateFacetValueOfP = facetsM[2].getFacetValues();  //use metabolomics now, need to be changed
+
+        String year = "";
+        String genomicsNo = "";
+        String metabolomicsNo = "";
+        String proteomicsNo = "";
+
+
+        for(int i=0; i<4; i++){  //latest 4 years
+            year = publicationDateFacetValueOfG[i].getLabel();
+            genomicsNo  = publicationDateFacetValueOfG[i].getCount();
+            metabolomicsNo  = publicationDateFacetValueOfM[i].getCount();
+            proteomicsNo  = publicationDateFacetValueOfP[i].getCount();
+            StatOmicsRecord record = new StatOmicsRecord(year,genomicsNo,metabolomicsNo,proteomicsNo);
+//            record.setName(label);
+//            record.setValue(value);
             resultStat.add(record);
         }
 

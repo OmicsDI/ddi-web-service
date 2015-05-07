@@ -132,11 +132,18 @@
         </dependency>
 
         <dependency>
+
             <groupId>uk.ac.ebi.ddi</groupId>
             <artifactId>ddi-service-db</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+             <groupId>com.google.code.gson</groupId>
+             <artifactId>gson</artifactId>
+             <version>2.3.1</version>
+        </dependency>
+        
     </dependencies>
 
 

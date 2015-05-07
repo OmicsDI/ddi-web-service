@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
@@ -24,13 +25,23 @@ import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.utils.Tuple;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 
+<<<<<<< HEAD
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
+=======
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.PubmedPublication;
+>>>>>>> c834715ab520d8c8381c188302ffda66140e26a1
 import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
+<<<<<<< HEAD
 import javax.servlet.http.HttpServletRequest;
+=======
+import uk.ac.ebi.ddi.ws.modules.dataset.util.PubmedUtil;
+
+>>>>>>> c834715ab520d8c8381c188302ffda66140e26a1
 import java.util.*;
 
 
@@ -165,15 +176,58 @@ public class DatasetController {
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
     @RequestMapping(value = "/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
+<<<<<<< HEAD
     DataSetResult get(
             @ApiParam(value = "Accession of the Dataset in the resource")
             @RequestParam(value = "acc", required = true) String acc,
             @ApiParam(value = "Database accession id")
             @RequestParam(value = "datatabase", required = true) String domain,
             HttpServletRequest httpServletRequest
+=======
+    public @ResponseBody DatasetDetail get(
+            @ApiParam(value = "Accession of the Dataset in the resource")
+            @RequestParam(value = "acc", required = true) String acc,
+            @ApiParam(value = "Database")
+            @RequestParam(value = "database", required = true) String domain
+>>>>>>> c834715ab520d8c8381c188302ffda66140e26a1
 
     ) {
+        acc = acc.replaceAll("\\s","");
+        DatasetDetail datasetDetail= new DatasetDetail();
+        Set<String> currentIds =  new HashSet(Arrays.asList(new String[] {acc}));
+        List <PubmedPublication> pubmedPublications;
 
+        QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds);
+        Entry[] entries = datasetResult.getEntries();
+        if(entries.length<=0) return null;
+        Entry entry1 = entries[0];
+        Map<String, String[]> fields = entry1.getFields();
+
+        String[] names = fields.get("name");
+        String[] descriptions = fields.get("description");
+        String[] publication_dates = fields.get("publication_date");
+        String[] full_dataset_links = fields.get("full_dataset_link");
+        String[] data_protocols = fields.get("data_protocol");
+        String[] sample_protocols = fields.get("sample_protocol");
+        String[] pubmedids = fields.get("PUBMED");
+
+        datasetDetail.setId(acc);
+        datasetDetail.setName(names[0]);
+        datasetDetail.setDescription(descriptions[0]);
+        datasetDetail.setPublicationDate(publication_dates[0]);
+        datasetDetail.setData_protocol(data_protocols[0]);
+        datasetDetail.setSample_protocol(sample_protocols[0]);
+
+        if ((pubmedids!=null) && (pubmedids.length > 0)) {
+            try {
+                pubmedPublications = PubmedUtil.getPubmedList(pubmedids);
+                datasetDetail.setPublications(pubmedPublications);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+<<<<<<< HEAD
         DatasetResource resource = resourceService.read(acc, domain);
         if(resource == null){
             resource = new DatasetResource("http://www.ebi.ac.uk/ddi/" + domain + "/" + acc,acc,domain);
@@ -222,4 +276,9 @@ public class DatasetController {
 
 
 
+=======
+        return datasetDetail;
+    }
+
+>>>>>>> c834715ab520d8c8381c188302ffda66140e26a1
 }
