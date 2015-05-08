@@ -117,9 +117,14 @@ public class DatasetController {
      List<Term> frequentTerms(
                     @ApiParam(value = "Number of terms to be retrieved: maximum 100")
                     @RequestParam(value = "size", required = false, defaultValue = "20") int size,
+                    @ApiParam(value = "Repository to find the information")
+                    @RequestParam(value = "domain", required = true, defaultValue = "pride") String domain,
+                    @ApiParam(value = "Field to search for the specific Terms")
+                    @RequestParam(value = "field", required = true, defaultValue = "description") String field,
+
                     HttpServletRequest httpServletRequest) {
 
-        TermResult termResult = dataWsClient.getFrequentlyTerms(Constants.PRIDE_DOMAIN, Constants.DESCRIPTION_FIELD, Constants.EXCLUSION_WORDS, size);
+        TermResult termResult = dataWsClient.getFrequentlyTerms(domain, field, Constants.EXCLUSION_WORDS, size);
 
         return RepoDatasetMapper.asTermResults(termResult);
 
