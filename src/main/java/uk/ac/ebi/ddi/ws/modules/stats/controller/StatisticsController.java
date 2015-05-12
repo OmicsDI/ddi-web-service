@@ -73,7 +73,7 @@ public class StatisticsController {
 
         DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
-        String[] dubdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
+        String[] dubdomains  = WsUtilities.getSubdomainList(domain);
 
         FacetList taxonomies = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.TAXONOMY_FIELD, 100);
 
@@ -90,7 +90,7 @@ public class StatisticsController {
 
         DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
-        String[] dubdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
+        String[] dubdomains  = WsUtilities.getSubdomainList(domain);
 
         FacetList tissues = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.TISSUE_FIELD, size);
 
@@ -105,11 +105,11 @@ public class StatisticsController {
 
         DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
-        String[] dubdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
+        String[] dubdomains  = WsUtilities.getSubdomainList(domain);
 
-        FacetList tissues = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.OMICS_TYPE_FIELD, 100);
+        FacetList omics = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,dubdomains,Constants.OMICS_TYPE_FIELD, 100);
 
-        return RepoStatsToWsStatsMapper.asFacetCount(tissues, Constants.OMICS_TYPE_FIELD);
+        return RepoStatsToWsStatsMapper.asFacetCount(omics, Constants.OMICS_TYPE_FIELD);
     }
 
      @ApiOperation(value = "Return statistics about the number of datasets per dieases", position = 1, notes = "Return statistics about the number of datasets per diseases")
@@ -121,7 +121,7 @@ public class StatisticsController {
 
         DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
-        String[] subdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
+        String[] subdomains  = WsUtilities.getSubdomainList(domain);
 
         FacetList diseases = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.DISEASE_FIELD, size);
 
@@ -136,7 +136,7 @@ public class StatisticsController {
 
         DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
-        String[] subdomains  = WsUtilities.getSubdomainList(Constants.MAIN_DOMAIN, domain);
+        String[] subdomains  = WsUtilities.getSubdomainList(domain);
 
         List<StatRecord> resultStat = new ArrayList<StatRecord>();
 
@@ -197,32 +197,6 @@ public class StatisticsController {
         String metabolomicsQuery =  "*:* AND omics_type:\"Metabolomics\"";
         String genomicsQuery =  "*:* AND omics_type:\"Genomics\"";
 
-//        String query;
-//
-//        int intOmicsType = 0;
-//        if (omicstype.equals("genomics")) intOmicsType = 1;
-//        if (omicstype.equals("metabolomics")) intOmicsType = 2;
-//        if (omicstype.equals("proteomics")) intOmicsType = 3;
-//        switch (intOmicsType){
-//            case 1:
-//                query = genomicsQuery;
-//                break;
-//            case 2:
-//                query = metabolomicsQuery;
-//                break;
-//            case 3:
-//                query = proteomicsQuery;
-//                break;
-//            default:
-//                StatRecord record = new StatOmicsRecord("","","","");
-//                record.setName("omics type Error");
-//                record.setValue("omics type Error");
-//                resultStat.add(record);
-//                return resultStat;
-//        }
-
-
-
         QueryResult queryResultOfGenomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, genomicsQuery, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
         QueryResult queryResultOfMetabolomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, metabolomicsQuery, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
         QueryResult queryResultOfProteomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, proteomicsQuery, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
@@ -247,8 +221,6 @@ public class StatisticsController {
             metabolomicsNo  = publicationDateFacetValueOfM[i].getCount();
             proteomicsNo  = publicationDateFacetValueOfP[i].getCount();
             StatOmicsRecord record = new StatOmicsRecord(year,genomicsNo,metabolomicsNo,proteomicsNo);
-//            record.setName(label);
-//            record.setValue(value);
             resultStat.add(record);
         }
 

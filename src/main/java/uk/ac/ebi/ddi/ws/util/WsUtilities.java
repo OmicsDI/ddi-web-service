@@ -19,20 +19,15 @@ public class WsUtilities {
 
     /**
      * Covet elements from a domain
-     * @param parentDomain
      * @param domain
      * @return
      */
 
-    public static String[] getSubdomainList(String parentDomain, DomainList domain){
+    public static String[] getSubdomainList(DomainList domain){
         List<String> domainList = new ArrayList<String>();
-        if(domain != null && domain.list.length > 0 && parentDomain != null){
+        if(domain != null && domain.list.length > 0){
             for(Domain domainInfo: domain.list){
-                if(domainInfo.getName().equalsIgnoreCase(parentDomain)){
-                    for(Domain subdomainInfo: domainInfo.getSubDomains()){
-                        domainList.add(subdomainInfo.getName());
-                    }
-                }
+                domainList.add(domainInfo.getName());
             }
         }
         String[] records = new String[domainList.size()];
