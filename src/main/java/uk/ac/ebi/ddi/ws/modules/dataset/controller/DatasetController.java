@@ -180,7 +180,7 @@ public class DatasetController {
             @ApiParam(value = "Accession of the Dataset in the resource")
             @RequestParam(value = "acc", required = true) String acc,
             @ApiParam(value = "Database accession id")
-            @RequestParam(value = "datatabase", required = true) String domain,
+            @RequestParam(value = "database", required = true) String domain,
             HttpServletRequest httpServletRequest){
 
         acc = acc.replaceAll("\\s","");
