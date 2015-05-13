@@ -36,17 +36,13 @@ public class WsUtilities {
         return records;
     }
 
-    public static Integer getNumberofEntries(String mainDomain, DomainList domain) {
+    public static Integer getNumberofEntries(DomainList domain) {
         int count = 0;
-        if(domain != null && domain.list.length > 0 && mainDomain != null){
+        if(domain != null && domain.list.length > 0){
             for(Domain domainInfo: domain.list){
-                if(domainInfo.getName().equalsIgnoreCase(mainDomain)){
-                    for(Domain subdomainInfo: domainInfo.getSubDomains()){
-                        for(IndexInfo info: subdomainInfo.getIndexInfo())
-                            if(info.getName().equalsIgnoreCase(Constants.ENTRY_COUNT))
-                                count += Integer.parseInt(info.getValue());
-                    }
-                }
+                for(IndexInfo info: domainInfo.getIndexInfo())
+                    if(info.getName().equalsIgnoreCase(Constants.ENTRY_COUNT))
+                        count += Integer.parseInt(info.getValue());
             }
         }
         return count;

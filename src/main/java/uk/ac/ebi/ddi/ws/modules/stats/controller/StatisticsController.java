@@ -142,38 +142,26 @@ public class StatisticsController {
 
         resultStat.add(new StatRecord("Different Repositories/Databases", String.valueOf(subdomains.length)));
 
-        Integer numberOfDatasets = WsUtilities.getNumberofEntries(Constants.MAIN_DOMAIN, domain);
+        Integer numberOfDatasets = WsUtilities.getNumberofEntries(domain);
 
         resultStat.add(new StatRecord("Different Datasets", String.valueOf(numberOfDatasets)));
 
         FacetList facet = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.DISEASE_FIELD, 100);
 
         if(facet.getFacets() != null && facet.getFacets()[0] != null && facet.getFacets()[0].getFacetValues()!= null){
-            if(facet.getFacets()[0].getFacetValues().length >= 100){
-                resultStat.add(new StatRecord("More than 100 Diseases", null));
-            }else{
-                resultStat.add(new StatRecord("Different Diseases", String.valueOf(facet.getFacets()[0].getFacetValues().length)));
-            }
+                resultStat.add(new StatRecord("Different Diseases", String.valueOf(facet.getFacets()[0].getTotal())));
         }
 
         facet = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.TISSUE_FIELD, 100);
 
         if(facet.getFacets() != null && facet.getFacets()[0] != null && facet.getFacets()[0].getFacetValues()!= null){
-            if(facet.getFacets()[0].getFacetValues().length >= 100){
-                resultStat.add(new StatRecord("More than 100 Tissues", null));
-            }else{
-                resultStat.add(new StatRecord("Different Tissues", String.valueOf(facet.getFacets()[0].getFacetValues().length)));
-            }
+            resultStat.add(new StatRecord("Different Tissues", String.valueOf(facet.getFacets()[0].getTotal())));
         }
 
         facet = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.TAXONOMY_FIELD, 100);
 
         if(facet.getFacets() != null && facet.getFacets()[0] != null && facet.getFacets()[0].getFacetValues()!= null){
-            if(facet.getFacets()[0].getFacetValues().length >= 100){
-                resultStat.add(new StatRecord("More than 100 Species/Organisms", null));
-            }else{
-                resultStat.add(new StatRecord("Different Species/Organisms", String.valueOf(facet.getFacets()[0].getFacetValues().length)));
-            }
+            resultStat.add(new StatRecord("Different Species/Organisms", String.valueOf(facet.getFacets()[0].getTotal())));
         }
 
         return resultStat;
