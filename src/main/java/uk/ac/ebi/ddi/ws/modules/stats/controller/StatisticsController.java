@@ -118,7 +118,6 @@ public class StatisticsController {
      public @ResponseBody
      List<StatRecord> getDiseases(@ApiParam(value = "Dieseases to be retrieved: maximum 100")
                                   @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
-
         DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
         String[] subdomains  = WsUtilities.getSubdomainList(domain);
