@@ -1,6 +1,8 @@
 package uk.ac.ebi.ddi.ws.util;
 
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Facet;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.FacetValue;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.IndexInfo;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.Domain;
@@ -88,6 +90,44 @@ public class WsUtilities {
                 if(subdomain.toLowerCase().contains(domain.toLowerCase()))
                     return subdomain;
             }
+        }
+        return null;
+    }
+
+    public static FacetValue[] getFacetValues(Facet[] facetsG, String field) {
+        if(facetsG != null && facetsG.length > 0 && field != null){
+            for(Facet facet: facetsG){
+                if(facet.getId().equalsIgnoreCase(field))
+                    return facet.getFacetValues();
+            }
+        }
+        return null;
+    }
+
+    public static List<String> distinctYears(FacetValue[] publicationDateFacetValueOfG,
+                                             FacetValue[] publicationDateFacetValueOfM,
+                                             FacetValue[] publicationDateFacetValueOfP) {
+        Set<String> finalYears = new HashSet<>();
+        finalYears.addAll(WsUtilities.addFacetValues(publicationDateFacetValueOfG));
+        finalYears.addAll(WsUtilities.addFacetValues(publicationDateFacetValueOfM));
+        finalYears.addAll(WsUtilities.addFacetValues(publicationDateFacetValueOfP));
+        return new ArrayList<>(finalYears);
+    }
+
+    private static List<String> addFacetValues(FacetValue[] facetValues) {
+        List<String> facetList = new ArrayList<>();
+        if(facetValues != null && facetValues.length > 0){
+            for(FacetValue facetValue: facetValues)
+                facetList.add(facetValue.getLabel());
+        }
+        return facetList;
+    }
+
+    public static String getFacetValueLabel(FacetValue[] facetValues, String label) {
+        if(facetValues != null && facetValues.length > 0 && label != null){
+            for(FacetValue facetValue: facetValues)
+                if(facetValue.getValue().equalsIgnoreCase(label))
+                    return facetValue.getCount();
         }
         return null;
     }

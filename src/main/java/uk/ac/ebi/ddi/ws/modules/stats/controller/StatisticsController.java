@@ -28,6 +28,7 @@ import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -174,27 +175,31 @@ public class StatisticsController {
 
         List<StatOmicsRecord> resultStat = new ArrayList<StatOmicsRecord>();
 
-        String sortfield = "";
-        String order = "";
+        String sortfield = Constants.DESCRIPTION_FIELD;
+        String order = Constants.ORDER_ASCENDING;
         int start = 0;
         int size = 1;
         int facetCount = 20;
 
-        String proteomicsQuery =  "*:* AND omics_type:\"Proteomics\"";
-        String metabolomicsQuery =  "*:* AND omics_type:\"Metabolomics\"";
-        String genomicsQuery =  "*:* AND omics_type:\"Genomics\"";
+        String proteomicsQuery   =    "*:* AND omics_type:\"Proteomics\"";
+        String metabolomicsQuery =    "*:* AND omics_type:\"Metabolomics\"";
+        String genomicsQuery     =    "*:* AND omics_type:\"Genomics\"";
 
-        QueryResult queryResultOfGenomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, genomicsQuery, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
+        QueryResult queryResultOfProteomics   = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, proteomicsQuery,  Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
+        QueryResult queryResultOfGenomics     = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, genomicsQuery,    Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
         QueryResult queryResultOfMetabolomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, metabolomicsQuery, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
-        QueryResult queryResultOfProteomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, proteomicsQuery, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
 
-        Facet[] facetsG = queryResultOfGenomics.getFacets();
-        Facet[] facetsM = queryResultOfMetabolomics.getFacets();
+        Facet[]  facetsG = queryResultOfGenomics.getFacets();
+        Facet[]  facetsM = queryResultOfMetabolomics.getFacets();
         Facet[]  facetsP = queryResultOfProteomics.getFacets();
 
-        FacetValue[] publicationDateFacetValueOfG = facetsM[2].getFacetValues(); //use metabolomics now, need to be changed
-        FacetValue[] publicationDateFacetValueOfM = facetsM[2].getFacetValues();
-        FacetValue[] publicationDateFacetValueOfP = facetsM[2].getFacetValues();  //use metabolomics now, need to be changed
+        FacetValue[] publicationDateFacetValueOfG = WsUtilities.getFacetValues(facetsG, Constants.PUB_DATE_FIELD);
+        FacetValue[] publicationDateFacetValueOfM = WsUtilities.getFacetValues(facetsM, Constants.PUB_DATE_FIELD);
+        FacetValue[] publicationDateFacetValueOfP = WsUtilities.getFacetValues(facetsP, Constants.PUB_DATE_FIELD);
+
+        List<String> distinctYears = WsUtilities.distinctYears(publicationDateFacetValueOfG, publicationDateFacetValueOfM, publicationDateFacetValueOfP);
+
+        Collections.sort(distinctYears, Collections.reverseOrder());
 
         String year = "";
         String genomicsNo = "";
@@ -202,11 +207,11 @@ public class StatisticsController {
         String proteomicsNo = "";
 
 
-        for(int i=0; i<4; i++){  //latest 4 years
-            year = publicationDateFacetValueOfG[i].getLabel();
-            genomicsNo  = publicationDateFacetValueOfG[i].getCount();
-            metabolomicsNo  = publicationDateFacetValueOfM[i].getCount();
-            proteomicsNo  = publicationDateFacetValueOfP[i].getCount();
+        for(int i= 0; i < 4; i++){  //latest 4 years
+            year                   = distinctYears.get(i);
+            genomicsNo             = WsUtilities.getFacetValueLabel(publicationDateFacetValueOfG, year);
+            metabolomicsNo         = WsUtilities.getFacetValueLabel(publicationDateFacetValueOfM, year);
+            proteomicsNo           = WsUtilities.getFacetValueLabel(publicationDateFacetValueOfP, year);
             StatOmicsRecord record = new StatOmicsRecord(year,genomicsNo,metabolomicsNo,proteomicsNo);
             resultStat.add(record);
         }

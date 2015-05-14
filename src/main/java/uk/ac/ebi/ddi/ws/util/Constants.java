@@ -87,4 +87,8 @@ public class Constants {
 
     public static String PRIDE_DOMAIN                  = "pride";
 
+    public static String ORDER_ASCENDING               = "ascending";
+
+    public static String ORDER_DESCENDING              = "descending";
+
 }
