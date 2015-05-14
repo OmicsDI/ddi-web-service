@@ -258,7 +258,7 @@ public class DatasetController {
 
         DataSetResult result = new DataSetResult();
         List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
-        Map<Tuple<String, String>, Integer> mostAccesedIds = eventService.moreAccessedDatasetResource(5);
+        Map<Tuple<String, String>, Integer> mostAccesedIds = eventService.moreAccessedDatasetResource(size);
         Map<String, Set<String>> currentIds = new HashMap<String, Set<String>>();
 
         for(Tuple<String, String> dataset: mostAccesedIds.keySet()){
