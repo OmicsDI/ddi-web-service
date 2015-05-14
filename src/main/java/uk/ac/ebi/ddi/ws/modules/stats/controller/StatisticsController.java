@@ -189,7 +189,7 @@ public class StatisticsController {
         QueryResult queryResultOfProteomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, proteomicsQuery, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
 
         Facet[] facetsG = queryResultOfGenomics.getFacets();
-        Facet[]  facetsM = queryResultOfMetabolomics.getFacets();
+        Facet[] facetsM = queryResultOfMetabolomics.getFacets();
         Facet[]  facetsP = queryResultOfProteomics.getFacets();
 
         FacetValue[] publicationDateFacetValueOfG = facetsM[2].getFacetValues(); //use metabolomics now, need to be changed

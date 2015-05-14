@@ -82,5 +82,13 @@ public class WsUtilities {
     }
 
 
-
+    public static String validateDomain(String[] subdomains, String domain) {
+        if(subdomains != null && subdomains.length > 0 && domain != null){
+            for(String subdomain: subdomains){
+                if(subdomain.toLowerCase().contains(domain.toLowerCase()))
+                    return subdomain;
+            }
+        }
+        return null;
+    }
 }

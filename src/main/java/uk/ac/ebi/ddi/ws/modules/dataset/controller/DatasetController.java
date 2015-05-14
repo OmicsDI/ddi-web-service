@@ -15,9 +15,11 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
+import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
 import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
@@ -49,6 +51,9 @@ public class DatasetController {
 
     @Autowired
     DatasetWsClient dataWsClient;
+
+    @Autowired
+    DomainWsClient domainWsClient;
 
     @Autowired
     private DatasetResourceService resourceService;
@@ -121,10 +126,18 @@ public class DatasetController {
                     @RequestParam(value = "domain", required = true, defaultValue = "pride") String domain,
                     @ApiParam(value = "Field to search for the specific Terms")
                     @RequestParam(value = "field", required = true, defaultValue = "description") String field,
-
                     HttpServletRequest httpServletRequest) {
 
-        TermResult termResult = dataWsClient.getFrequentlyTerms(domain, field, Constants.EXCLUSION_WORDS, size);
+        DomainList domainList    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+
+        String[] subdomains  = WsUtilities.getSubdomainList(domainList);
+
+        domain = WsUtilities.validateDomain(subdomains, domain);
+
+        TermResult termResult = null;
+
+        if(domain != null)
+             termResult = dataWsClient.getFrequentlyTerms(domain, field, Constants.EXCLUSION_WORDS, size);
 
         return RepoDatasetMapper.asTermResults(termResult);
 

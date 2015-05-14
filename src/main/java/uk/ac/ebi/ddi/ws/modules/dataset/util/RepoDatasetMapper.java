@@ -136,7 +136,7 @@ public class RepoDatasetMapper {
         List<Term> terms = new ArrayList<Term>();
         if(termResult != null && termResult.getTerms() != null && termResult.getTerms().length > 0){
             for(uk.ac.ebi.ddi.ebe.ws.dao.model.common.Term oldTerm: termResult.getTerms())
-                terms.add(new Term(oldTerm.getText(), oldTerm.getFrecuency()));
+                terms.add(new Term(oldTerm.getText(), oldTerm.getFrequency()));
         }
         return terms;
     }
