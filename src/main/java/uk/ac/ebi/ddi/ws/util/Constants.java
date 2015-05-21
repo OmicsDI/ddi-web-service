@@ -68,7 +68,7 @@ public class Constants {
 
     public static String[] TAXONOMY_FIELDS              = {Constants.TAXONOMY_NAME};
 
-    public static String[] EXCLUSION_WORDS              = {"1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h",
+    public static String[] EXCLUSION_WORDS              = {"1","2","3","4","5","6","7","8","9","10","a","b","c","d","e","f","g","h",
             "i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",
             "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it",
             "no", "not", "of", "on", "or", "such", "that", "the", "their", "then", "there", "these", "they", "this", "to", "was", "will", "with",
@@ -80,6 +80,7 @@ public class Constants {
             "who","whom","why","will","with","would","yet","you","your",
             "protein", "proteomics", "proteomic", "proteome", "proteomes", "mass", "proteins", "lc", "ms", "based", "from", "using", "during", "LC-MS", "LC-MS/MS","reveals","as","non","data"};
 
+    public static String[] SHORT_EXCLUSION_WORDS              = {"data", "using", "10", "available", "da", "two", "protein", "proteins", "peptide", "peptides", "20", "80", "24","30","50", "0", "100", "15", "24"};
 
     public static String TAXONOMY_DOMAIN               = "taxonomy";
 

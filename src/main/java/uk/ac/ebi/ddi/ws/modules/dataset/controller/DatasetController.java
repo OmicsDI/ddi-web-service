@@ -137,7 +137,7 @@ public class DatasetController {
         TermResult termResult = null;
 
         if(domain != null)
-             termResult = dataWsClient.getFrequentlyTerms(domain, field, Constants.EXCLUSION_WORDS, size);
+             termResult = dataWsClient.getFrequentlyTerms(domain, field, Constants.SHORT_EXCLUSION_WORDS, size);
 
         return RepoDatasetMapper.asTermResults(termResult);
 

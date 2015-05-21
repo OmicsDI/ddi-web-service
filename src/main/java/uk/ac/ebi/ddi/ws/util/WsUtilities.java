@@ -29,7 +29,7 @@ public class WsUtilities {
         List<String> domainList = new ArrayList<String>();
         if(domain != null && domain.list.length > 0){
             for(Domain domainInfo: domain.list){
-                domainList.add(domainInfo.getName());
+                domainList.add(domainInfo.getId());
             }
         }
         String[] records = new String[domainList.size()];
