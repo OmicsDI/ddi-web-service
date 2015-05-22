@@ -47,7 +47,7 @@ public final class RepoStatsToWsStatsMapper {
         DomainStats domainStasts = null;
         if(domain != null){
             domainStasts = new DomainStats();
-            StatRecord record = new StatRecord(domain.getName(), null);
+            StatRecord record = new StatRecord(domain.getName(), null, null);
             if(domain.getIndexInfo() != null && domain.getIndexInfo().length > 0){
                 for(IndexInfo info: domain.getIndexInfo()){
                     if(info != null && info.getName().equalsIgnoreCase(Constants.ENTRY_COUNT)){
@@ -77,7 +77,7 @@ public final class RepoStatsToWsStatsMapper {
         List<DomainStats> domainStatses = asDomainStatsList(domain);
         int count = 0;
         for(DomainStats domainStats: domainStatses)
-        general.add(new StatRecord(Constants.REPOSITORY_TAG, String.valueOf(count)));
+        general.add(new StatRecord(Constants.REPOSITORY_TAG, String.valueOf(count), null));
         return general;
 
     }
@@ -92,8 +92,8 @@ public final class RepoStatsToWsStatsMapper {
         List<StatRecord> records = new ArrayList<StatRecord>();
 
         if(facets != null && facets.getFacets().length != 0){
-            records.add(new StatRecord("Total", facets.getHitCount()));
-            StatRecord unknowRecord = new StatRecord(Constants.NOT_AVAILABLE, "0");
+            records.add(new StatRecord("Total", facets.getHitCount(), null));
+            StatRecord unknowRecord = new StatRecord(Constants.NOT_AVAILABLE, "0", null);
             int countNotAvailable = 0;
             for(Facet facet: facets.getFacets()){
                 if(facet.getId().equalsIgnoreCase(field)){
@@ -101,7 +101,7 @@ public final class RepoStatsToWsStatsMapper {
                         if(facetValue.getLabel().equalsIgnoreCase(Constants.NOT_AVAILABLE) || facetValue.getLabel().contains(Constants.NOT_APPLICABLE)){
                             countNotAvailable = countNotAvailable + Integer.parseInt(facetValue.getCount());
                         }else{
-                            records.add(new StatRecord(facetValue.getLabel(), facetValue.getCount()));
+                            records.add(new StatRecord(facetValue.getLabel(), facetValue.getCount(), facetValue.getValue()));
                         }
 
                     }

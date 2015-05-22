@@ -140,28 +140,28 @@ public class StatisticsController {
 
         List<StatRecord> resultStat = new ArrayList<StatRecord>();
 
-        resultStat.add(new StatRecord("Different Repositories/Databases", String.valueOf(subdomains.length)));
+        resultStat.add(new StatRecord("Different Repositories/Databases", String.valueOf(subdomains.length), null));
 
         Integer numberOfDatasets = WsUtilities.getNumberofEntries(domain);
 
-        resultStat.add(new StatRecord("Different Datasets", String.valueOf(numberOfDatasets)));
+        resultStat.add(new StatRecord("Different Datasets", String.valueOf(numberOfDatasets), null));
 
         FacetList facet = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.DISEASE_FIELD, 100);
 
         if(facet.getFacets() != null && facet.getFacets()[0] != null && facet.getFacets()[0].getFacetValues()!= null){
-                resultStat.add(new StatRecord("Different Diseases", String.valueOf(facet.getFacets()[0].getTotal())));
+                resultStat.add(new StatRecord("Different Diseases", String.valueOf(facet.getFacets()[0].getTotal()), null));
         }
 
         facet = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.TISSUE_FIELD, 100);
 
         if(facet.getFacets() != null && facet.getFacets()[0] != null && facet.getFacets()[0].getFacetValues()!= null){
-            resultStat.add(new StatRecord("Different Tissues", String.valueOf(facet.getFacets()[0].getTotal())));
+            resultStat.add(new StatRecord("Different Tissues", String.valueOf(facet.getFacets()[0].getTotal()), null));
         }
 
         facet = facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN,subdomains,Constants.TAXONOMY_FIELD, 100);
 
         if(facet.getFacets() != null && facet.getFacets()[0] != null && facet.getFacets()[0].getFacetValues()!= null){
-            resultStat.add(new StatRecord("Different Species/Organisms", String.valueOf(facet.getFacets()[0].getTotal())));
+            resultStat.add(new StatRecord("Different Species/Organisms", String.valueOf(facet.getFacets()[0].getTotal()), null));
         }
 
         return resultStat;
