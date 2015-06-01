@@ -47,22 +47,39 @@ public class Constants {
 
     public static final String DATASET_LINK_FIELD       = "full_dataset_link";
 
+    public static final String INSTRUMENT_FIELD         = "instrument_platform";
+
+    public static final String EXPERIMENT_TYPE_FIELD    = "technology_type";
+
     public static final String[] DATASET_SUMMARY        = {Constants.DESCRIPTION_FIELD,
                                                            Constants.NAME_FIELD,
                                                            Constants.SUBMITTER_KEY_FIELD,Constants.CURATOR_KEY_FIELD,
                                                            Constants.PUB_DATE_FIELD,
                                                            Constants.TAXONOMY_FIELD};
+
+
     public static final String[] DATASET_DETAIL         = {Constants.NAME_FIELD,
                                                            Constants.DESCRIPTION_FIELD,
                                                            Constants.PUB_DATE_FIELD,
                                                            Constants.DATASET_LINK_FIELD,
                                                            Constants.DATA_PROTOCOL_FIELD,
                                                            Constants.SAMPLE_PROTOCOL_FIELD,
+                                                           Constants.INSTRUMENT_FIELD,
+                                                           Constants.EXPERIMENT_TYPE_FIELD,
                                                            Constants.PUBMED_FIELD};
+
+    public static final String[] MORELIKE_FIELDS        =  {Constants.NAME_FIELD,
+                                                            Constants.DESCRIPTION_FIELD,
+                                                            Constants.DATA_PROTOCOL_FIELD,
+                                                            Constants.SAMPLE_PROTOCOL_FIELD
+    };
+
+
 
     public static final String  NOT_AVAILABLE           = "Not available";
 
     public static final String  NOT_APPLICABLE          = "not applicable";
+
 
     public static String TAXONOMY_NAME                  = "name";
 
@@ -91,5 +108,19 @@ public class Constants {
     public static String ORDER_ASCENDING               = "ascending";
 
     public static String ORDER_DESCENDING              = "descending";
+
+//    public static final String CHROMATOGRAPHY_PROTOCOL  = "chromatography_protocol";
+//
+//    public static final String MASS_SPEC_PROTOCOL       = "mass_spec_protocol";
+//
+//    public static final String METABOLITE_ID_PROTOCOL   = "metabolite_id_protocol";
+//
+//    public static final String NMR_ASSAY_PROTOCOL       = "nmr_assay_protocol";
+//
+//    public static final String NMR_SPEC_PROTOCOL        = "nmr_spec_protocol";
+
+//    public static final String DERIVATIZATION_PROTOCOL  = "derivatization_protocol";
+//
+//    public static final String EXTRACTION_PROTOCOL      = "extraction_protocol";
 
 }
