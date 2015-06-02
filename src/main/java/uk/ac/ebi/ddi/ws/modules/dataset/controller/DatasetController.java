@@ -18,6 +18,7 @@ import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
@@ -197,6 +198,7 @@ public class DatasetController {
             HttpServletRequest httpServletRequest){
 
         acc = acc.replaceAll("\\s","");
+
         DatasetDetail datasetDetail= new DatasetDetail();
         Set<String> currentIds =  new HashSet(Arrays.asList(new String[] {acc}));
         List <PubmedPublication> pubmedPublications;
@@ -207,21 +209,35 @@ public class DatasetController {
         Entry entry1 = entries[0];
         Map<String, String[]> fields = entry1.getFields();
 
-        String[] names = fields.get(Constants.NAME_FIELD);
-        String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
-        String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
-        String[] full_dataset_links = fields.get(Constants.DATASET_LINK_FIELD);
-        String[] data_protocols = fields.get(Constants.DATA_PROTOCOL_FIELD);
-        String[] sample_protocols = fields.get(Constants.SAMPLE_PROTOCOL_FIELD);
-        String[] pubmedids = fields.get(Constants.PUBMED_FIELD);
-
         datasetDetail.setId(acc);
-        if(names.length > 0) datasetDetail.setName(names[0]);
-        if(descriptions.length > 0) datasetDetail.setDescription(descriptions[0]);
-        if(publication_dates.length > 0) datasetDetail.setPublicationDate(publication_dates[0]);
-        if(data_protocols.length > 0) datasetDetail.setData_protocol(data_protocols[0]);
-        if(sample_protocols.length > 0)datasetDetail.setSample_protocol(sample_protocols[0]);
 
+        String[] names = fields.get(Constants.NAME_FIELD);
+        datasetDetail.setName(names[0]);
+
+        String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
+        datasetDetail.setDescription(descriptions[0]);
+
+        String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
+        datasetDetail.setPublicationDate(publication_dates[0]);
+
+        String[] data_protocols = fields.get(Constants.DATA_PROTOCOL_FIELD);
+        datasetDetail.addProtocols(Constants.DATA_PROTOCOL_FIELD, data_protocols);
+
+        String[] sample_protocols = fields.get(Constants.SAMPLE_PROTOCOL_FIELD);
+        datasetDetail.addProtocols(Constants.SAMPLE_PROTOCOL_FIELD, sample_protocols);
+
+        String[] full_dataset_links = fields.get(Constants.DATASET_LINK_FIELD);
+        if(full_dataset_links != null && full_dataset_links.length > 0){
+            datasetDetail.setFull_dataset_link(full_dataset_links[0]);
+        }
+
+        String[] instruments = fields.get(Constants.INSTRUMENT_FIELD);
+        datasetDetail.setArrayInstruments(instruments);
+
+        String[] experiment_type = fields.get(Constants.EXPERIMENT_TYPE_FIELD);
+        datasetDetail.setArrayExperimentType(experiment_type);
+
+        String[] pubmedids = fields.get(Constants.PUBMED_FIELD);
         if ((pubmedids!=null) && (pubmedids.length > 0)) {
             try {
                 pubmedPublications = PubmedUtil.getPubmedList(pubmedids);
@@ -277,4 +293,53 @@ public class DatasetController {
 
         return result;
     }
+
+
+    @ApiOperation(value = "Retrieve the related datasets to one Dataset", position = 1, notes = "Retrieve the related datasets to one Dataset")
+    @RequestMapping(value = "/moreLikeThis", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    DataSetResult moreLikeThis(
+            @ApiParam(value = "Accession of the Dataset in the resource")
+            @RequestParam(value = "acc", required = true) String acc,
+            @ApiParam(value = "Database accession id")
+            @RequestParam(value = "database", required = true) String domain
+    ) {
+
+        SimilarResult queryResult = dataWsClient.getSimilarProjects(domain, acc, Constants.MORELIKE_FIELDS);
+
+        DataSetResult result = new DataSetResult();
+        List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
+
+        Map<String, Set<String>> currentIds = new HashMap<String, Set<String>>();
+
+
+        if(queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0){
+
+            for(Entry entry: queryResult.getEntries()){
+                if(entry.getId() != null && entry.getSource() != null){
+                    Set<String> ids = currentIds.get(entry.getSource());
+                    if(ids == null)
+                        ids = new HashSet<String>();
+                    if(!(entry.getId().equalsIgnoreCase(acc) && entry.getSource().equalsIgnoreCase(domain)))
+                        ids.add(entry.getId());
+                    currentIds.put(entry.getSource(), ids);
+                }
+            }
+
+            for(String currentDomain: currentIds.keySet()){
+                QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, currentIds.get(currentDomain));
+                datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult,currentDomain));
+            }
+
+            result.setDatasets(datasetSummaryList);
+            result.setCount(datasetSummaryList.size());
+
+            return result;
+        }
+
+        return null;
+    }
+
+
 }
