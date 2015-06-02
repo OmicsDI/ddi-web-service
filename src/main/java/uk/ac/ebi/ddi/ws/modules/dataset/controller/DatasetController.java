@@ -216,11 +216,11 @@ public class DatasetController {
         String[] pubmedids = fields.get(Constants.PUBMED_FIELD);
 
         datasetDetail.setId(acc);
-        datasetDetail.setName(names[0]);
-        datasetDetail.setDescription(descriptions[0]);
-        datasetDetail.setPublicationDate(publication_dates[0]);
-        datasetDetail.setData_protocol(data_protocols[0]);
-        datasetDetail.setSample_protocol(sample_protocols[0]);
+        if(names.length > 0) datasetDetail.setName(names[0]);
+        if(descriptions.length > 0) datasetDetail.setDescription(descriptions[0]);
+        if(publication_dates.length > 0) datasetDetail.setPublicationDate(publication_dates[0]);
+        if(data_protocols.length > 0) datasetDetail.setData_protocol(data_protocols[0]);
+        if(sample_protocols.length > 0)datasetDetail.setSample_protocol(sample_protocols[0]);
 
         if ((pubmedids!=null) && (pubmedids.length > 0)) {
             try {
