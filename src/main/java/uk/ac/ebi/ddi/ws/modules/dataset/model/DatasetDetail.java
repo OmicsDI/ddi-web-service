@@ -53,11 +53,6 @@ public class DatasetDetail {
     List<PubmedPublication> publications;
 
     /*
-     * List of Related Datasets for this dataset, can be one or more than one related datasets
-     */
-    List<DatasetSummary> relatedDatasets;
-
-    /*
      * Data Protocol of the dataset
      */
     List<Protocol> protocols = null;
@@ -135,15 +130,6 @@ public class DatasetDetail {
     public void setPublications(List<PubmedPublication> publications) {
         this.publications = publications;
     }
-
-    public List<DatasetSummary> getRelatedDatasets() {
-        return relatedDatasets;
-    }
-
-    public void setRelatedDatasets(List<DatasetSummary> relatedDatasets) {
-        this.relatedDatasets = relatedDatasets;
-    }
-
     public String getSource() {
         return source;
     }
