@@ -152,6 +152,11 @@ public class DatasetDetail {
                     publicationIds.add(id);
         }
     }
+
+    public List<String> getPublicationIds() {
+        return publicationIds;
+    }
+
     public String getSource() {
         return source;
     }
@@ -252,4 +257,6 @@ public class DatasetDetail {
             }
         }
     }
+
+
 }
