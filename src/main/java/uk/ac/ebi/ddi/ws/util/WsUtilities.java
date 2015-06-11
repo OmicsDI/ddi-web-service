@@ -72,9 +72,9 @@ public class WsUtilities {
                 String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
 
                 datasetSummary.setId(entry.getId());
-                datasetSummary.setTitle(names[0]);
-                datasetSummary.setDescription(descriptions[0]);
-                datasetSummary.setPublicationDate(publication_dates[0]);
+                if(names != null && names.length >0) datasetSummary.setTitle(names[0]);
+                if(descriptions != null && descriptions.length >0) datasetSummary.setDescription(descriptions[0]);
+                if(publication_dates != null && publication_dates.length >0) datasetSummary.setPublicationDate(publication_dates[0]);
                 datasetSummary.setSource(domain);
                 datasetSummaryList.add(datasetSummary);
             }
