@@ -201,58 +201,60 @@ public class DatasetController {
 
         DatasetDetail datasetDetail= new DatasetDetail();
         Set<String> currentIds =  new HashSet(Arrays.asList(new String[] {acc}));
-        List <PubmedPublication> pubmedPublications;
+
 
         QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds);
         Entry[] entries = datasetResult.getEntries();
-        if(entries.length<=0) return null;
-        Entry entry1 = entries[0];
-        Map<String, String[]> fields = entry1.getFields();
 
-        datasetDetail.setId(acc);
+        if(!(entries.length<=0)){
+            Entry entry1 = entries[0];
+            Map<String, String[]> fields = entry1.getFields();
 
-        String[] names = fields.get(Constants.NAME_FIELD);
-        datasetDetail.setName(names[0]);
+            datasetDetail.setId(acc);
 
-        String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
-        datasetDetail.setDescription(descriptions[0]);
+            String[] names = fields.get(Constants.NAME_FIELD);
+            datasetDetail.setName(names[0]);
 
-        String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
-        datasetDetail.setPublicationDate(publication_dates[0]);
+            String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
+            datasetDetail.setDescription(descriptions[0]);
 
-        String[] data_protocols = fields.get(Constants.DATA_PROTOCOL_FIELD);
-        datasetDetail.addProtocols(Constants.DATA_PROTOCOL_FIELD, data_protocols);
+            String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
+            datasetDetail.setPublicationDate(publication_dates[0]);
 
-        String[] sample_protocols = fields.get(Constants.SAMPLE_PROTOCOL_FIELD);
-        datasetDetail.addProtocols(Constants.SAMPLE_PROTOCOL_FIELD, sample_protocols);
+            String[] data_protocols = fields.get(Constants.DATA_PROTOCOL_FIELD);
+            datasetDetail.addProtocols(Constants.DATA_PROTOCOL_FIELD, data_protocols);
 
-        String[] full_dataset_links = fields.get(Constants.DATASET_LINK_FIELD);
-        if(full_dataset_links != null && full_dataset_links.length > 0){
-            datasetDetail.setFull_dataset_link(full_dataset_links[0]);
-        }
+            String[] sample_protocols = fields.get(Constants.SAMPLE_PROTOCOL_FIELD);
+            datasetDetail.addProtocols(Constants.SAMPLE_PROTOCOL_FIELD, sample_protocols);
 
-        String[] instruments = fields.get(Constants.INSTRUMENT_FIELD);
-        datasetDetail.setArrayInstruments(instruments);
+            String[] full_dataset_links = fields.get(Constants.DATASET_LINK_FIELD);
+            if(full_dataset_links != null && full_dataset_links.length > 0){
+                datasetDetail.setFull_dataset_link(full_dataset_links[0]);
+            }
 
-        String[] experiment_type = fields.get(Constants.EXPERIMENT_TYPE_FIELD);
-        datasetDetail.setArrayExperimentType(experiment_type);
+            String[] instruments = fields.get(Constants.INSTRUMENT_FIELD);
+            datasetDetail.setArrayInstruments(instruments);
 
-        String[] pubmedids = fields.get(Constants.PUBMED_FIELD);
-        if ((pubmedids!=null) && (pubmedids.length > 0)) {
+            String[] experiment_type = fields.get(Constants.EXPERIMENT_TYPE_FIELD);
+            datasetDetail.setArrayExperimentType(experiment_type);
+
+            String[] pubmedids = fields.get(Constants.PUBMED_FIELD);
+            if ((pubmedids!=null) && (pubmedids.length > 0)) {
                 datasetDetail.setArrayPublicationIds(pubmedids);
-        }
+            }
 
-        /**
-         * Trace the access to the dataset
-         */
-        DatasetResource resource = resourceService.read(acc, domain);
-        if(resource == null){
-            resource = new DatasetResource("http://www.ebi.ac.uk/ddi/" + domain + "/" + acc,acc,domain);
-            resource = resourceService.save(resource);
+            /**
+             * Trace the access to the dataset
+             */
+            DatasetResource resource = resourceService.read(acc, domain);
+            if(resource == null){
+                resource = new DatasetResource("http://www.ebi.ac.uk/ddi/" + domain + "/" + acc,acc,domain);
+                resource = resourceService.save(resource);
+            }
+            HttpEvent event = WsUtilities.tranformServletResquestToEvent(httpServletRequest);
+            event.setResource(resource);
+            eventService.save(event);
         }
-        HttpEvent event = WsUtilities.tranformServletResquestToEvent(httpServletRequest);
-        event.setResource(resource);
-        eventService.save(event);
 
         return datasetDetail;
 
