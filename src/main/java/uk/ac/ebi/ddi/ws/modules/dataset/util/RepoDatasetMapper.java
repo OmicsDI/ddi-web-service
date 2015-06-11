@@ -1,7 +1,7 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.util;
 
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
-import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;

@@ -18,6 +18,7 @@ import com.google.gson.Gson;
  * Created by baimz on 2015/5/6.
  */
 public class PubmedUtil {
+
 private static final Logger logger = LoggerFactory.getLogger(PubmedUtil.class);
 
  public static List<PubmedPublication> getPubmedList(String[] pubmedids) throws Exception {

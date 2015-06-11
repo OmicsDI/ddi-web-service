@@ -14,7 +14,7 @@ import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.facet.FacetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.FacetValue;
-import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Facet;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.facet.FacetList;

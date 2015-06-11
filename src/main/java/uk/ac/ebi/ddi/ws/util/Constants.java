@@ -15,14 +15,6 @@ public class Constants {
 
     public static final String REPOSITORY_TAG           = "Repositories";
 
-    public static final String DATASET_TAGS             = "Datasets";
-
-    public static final String CONTRIBUTORS_TAG         = "Contributors";
-
-    public static final String SPECIES_TAG              = "Different Species";
-
-    public static final String MANUSCRIPT_TAG           = "Manuscripts";
-
     public static final String TISSUE_FIELD             = "tissue" ;
 
     public static final String OMICS_TYPE_FIELD         = "omics_type";
@@ -108,6 +100,42 @@ public class Constants {
     public static String ORDER_ASCENDING               = "ascending";
 
     public static String ORDER_DESCENDING              = "descending";
+
+    public static String PUBMED_AUTHOR_FIELD           = "author";
+
+    public static String PUBMED_ABSTRACT_FIELD         = "description";
+
+    public static String PUBMED_ID_FIELD               = "id";
+
+    public static String PUBMED_ISSUE_FIELD            = "issue";
+
+    public static String PUBMED_JOURNAL_FIELD          = "journal";
+
+    public static String PUBMED_KEYS_FIELD             = "keywords";
+
+    public static String PUBMED_NAME_FIELD             = "name";
+
+    public static String PUBMED_PAG_FIELD              = "pagination";
+
+    public static String PUBMED_VOL_FIELD              = "volume";
+
+    public static String PUBMED_DATE_FIELD             = "publication_date";
+
+    public static String PUBMED_AFFILATION_FIELD       = "affiliation";
+
+    public static String[] PUBLICATION_SUMMARY         = { Constants.PUBMED_ABSTRACT_FIELD,
+                                                           Constants.PUBMED_AUTHOR_FIELD,
+                                                           Constants.PUBMED_DATE_FIELD,
+                                                           Constants.PUBMED_ID_FIELD,
+                                                           Constants.PUBMED_JOURNAL_FIELD,
+                                                           Constants.PUBMED_ISSUE_FIELD,
+                                                           Constants.PUBMED_KEYS_FIELD,
+                                                           Constants.PUBMED_NAME_FIELD,
+                                                           Constants.PUBMED_PAG_FIELD,
+                                                           Constants.PUBMED_VOL_FIELD,
+                                                           Constants.PUBMED_AFFILATION_FIELD
+    };
+
 
 //    public static final String CHROMATOGRAPHY_PROTOCOL  = "chromatography_protocol";
 //

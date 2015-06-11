@@ -50,7 +50,7 @@ public class DatasetDetail {
     /*
      * List of Publications for this dataset, can be one or more than one publications
      */
-    List<PubmedPublication> publications;
+    List<String> publicationIds;
 
     /*
      * Data Protocol of the dataset
@@ -123,12 +123,17 @@ public class DatasetDetail {
         this.publicationDate = publicationDate;
     }
 
-    public List<PubmedPublication> getPublications() {
-        return publications;
+    public void setPublications(List<String> publications) {
+        this.publicationIds = publications;
     }
 
-    public void setPublications(List<PubmedPublication> publications) {
-        this.publications = publications;
+    public void setArrayPublicationIds(String[] ids){
+        if(ids != null && ids.length> 0){
+            publicationIds = new ArrayList<String>();
+            for(String id: ids)
+                if(id != null && id.length() > 0)
+                    publicationIds.add(id);
+        }
     }
     public String getSource() {
         return source;

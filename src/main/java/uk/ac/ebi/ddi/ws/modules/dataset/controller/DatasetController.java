@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
-import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.QueryResult;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
@@ -239,12 +239,7 @@ public class DatasetController {
 
         String[] pubmedids = fields.get(Constants.PUBMED_FIELD);
         if ((pubmedids!=null) && (pubmedids.length > 0)) {
-            try {
-                pubmedPublications = PubmedUtil.getPubmedList(pubmedids);
-                datasetDetail.setPublications(pubmedPublications);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                datasetDetail.setArrayPublicationIds(pubmedids);
         }
 
         /**

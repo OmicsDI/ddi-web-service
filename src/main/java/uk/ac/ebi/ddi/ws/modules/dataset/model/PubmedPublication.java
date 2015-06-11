@@ -30,6 +30,15 @@ public class PubmedPublication {
      */
     String cycle = null;
 
+    /**
+     * Author List of the manuscript
+     */
+    String authorList = null;
+
+    /**
+     * Citation of the manuscript
+     */
+    String citation   = null;
 
     public String getId() {
         return id;
@@ -69,5 +78,21 @@ public class PubmedPublication {
 
     public void setCycle(String cycle) {
         this.cycle = cycle;
+    }
+
+    public String getAuthorList() {
+        return authorList;
+    }
+
+    public void setAuthorList(String authorList) {
+        this.authorList = authorList;
+    }
+
+    public String getCitation() {
+        return citation;
+    }
+
+    public void setCitation(String citation) {
+        this.citation = citation;
     }
 }
