@@ -207,10 +207,13 @@ public class DatasetController {
         Entry[] entries = datasetResult.getEntries();
 
         if(!(entries.length<=0)){
+
             Entry entry1 = entries[0];
             Map<String, String[]> fields = entry1.getFields();
 
             datasetDetail.setId(acc);
+
+            datasetDetail.setSource(entry1.getSource());
 
             String[] names = fields.get(Constants.NAME_FIELD);
             datasetDetail.setName(names[0]);
@@ -243,6 +246,19 @@ public class DatasetController {
                 datasetDetail.setArrayPublicationIds(pubmedids);
             }
 
+            String[] submitterKeys = fields.get(Constants.SUBMITTER_KEY_FIELD);
+            String[] curatorKeys   = fields.get(Constants.CURATOR_KEY_FIELD);
+            datasetDetail.setKeywords(submitterKeys, curatorKeys);
+
+            Set<String> taxonomyIds    = RepoDatasetMapper.getTaxonomyIds(datasetResult);
+
+            QueryResult taxonomies = null;
+
+            if(taxonomyIds.size() > 0){
+                taxonomies   = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, taxonomyIds);
+            }
+
+            datasetDetail = RepoDatasetMapper.addTaxonomy(datasetDetail, taxonomies);
             /**
              * Trace the access to the dataset
              */

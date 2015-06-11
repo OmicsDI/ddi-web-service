@@ -58,7 +58,9 @@ public class Constants {
                                                            Constants.SAMPLE_PROTOCOL_FIELD,
                                                            Constants.INSTRUMENT_FIELD,
                                                            Constants.EXPERIMENT_TYPE_FIELD,
-                                                           Constants.PUBMED_FIELD};
+                                                           Constants.PUBMED_FIELD,
+                                                           Constants.SUBMITTER_KEY_FIELD,Constants.CURATOR_KEY_FIELD,
+                                                           Constants.TAXONOMY_FIELD};
 
     public static final String[] MORELIKE_FIELDS        =  {Constants.NAME_FIELD,
                                                             Constants.DESCRIPTION_FIELD,

@@ -3,10 +3,7 @@ package uk.ac.ebi.ddi.ws.modules.dataset.util;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.Organism;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.*;
 import uk.ac.ebi.ddi.ws.util.Constants;
 
 
@@ -183,5 +180,21 @@ public class RepoDatasetMapper {
         result.setCount(entryArray.length);
 
         return result;
+    }
+
+    public static DatasetDetail addTaxonomy(DatasetDetail datasetDetail, QueryResult taxonomies) {
+        List<Organism> organismList = new ArrayList<Organism>();
+        if(taxonomies != null && taxonomies.getEntries() != null && taxonomies.getEntries().length > 0){
+            for(Entry entry: taxonomies.getEntries()){
+                if(entry != null){
+                    String acc = entry.getId();
+                    String name = entry.getFields().get(Constants.TAXONOMY_NAME)[0];
+                    Organism organism = new Organism(acc, name);
+                    organismList.add(organism);
+                }
+            }
+        }
+        datasetDetail.setOrganisms(organismList);
+        return datasetDetail;
     }
 }

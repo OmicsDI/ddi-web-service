@@ -1,6 +1,7 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -113,6 +114,22 @@ public class DatasetDetail {
 
     public void setKeywords(String[] keywords) {
         this.keywords = keywords;
+    }
+
+    public void setKeywords(String[] submitterKeys, String[] curatorKeys){
+        List<String> tmpkeywords = new ArrayList<String>();
+        if(submitterKeys != null && submitterKeys.length > 0)
+                tmpkeywords.addAll(Arrays.asList(submitterKeys));
+
+        if(curatorKeys != null && curatorKeys.length > 0)
+                tmpkeywords.addAll(Arrays.asList(curatorKeys));
+
+        if(tmpkeywords.size() > 0){
+            String[] arrayKeywords = new String[tmpkeywords.size()];
+            for(int i = 0; i < tmpkeywords.size(); i++)
+                arrayKeywords[i] = tmpkeywords.get(i);
+            setKeywords(arrayKeywords);
+        }
     }
 
     public String getPublicationDate() {
