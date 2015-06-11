@@ -62,7 +62,7 @@ public class PublicationController {
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     PublicationResult list(
-            @ApiParam(value = "Accession of the publications to be retrieved")
+            @ApiParam(value = "Accession of the publications to be retrieved, e.g: 25347964,23851314")
             @RequestParam(value = "acc", required = true) String[] accs){
 
         PublicationResult publicationResult = new PublicationResult();

@@ -30,14 +30,13 @@ import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.PubmedPublication;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 import javax.servlet.http.HttpServletRequest;
-import uk.ac.ebi.ddi.ws.modules.dataset.util.PubmedUtil;
+
 
 import java.util.*;
 
@@ -68,17 +67,17 @@ public class DatasetController {
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     DataSetResult search(
-            @ApiParam(value = "general search term against multiple fields including: cancer human, default is *:* ")
+            @ApiParam(value = "general search term against multiple fields including, e.g: cancer human, default is *:* ")
             @RequestParam(value = "query", required = false, defaultValue = "") String query,
-            @ApiParam(value = "field to sort the output of the search results: e.g description")
+            @ApiParam(value = "field to sort the output of the search results, e.g:  description")
             @RequestParam(value = "sortfield", required = false, defaultValue = "") String sortfield,
-            @ApiParam(value = "type of sorting ascending or descending: default: ascending")
+            @ApiParam(value = "type of sorting ascending or descending, e.g: ascending")
             @RequestParam(value = "order", required = false, defaultValue = "") String order,
-            @ApiParam(value = "the starting point for the search: 0")
+            @ApiParam(value = "the starting point for the search, e.g: 0")
             @RequestParam(value = "start", required = false, defaultValue = "0") int start,
-            @ApiParam(value = "the number of records to be retrieved: maximum 100")
+            @ApiParam(value = "the number of records to be retrieved, e.g: maximum 100")
             @RequestParam(value = "size", required = false, defaultValue = "20") int size,
-            @ApiParam(value = "the starting point for the search: 0")
+            @ApiParam(value = "the starting point for the search, e.g: 0")
             @RequestParam(value = "faceCount", required = false, defaultValue = "20") int facetCount,
             HttpServletRequest httpServletRequest) {
 
@@ -121,11 +120,11 @@ public class DatasetController {
      @ResponseStatus(HttpStatus.OK) // 200
      public @ResponseBody
      List<Term> frequentTerms(
-                    @ApiParam(value = "Number of terms to be retrieved: maximum 100")
+                    @ApiParam(value = "Number of terms to be retrieved, e.g: maximum 100")
                     @RequestParam(value = "size", required = false, defaultValue = "20") int size,
-                    @ApiParam(value = "Repository to find the information")
+                    @ApiParam(value = "Repository to find the information, e.g: pride")
                     @RequestParam(value = "domain", required = true, defaultValue = "pride") String domain,
-                    @ApiParam(value = "Field to search for the specific Terms")
+                    @ApiParam(value = "Field to search for the specific Terms, e.g: description")
                     @RequestParam(value = "field", required = true, defaultValue = "description") String field,
                     HttpServletRequest httpServletRequest) {
 
@@ -149,7 +148,7 @@ public class DatasetController {
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     DataSetResult latest(
-            @ApiParam(value = "Number of terms to be retrieved: maximum 100, default 20")
+            @ApiParam(value = "Number of terms to be retrieved, e.g : maximum 100, default 20")
             @RequestParam(value = "size", required = false, defaultValue = "20") int size,
             HttpServletRequest httpServletRequest) {
 
@@ -191,9 +190,9 @@ public class DatasetController {
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     DatasetDetail get(
-            @ApiParam(value = "Accession of the Dataset in the resource")
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
             @RequestParam(value = "acc", required = true) String acc,
-            @ApiParam(value = "Database accession id")
+            @ApiParam(value = "Database accession id, e.g: pride")
             @RequestParam(value = "database", required = true) String domain,
             HttpServletRequest httpServletRequest){
 
@@ -281,7 +280,7 @@ public class DatasetController {
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     DataSetResult getMostAccessed(
-            @ApiParam(value = "The most accessed datasets size")
+            @ApiParam(value = "The most accessed datasets size, e.g: 20")
             @RequestParam(value = "size", required = true, defaultValue = "20") int size
     ) {
 
@@ -313,9 +312,9 @@ public class DatasetController {
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     DataSetResult moreLikeThis(
-            @ApiParam(value = "Accession of the Dataset in the resource")
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
             @RequestParam(value = "acc", required = true) String acc,
-            @ApiParam(value = "Database accession id")
+            @ApiParam(value = "Database accession id, e.g : pride")
             @RequestParam(value = "database", required = true) String domain
     ) {
 
