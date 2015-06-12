@@ -39,16 +39,34 @@
     <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
 
     <!-- Default bean name is 'mongo' -->
-    <mongo:mongo host="127.0.0.1" port="27017" />
+    <mongo:mongo host="${ddi.mongo.app.machine}" port="${ddi.mongo.app.port}" />
 
     <!-- Offers convenience methods and automatic mapping between MongoDB JSON
         documents and your domain classes. -->
+    <!--<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">-->
+        <!--<constructor-arg ref="mongo" />-->
+        <!--<constructor-arg name="databaseName" value="${ddi.mongo.app.db}" />-->
+        <!--<constructor-arg name=""-->
+        <!--<constructor-arg name="userCredentials" ref="userCredentials" />-->
+    <!--</bean>-->
+
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-        <constructor-arg ref="mongo" />
-        <constructor-arg name="databaseName" value="ddiDB" />
+         <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
     </bean>
+
+    <mongo:db-factory id="mongoDbFactory"
+                      dbname="${ddi.mongo.app.db}"
+                      username="${ddi.mongo.app.user}"
+                      password="${ddi.mongo.app.password}"
+                      mongo-ref="mongo"
+                      authentication-dbname="${ddi.mongo.app.authenticationDatabase}" />
+
+
+    <mongo:auditing/>
 
     <bean id="resourceService" class="uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService"/>
     <bean id="eventService" class="uk.ac.ebi.ddi.service.db.service.logger.HttpEventService"/>
+
+    <context:property-placeholder location="classpath:META-INF/props/*.properties" ignore-unresolvable="true"/>
 
 </beans>
