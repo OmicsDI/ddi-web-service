@@ -128,11 +128,13 @@ public class DatasetController {
                     @RequestParam(value = "field", required = true, defaultValue = "description") String field,
                     HttpServletRequest httpServletRequest) {
 
-        DomainList domainList    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
 
-        String[] subdomains  = WsUtilities.getSubdomainList(domainList);
+        if(!Constants.MAIN_DOMAIN.equalsIgnoreCase(domain)){
+            DomainList domainList    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+            String[] subdomains  = WsUtilities.getSubdomainList(domainList);
+            domain = WsUtilities.validateDomain(subdomains, domain);
+        }
 
-        domain = WsUtilities.validateDomain(subdomains, domain);
 
         TermResult termResult = null;
 
