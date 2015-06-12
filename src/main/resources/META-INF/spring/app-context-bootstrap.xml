@@ -62,8 +62,6 @@
                       authentication-dbname="${ddi.mongo.app.authenticationDatabase}" />
 
 
-    <mongo:auditing/>
-
     <bean id="resourceService" class="uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService"/>
     <bean id="eventService" class="uk.ac.ebi.ddi.service.db.service.logger.HttpEventService"/>
 
