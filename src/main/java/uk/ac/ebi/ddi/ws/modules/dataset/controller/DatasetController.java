@@ -223,7 +223,8 @@ public class DatasetController {
             datasetDetail.setDescription(descriptions[0]);
 
             String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
-            datasetDetail.setPublicationDate(publication_dates[0]);
+            if(publication_dates != null && publication_dates.length > 0 && publication_dates[0] != null)
+                   datasetDetail.setPublicationDate(publication_dates[0]);
 
             String[] data_protocols = fields.get(Constants.DATA_PROTOCOL_FIELD);
             datasetDetail.addProtocols(Constants.DATA_PROTOCOL_FIELD, data_protocols);
