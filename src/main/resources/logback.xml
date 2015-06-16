@@ -27,7 +27,7 @@
     <logger name="org.springframework.beans" level="error"/>
     <logger name="com.mangofactory.swagger" level="info"/>
 
-    <root level="warn">
+    <root level="debug">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="LOGFILE" />
     </root>
