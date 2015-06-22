@@ -84,6 +84,17 @@ public class DatasetDetail {
      */
     String full_dataset_link   = null;
 
+    /**
+     * Tissues related with the submisssion
+     */
+    List<String> tissues       = null;
+
+    /**
+     * The diseases related with the submission
+     */
+    List<String> diseases      = null;
+
+
     public String getId() {
         return id;
     }
@@ -258,5 +269,31 @@ public class DatasetDetail {
         }
     }
 
+    public List<String> getTissues() {
+        return tissues;
+    }
 
+    public void setTissues(String[] tissues) {
+        if(tissues != null && tissues.length >0){
+            this.tissues = new ArrayList<String>();
+            for(String tissue: tissues)
+                if(tissue != null && tissue.length() > 0)
+                    this.tissues.add(tissue);
+
+        }
+    }
+
+    public List<String> getDiseases() {
+        return diseases;
+    }
+
+    public void setDiseases(String[] diseases) {
+        if(diseases != null && diseases.length >0){
+            this.diseases = new ArrayList<String>();
+            for(String disease: diseases)
+                if(disease != null && disease.length() > 0)
+                    this.diseases.add(disease);
+
+        }
+    }
 }

@@ -60,7 +60,9 @@ public class Constants {
                                                            Constants.EXPERIMENT_TYPE_FIELD,
                                                            Constants.PUBMED_FIELD,
                                                            Constants.SUBMITTER_KEY_FIELD,Constants.CURATOR_KEY_FIELD,
-                                                           Constants.TAXONOMY_FIELD};
+                                                           Constants.TAXONOMY_FIELD,
+                                                           Constants.DISEASE_FIELD,
+                                                           Constants.TISSUE_FIELD};
 
     public static final String[] MORELIKE_FIELDS        =  {Constants.NAME_FIELD,
                                                             Constants.DESCRIPTION_FIELD,
@@ -73,6 +75,8 @@ public class Constants {
     public static final String  NOT_AVAILABLE           = "Not available";
 
     public static final String  NOT_APPLICABLE          = "not applicable";
+
+    public static final String DATASET_FILE             = "dataset_file"  ;
 
 
     public static String TAXONOMY_NAME                  = "name";

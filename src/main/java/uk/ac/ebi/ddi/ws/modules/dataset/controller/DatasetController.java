@@ -237,6 +237,16 @@ public class DatasetController {
                 datasetDetail.setFull_dataset_link(full_dataset_links[0]);
             }
 
+            String[] diseases = fields.get(Constants.DISEASE_FIELD);
+            if(diseases != null && diseases.length > 0){
+                datasetDetail.setDiseases(diseases);
+            }
+
+            String[] tissues = fields.get(Constants.TISSUE_FIELD);
+            if(tissues != null && tissues.length > 0){
+                datasetDetail.setTissues(tissues);
+            }
+
             String[] instruments = fields.get(Constants.INSTRUMENT_FIELD);
             datasetDetail.setArrayInstruments(instruments);
 
@@ -259,6 +269,7 @@ public class DatasetController {
             if(taxonomyIds.size() > 0){
                 taxonomies   = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, taxonomyIds);
             }
+
 
             datasetDetail = RepoDatasetMapper.addTaxonomy(datasetDetail, taxonomies);
             /**
@@ -301,7 +312,7 @@ public class DatasetController {
         }
         for(String domain: currentIds.keySet()){
             QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds.get(domain));
-            datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult,domain));
+            datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult,domain, mostAccesedIds));
         }
         result.setDatasets(datasetSummaryList);
         result.setCount(datasetSummaryList.size());
@@ -344,7 +355,7 @@ public class DatasetController {
 
             for(String currentDomain: currentIds.keySet()){
                 QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, currentIds.get(currentDomain));
-                datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult,currentDomain));
+                datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult,currentDomain, null));
             }
 
             result.setDatasets(datasetSummaryList);
@@ -354,6 +365,40 @@ public class DatasetController {
         }
 
         return null;
+    }
+
+
+    @ApiOperation(value = "Retrieve all file links for a given dataset", position = 1, notes = "Retrieve all file links for a given dataset")
+    @RequestMapping(value = "/getFileLinks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    List<String> getFileLinks(
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
+            @RequestParam(value = "acc", required = true) String acc,
+            @ApiParam(value = "Database accession id, e.g : pride")
+            @RequestParam(value = "database", required = true) String domain
+    ) {
+        List<String> files = new ArrayList<String>();
+
+        String[] fields = {
+                Constants.DATASET_FILE
+        };
+
+        Set<String> currentIds =  new HashSet(Arrays.asList(new String[] {acc}));
+
+        QueryResult datasetResult = dataWsClient.getDatasetsById(domain, fields, currentIds);
+
+        if(datasetResult != null && datasetResult.getEntries() != null &&
+                datasetResult.getEntries().length > 0){
+            Entry entry = datasetResult.getEntries()[0];
+            String[] fileNames = entry.getFields().get(Constants.DATASET_FILE);
+            if(fileNames != null && fileNames.length > 0){
+                for(String fileName: fileNames)
+                    if(fileName != null && fileNames.length > 0 )
+                        files.add(fileName);
+            }
+        }
+        return files;
     }
 
 

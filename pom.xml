@@ -119,12 +119,6 @@
         </dependency>
 
 
-        <!--jUnit-->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit-dep</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>uk.ac.ebi.ddi</groupId>
             <artifactId>ddi-ebe-ws-dao</artifactId>

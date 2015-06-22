@@ -8,6 +8,7 @@ import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.Domain;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
+import uk.ac.ebi.ddi.service.db.utils.Tuple;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,7 +61,7 @@ public class WsUtilities {
         return event;
     }
 
-    public static List<DatasetSummary> transformDatasetSummary(QueryResult queryResult, String domain){
+    public static List<DatasetSummary> transformDatasetSummary(QueryResult queryResult, String domain, Map<Tuple<String, String>, Integer> visitMap){
 
         if(queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0){
             List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
@@ -76,6 +77,12 @@ public class WsUtilities {
                 if(descriptions != null && descriptions.length >0) datasetSummary.setDescription(descriptions[0]);
                 if(publication_dates != null && publication_dates.length >0) datasetSummary.setPublicationDate(publication_dates[0]);
                 datasetSummary.setSource(domain);
+                if(visitMap != null && visitMap.size()> 0){
+                    Tuple<String, String> newKey = new Tuple<String, String>(entry.getId(), domain);
+                    if(visitMap.containsKey(newKey)){
+                        datasetSummary.setVisitCount(visitMap.get(newKey));
+                    }
+                }
                 datasetSummaryList.add(datasetSummary);
             }
             return datasetSummaryList;
