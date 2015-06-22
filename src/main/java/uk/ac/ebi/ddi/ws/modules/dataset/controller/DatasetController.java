@@ -99,7 +99,12 @@ public class DatasetController {
             List<String> list = new ArrayList<String>(taxonomyIds);
             int count = 0;
             for(int i=0 ; i < taxonomyIds.size(); i += Constants.HIGH_QUERY_THRESHOLD){
-               Set<String> currentIds = new HashSet<String>(list.subList(i, Constants.HIGH_QUERY_THRESHOLD));
+                Set<String> currentIds = null;
+                if((i+Constants.HIGH_QUERY_THRESHOLD) < taxonomyIds.size())
+                    currentIds   = new HashSet<String>(list.subList(i, i+Constants.HIGH_QUERY_THRESHOLD));
+                else
+                    currentIds   = new HashSet<String>(list.subList(i , taxonomyIds.size()-1));
+
                resultList.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, currentIds));
                count = i;
             }
@@ -277,7 +282,7 @@ public class DatasetController {
              */
             DatasetResource resource = resourceService.read(acc, domain);
             if(resource == null){
-                resource = new DatasetResource("http://www.ebi.ac.uk/ddi/" + domain + "/" + acc,acc,domain);
+                resource = new DatasetResource("http://www.ebi.ac.uk/Tools/ddi/" + domain + "/" + acc,acc,domain);
                 resource = resourceService.save(resource);
             }
             HttpEvent event = WsUtilities.tranformServletResquestToEvent(httpServletRequest);

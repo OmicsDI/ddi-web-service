@@ -36,7 +36,7 @@ public class ExceptionHandlingAdvice {
                     HttpStatus.UNAUTHORIZED.value(),
                     "Private data! Please log in.",
                     "Authorisation required.",
-                    "http://www.ebi.ac.uk/ddi/login",
+                    "http://www.ebi.ac.uk/Tools/ddi/login",
                     null);
         } else {
             return new RestError(HttpStatus.FORBIDDEN,
