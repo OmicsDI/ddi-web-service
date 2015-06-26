@@ -21,6 +21,7 @@ import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.dictionary.DictWord;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
@@ -129,7 +130,7 @@ public class DatasetController {
     @RequestMapping(value = "/words", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
-    List<String> getWords(
+    DictWord getWords(
             @ApiParam(value = "general pattern term to be search in the dictionary: hom")
             @RequestParam(value = "pattern", required = false, defaultValue = "") String pattern,
             @ApiParam(value = "the number of records to be retrieved, e.g: maximum 100")
@@ -138,7 +139,7 @@ public class DatasetController {
         if(pattern.length() > 2){
             return dictionaryClient.getWordsDomains(Constants.INITIAL_DOMAINS, pattern, size);
         }
-        return Collections.EMPTY_LIST;
+        return new DictWord();
     }
 
     @ApiOperation(value = "Retrieve frequently terms from the Repo", position = 1, notes = "Retrieve frequently terms from the Repo")
