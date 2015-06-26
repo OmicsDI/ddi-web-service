@@ -134,7 +134,7 @@ public class DatasetController {
             @ApiParam(value = "general pattern term to be search in the dictionary: hom")
             @RequestParam(value = "q", required = false, defaultValue = "") String q,
             @ApiParam(value = "the number of records to be retrieved, e.g: maximum 100")
-            @RequestParam(value = "size", required = false, defaultValue = "20") int size
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size
             ) {
         if(q.length() > 2){
             return dictionaryClient.getWordsDomains(Constants.INITIAL_DOMAINS, q, size);
