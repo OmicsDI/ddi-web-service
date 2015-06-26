@@ -132,12 +132,12 @@ public class DatasetController {
     public @ResponseBody
     DictWord getWords(
             @ApiParam(value = "general pattern term to be search in the dictionary: hom")
-            @RequestParam(value = "pattern", required = false, defaultValue = "") String pattern,
+            @RequestParam(value = "q", required = false, defaultValue = "") String q,
             @ApiParam(value = "the number of records to be retrieved, e.g: maximum 100")
             @RequestParam(value = "size", required = false, defaultValue = "20") int size
             ) {
-        if(pattern.length() > 2){
-            return dictionaryClient.getWordsDomains(Constants.INITIAL_DOMAINS, pattern, size);
+        if(q.length() > 2){
+            return dictionaryClient.getWordsDomains(Constants.INITIAL_DOMAINS, q, size);
         }
         return new DictWord();
     }
