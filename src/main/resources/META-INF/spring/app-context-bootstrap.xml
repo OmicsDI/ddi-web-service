@@ -29,6 +29,10 @@
         <constructor-arg ref="ebeyeWsConfig"/>
     </bean>
 
+    <bean id="dictionaryClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient">
+        <constructor-arg ref="ebeyeWsConfig"/>
+    </bean>
+
     <bean id="publicationWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.publication.PublicationWsClient">
         <constructor-arg ref="ebeyeWsConfig"/>
     </bean>

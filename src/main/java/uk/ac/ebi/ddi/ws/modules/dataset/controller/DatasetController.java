@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
+import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
@@ -60,6 +61,9 @@ public class DatasetController {
 
     @Autowired
     HttpEventService eventService;
+
+    @Autowired
+    private DictionaryClient dictionaryClient;
 
 
     @ApiOperation(value = "Search for datasets in the resource", position = 1, notes = "retrieve datasets in the resource using different queries")
@@ -118,6 +122,23 @@ public class DatasetController {
 
         return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
 
+    }
+
+
+    @ApiOperation(value = "Search dictionary words", position = 1, notes = "retrive the words for a pattern")
+    @RequestMapping(value = "/words", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    List<String> getWords(
+            @ApiParam(value = "general pattern term to be search in the dictionary: hom")
+            @RequestParam(value = "pattern", required = false, defaultValue = "") String pattern,
+            @ApiParam(value = "the number of records to be retrieved, e.g: maximum 100")
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size
+            ) {
+        if(pattern.length() > 2){
+            return dictionaryClient.getWordsDomains(Constants.INITIAL_DOMAINS, pattern, size);
+        }
+        return Collections.EMPTY_LIST;
     }
 
     @ApiOperation(value = "Retrieve frequently terms from the Repo", position = 1, notes = "Retrieve frequently terms from the Repo")

@@ -142,6 +142,13 @@ public class Constants {
                                                            Constants.PUBMED_AFFILATION_FIELD
     };
 
+    //Todo: We need to do this dynamic
+
+    public static String[] INITIAL_DOMAINS            = { "pride", "peptide_atlas", "ega", "massive", "metabolights_dataset", "metabolome_workbench"
+
+
+    };
+
 
 //    public static final String CHROMATOGRAPHY_PROTOCOL  = "chromatography_protocol";
 //
