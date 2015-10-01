@@ -37,7 +37,7 @@ import java.util.List;
  * @author ypriverol Yasset Perez-Riverol
  */
 
-@Api(value = "stats", description = "retrieve statistics about the DDI repositories, access, etc", position = 0)
+@Api(value = "statistics", description = "retrieve statistics about the DDI repositories, access, etc", position = 0)
 @Controller
 @RequestMapping(value = "/statistics")
 
@@ -167,15 +167,16 @@ public class StatisticsController {
         return resultStat;
     }
 
-    @ApiOperation(value = "Return statistics about the number of datasets per OmicsType on recent 5 years ", position = 1, notes = "Return statistics about the number of datasets per OmicsType on recent 5 years ")
+    @ApiOperation(value = "Return statistics about the number of datasets By Omics type on recent 5 years ", position = 1, notes = "Return statistics about the number of datasets per OmicsType on recent 5 years ")
     @RequestMapping(value = "/omicsByYear", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
-    List<StatOmicsRecord> getOmicsNo() {
+    List<StatOmicsRecord> getOmicsByYear() {
 
         List<StatOmicsRecord> resultStat = new ArrayList<StatOmicsRecord>();
 
-        String sortfield = Constants.DESCRIPTION_FIELD;
+    //    String sortfield = Constants.DESCRIPTION_FIELD;
+        ///Todo: We need to update the fields that can be sorted
         String order = Constants.ORDER_ASCENDING;
         int start = 0;
         int size = 1;
@@ -185,9 +186,9 @@ public class StatisticsController {
         String metabolomicsQuery =    "*:* AND omics_type:\"Metabolomics\"";
         String genomicsQuery     =    "*:* AND omics_type:\"Genomics\"";
 
-        QueryResult queryResultOfProteomics   = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, proteomicsQuery,  Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
-        QueryResult queryResultOfGenomics     = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, genomicsQuery,    Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
-        QueryResult queryResultOfMetabolomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, metabolomicsQuery, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
+        QueryResult queryResultOfProteomics   = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, proteomicsQuery,  Constants.DATASET_SUMMARY, null, order, start, size, facetCount);
+        QueryResult queryResultOfGenomics     = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, genomicsQuery,    Constants.DATASET_SUMMARY, null, order, start, size, facetCount);
+        QueryResult queryResultOfMetabolomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, metabolomicsQuery, Constants.DATASET_SUMMARY, null, order, start, size, facetCount);
 
         Facet[]  facetsG = queryResultOfGenomics.getFacets();
         Facet[]  facetsM = queryResultOfMetabolomics.getFacets();
