@@ -14,34 +14,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
-import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.publication.PublicationWsClient;
-import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
-import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
-import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
-import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
-import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
-import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
-import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
-import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
-import uk.ac.ebi.ddi.service.db.utils.Tuple;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.PubmedPublication;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.Term;
-import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.publication.model.PublicationDetail;
 import uk.ac.ebi.ddi.ws.modules.publication.model.PublicationResult;
 import uk.ac.ebi.ddi.ws.modules.publication.util.PubmedUtils;
 import uk.ac.ebi.ddi.ws.util.Constants;
-import uk.ac.ebi.ddi.ws.util.WsUtilities;
-
-import javax.servlet.http.HttpServletRequest;
-import uk.ac.ebi.ddi.ws.modules.dataset.util.PubmedUtil;
 
 import java.util.*;
 

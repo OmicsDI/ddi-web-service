@@ -1,4 +1,4 @@
-package uk.ac.ebi.ddi.ws.modules.dataset.model;
+package uk.ac.ebi.ddi.ws.modules.term.model;
 
 /**
  * @author ypriverol

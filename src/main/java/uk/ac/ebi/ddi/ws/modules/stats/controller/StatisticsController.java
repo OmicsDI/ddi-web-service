@@ -39,7 +39,7 @@ import java.util.List;
 
 @Api(value = "stats", description = "retrieve statistics about the DDI repositories, access, etc", position = 0)
 @Controller
-@RequestMapping(value = "/stats")
+@RequestMapping(value = "/statistics")
 
 public class StatisticsController {
 
@@ -99,7 +99,7 @@ public class StatisticsController {
     }
 
      @ApiOperation(value = "Return statistics about the number of datasets per Omics Type", position = 1, notes = "Return statistics about the number of datasets per Omics Type")
-     @RequestMapping(value = "/omicsType", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+     @RequestMapping(value = "/omics", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
      @ResponseStatus(HttpStatus.OK) // 200
      public @ResponseBody
      List<StatRecord> getOmics() {
@@ -168,7 +168,7 @@ public class StatisticsController {
     }
 
     @ApiOperation(value = "Return statistics about the number of datasets per OmicsType on recent 5 years ", position = 1, notes = "Return statistics about the number of datasets per OmicsType on recent 5 years ")
-    @RequestMapping(value = "/omicsType_annual", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/omicsByYear", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     List<StatOmicsRecord> getOmicsNo() {
@@ -219,5 +219,7 @@ public class StatisticsController {
 
         return resultStat;
     }
+
+
 
 }

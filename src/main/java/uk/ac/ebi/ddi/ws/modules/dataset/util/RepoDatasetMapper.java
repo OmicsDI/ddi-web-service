@@ -4,6 +4,7 @@ import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.*;
+import uk.ac.ebi.ddi.ws.modules.term.model.Term;
 import uk.ac.ebi.ddi.ws.util.Constants;
 
 

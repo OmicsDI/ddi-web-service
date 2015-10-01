@@ -11,4 +11,4 @@ Detailed and functional documentation will be available thanks to [Swagger](http
 web-service is deployed. As a summary, these are the available end-points for the web service:
 
 * `stast`: statistics about the data in the DDI project. 
-* `datatset`: information about datasets, such as search, terms frecuency etc. 
+* `datatset`: information about datasets, such as search, terms frequency etc.
