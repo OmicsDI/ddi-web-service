@@ -47,3 +47,9 @@ scripts/
 config/
 data/
 .idea/
+=======
+# Created by .ignore support plugin (hsz.mobi)
+/web-service.iml
+/catalina.base_IS_UNDEFINED
+/.idea
+/target
