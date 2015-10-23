@@ -37,6 +37,8 @@ import javax.servlet.http.HttpServletRequest;
 
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Api(value = "dataset", description = "Retrieve the information about the dataset including search functionalities", position = 0)
@@ -86,6 +88,8 @@ public class DatasetController {
 
         query = (query == null || query.isEmpty() || query.length() == 0)? "*:*": query;
 
+        query = modifyIfSearchByYear(query);
+
         QueryResult queryResult = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
 
         QueryResult taxonomies = null;
@@ -119,6 +123,18 @@ public class DatasetController {
 
         return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
 
+    }
+
+    private String modifyIfSearchByYear(String query) {
+        Pattern pattern = Pattern.compile("publication_date:\"\\s*(\\d{4})\"");
+        Matcher matcher = pattern.matcher(query);
+        if(matcher.find()){
+            String matchedYear = matcher.group().replaceAll("publication_date:\"\\s*(\\d{4})\"", "$1");
+            String searchByYear = "[" + matchedYear + "0000 TO " + matchedYear + "1231]";
+            query = query.replaceAll("publication_date:\"\\s*(\\d{4})\"", "publication_date:" + searchByYear);
+
+        }
+        return query;
     }
 
     @ApiOperation(value = "Retrieve the latest datasets in the repository", position = 1, notes = "Retrieve the latest datasets in the repository")
