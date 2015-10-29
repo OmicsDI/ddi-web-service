@@ -329,7 +329,7 @@ function program1(depth0,data) {
   }
 
 function program3(depth0,data) {
-                                 º
+                                 º;
   
   return "\n        <div class=\"auth\">\n        <span class=\"api-ic ic-error\"></span>";
   }

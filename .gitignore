@@ -19,12 +19,13 @@
 *.rar
 *.tar
 *.zip
-   
+  
 # Logs and databases #
 ######################
 *.log
+*.sql
 *.sqlite
-      
+   
 # OS generated files #
 ######################
 .DS_Store
@@ -39,17 +40,14 @@ Thumbs.db
 #####################
 *.iml
 
+# Eclipse generated files #
+###########################
+/.settings
+.classpath
+.project
+
 # Directory to ignore #
 #####################
 log/
 target/
-scripts/
-config/
-data/
 .idea/
-=======
-# Created by .ignore support plugin (hsz.mobi)
-/web-service.iml
-/catalina.base_IS_UNDEFINED
-/.idea
-/target
