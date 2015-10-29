@@ -3,7 +3,6 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:util="http://www.springframework.org/schema/util"
        xmlns:mongo="http://www.springframework.org/schema/data/mongo"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
@@ -42,30 +41,6 @@
     <mongo:repositories base-package="uk.ac.ebi.ddi.service.db.repo" />
     <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
 
-    <!--&lt;!&ndash; Default bean name is 'mongo' &ndash;&gt;-->
-    <!--<mongo:mongo host="${ddi.mongo.app.machine}" port="${ddi.mongo.app.port}" />-->
-
-    <!--&lt;!&ndash; Offers convenience methods and automatic mapping between MongoDB JSON-->
-        <!--documents and your domain classes. &ndash;&gt;-->
-    <!--&lt;!&ndash;<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">&ndash;&gt;-->
-        <!--&lt;!&ndash;<constructor-arg ref="mongo" />&ndash;&gt;-->
-        <!--&lt;!&ndash;<constructor-arg name="databaseName" value="${ddi.mongo.app.db}" />&ndash;&gt;-->
-        <!--&lt;!&ndash;<constructor-arg name=""&ndash;&gt;-->
-        <!--&lt;!&ndash;<constructor-arg name="userCredentials" ref="userCredentials" />&ndash;&gt;-->
-    <!--&lt;!&ndash;</bean>&ndash;&gt;-->
-
-    <!--<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">-->
-         <!--<constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />-->
-
-    <!--</bean>-->
-
-    <!--<mongo:db-factory id="mongoDbFactory"-->
-                      <!--dbname="${ddi.mongo.app.db}"-->
-                      <!--username="${ddi.mongo.app.user}"-->
-                      <!--password="${ddi.mongo.app.password}"-->
-                      <!--mongo-ref="mongo"-->
-                      <!--authentication-dbname="${ddi.mongo.app.authenticationDatabase}" />-->
-
 
     <mongo:mongo-client id="mongoClient" replica-set="${ddi.mongo.app.machine.one}:${ddi.mongo.app.port},${ddi.mongo.app.machine.two}:${ddi.mongo.app.port},${ddi.mongo.app.machine.three}:${ddi.mongo.app.port}">
         <mongo:client-options connections-per-host="5"
@@ -88,24 +63,13 @@
 
     <bean id="resourceService" class="uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService"/>
     <bean id="eventService" class="uk.ac.ebi.ddi.service.db.service.logger.HttpEventService"/>
+    <bean id="enrichmentService" class="uk.ac.ebi.ddi.service.db.service.enrichment.EnrichmentInfoService"/>
 
-
-    <bean id="service" class="uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService"/>
-    <bean id="accessService" class="uk.ac.ebi.ddi.service.db.service.logger.HttpEventService"/>
-    <bean id="termInDBService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>
-    <bean id="expOutputDatasetService" class="uk.ac.ebi.ddi.service.db.service.similarity.ExpOutputDatasetService"/>
-    <!--<bean id="ddiExpDataImportService" class="uk.ac.ebi.ddi.annotation.service.DDIExpDataImportService"/>-->
-    <!--<bean id="ddiDatasetSimilarityService" class="uk.ac.ebi.ddi.annotation.service.DDIDatasetSimilarityService"/>-->
-    <bean id="datasetStatInfoService" class="uk.ac.ebi.ddi.service.db.service.similarity.DatasetStatInfoService"/>
-    <!--<bean id="ddiXmlProcessService" class="uk.ac.ebi.ddi.annotation.service.DDIXmlProcessService"/>-->
-
-    <bean id="InDBServiceRepo" class="uk.ac.ebi.ddi.service.db.repo.similarity.ITermInDBRepoImpl"/>
     <bean class="uk.ac.ebi.ddi.service.db.utils.CascadingMongoEventListener" />
 
-    <!--<bean id="annotService" class="uk.ac.ebi.ddi.annotation.service.DDIAnnotationService"/>-->
-    <bean id="termService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>
-    <bean id="enrichmentService" class="uk.ac.ebi.ddi.service.db.service.enrichment.EnrichmentInfoService"/>
-    <bean id="synonymsService " class="uk.ac.ebi.ddi.service.db.service.enrichment.SynonymsService"/>
+    <!--&lt;!&ndash;<bean id="annotService" class="uk.ac.ebi.ddi.annotation.service.DDIAnnotationService"/>&ndash;&gt;-->
+    <!--<bean id="termService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>-->
+    <!--<bean id="synonymsService " class="uk.ac.ebi.ddi.service.db.service.enrichment.SynonymsService"/>-->
 
 
     <context:property-placeholder location="classpath:META-INF/props/*.properties" ignore-unresolvable="true"/>

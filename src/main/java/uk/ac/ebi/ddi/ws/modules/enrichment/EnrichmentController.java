@@ -31,9 +31,6 @@ public class EnrichmentController {
     private static final Logger logger = LoggerFactory.getLogger(EnrichmentController.class);
 
     @Autowired
-    HttpEventService eventService;
-
-    @Autowired
     IEnrichmentInfoService enrichmentService;
 
     @ApiOperation(value = "get enrichment Info", position = 1, notes = "retrieve the enrichment data for a dataset")
