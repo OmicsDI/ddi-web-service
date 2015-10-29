@@ -22,6 +22,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: uk.ac.ebi.ddi:ddi-service-db:0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.mongodb:mongo-java-driver:2.13.0" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:4.0.3.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-beans:4.0.3.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context:4.0.3.RELEASE" level="project" />
@@ -82,12 +84,20 @@
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.0.7" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:1.6.4" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.0.7" level="project" />
+<<<<<<< HEAD
     <orderEntry type="library" name="Maven: uk.ac.ebi.ddi:ddi-ebe-ws-dao:0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.11" level="project" />
     <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="module" module-name="ddi-service-db" />
     <orderEntry type="library" name="Maven: org.springframework:spring-tx:4.0.3.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongo-java-driver:2.12.5" level="project" />
+=======
+    <orderEntry type="module" module-name="ddi-ebe-ws-dao" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit-dep:4.10" level="project" />
+    <orderEntry type="module" module-name="ddi-service-db" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-tx:4.0.3.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.mongodb:mongo-java-driver:3.0.0" level="project" />
+>>>>>>> 2f3adcdf35bf7eaa0bb17faa953f8011efc9a7c3
     <orderEntry type="library" name="Maven: com.github.fakemongo:fongo:1.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.github.davidmoten:geo:0.6.5" level="project" />
     <orderEntry type="library" name="Maven: rhino:js:1.7R2" level="project" />
