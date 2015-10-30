@@ -64,6 +64,7 @@
     <bean id="resourceService" class="uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService"/>
     <bean id="eventService" class="uk.ac.ebi.ddi.service.db.service.logger.HttpEventService"/>
     <bean id="enrichmentService" class="uk.ac.ebi.ddi.service.db.service.enrichment.EnrichmentInfoService"/>
+    <bean id="datasetStatInfoService" class="uk.ac.ebi.ddi.service.db.service.similarity.DatasetStatInfoService"/>
 
     <bean class="uk.ac.ebi.ddi.service.db.utils.CascadingMongoEventListener" />
 
