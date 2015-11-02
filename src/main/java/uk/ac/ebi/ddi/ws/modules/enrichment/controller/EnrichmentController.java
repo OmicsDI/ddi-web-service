@@ -27,9 +27,11 @@ import uk.ac.ebi.ddi.service.db.service.similarity.IDatasetStatInfoService;
 import uk.ac.ebi.ddi.service.db.service.similarity.IExpOutputDatasetService;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
+import uk.ac.ebi.ddi.ws.modules.enrichment.model.SimilarInfoResult;
 import uk.ac.ebi.ddi.ws.modules.enrichment.model.SynonymsForDataset;
 import uk.ac.ebi.ddi.ws.modules.enrichment.model.SynonymsForWord;
 import uk.ac.ebi.ddi.ws.util.Constants;
+import uk.ac.ebi.ddi.ws.util.Triplet;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 import java.util.*;
@@ -185,7 +187,7 @@ public class EnrichmentController {
     @ResponseStatus(HttpStatus.OK) // 200
     public
     @ResponseBody
-    DataSetResult getSimilarityInfo(
+    SimilarInfoResult getSimilarityInfo(
             @ApiParam(value = "Dataset accession")
             @RequestParam(value = "accession", required = true, defaultValue = "PXD000002") String accession,
             @ApiParam(value = "Database name, e.g: PRIDE")
@@ -198,25 +200,48 @@ public class EnrichmentController {
         }
 
         Map<String, String> similarDatasets = new HashMap<>();
+        Set<Triplet> Scores = new HashSet<>();
         similarDatasets.put(accession, databaseNameInMongoDB);//put itself in the set;
+        String combatName = accession + "@" + databaseNameInMongoDB;
 
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, databaseNameInMongoDB);
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
             int length = intersectionInfos.size();
-            Float[][] Scores = new Float[length+1][length+1];
             for (int i=0; i<length; i++) {
                 IntersectionInfo intersectionInfo = intersectionInfos.get(i);
+                String combatName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
+
                 if (intersectionInfo.getRelatedDatasetAcc() != null && intersectionInfo.getRelatedDatasetDatabase() != null) {
                     similarDatasets.put(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase());
-                    Scores[0][i] = (float) intersectionInfo.getCosineScore();
+                    Triplet<String, String, Float> score = new Triplet<>(combatName,combatName2,(float)intersectionInfo.getCosineScore());
+                    Scores.add(score);
+                findSimilarDatasetsFor(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase(), similarDatasets, Scores);
                 }
             }
         }
+        SimilarInfoResult similarInfoResult = new SimilarInfoResult(accession, databaseNameInMongoDB, Scores);
+        return similarInfoResult;
+    }
 
-
-
-        return null;
+    private void findSimilarDatasetsFor(String accession, String databaseNameInMongoDB, Map<String, String> similarDatasets, Set<Triplet> Scores) {
+        String combatName = accession + "@" + databaseNameInMongoDB;
+        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, databaseNameInMongoDB);
+        if (datasetStatInfo != null) {
+            List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
+            int length = intersectionInfos.size();
+            for (int i=0; i<length; i++) {
+                IntersectionInfo intersectionInfo = intersectionInfos.get(i);
+                String combatName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
+                if (intersectionInfo.getRelatedDatasetAcc() != null && intersectionInfo.getRelatedDatasetDatabase() != null) {
+                    similarDatasets.put(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase());
+                    Triplet<String, String, Float> score = new Triplet<>(combatName,combatName2,(float)intersectionInfo.getCosineScore());
+                    if (!Scores.contains(score)) {
+                        Scores.add(score);
+                    }
+                }
+            }
+        }
     }
 
 
