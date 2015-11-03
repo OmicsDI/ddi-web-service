@@ -38,7 +38,7 @@
 
     <!-- Maven information an autowired classes -->
 
-    <mongo:repositories base-package="uk.ac.ebi.ddi.service.db.repo" />
+    <mongo:repositories     base-package="uk.ac.ebi.ddi.service.db.repo" />
     <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
 
 
