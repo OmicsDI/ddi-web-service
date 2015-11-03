@@ -255,11 +255,26 @@ public class DatasetController {
             datasetDetail.setKeywords(submitterKeys, curatorKeys);
 
             Set<String> taxonomyIds    = RepoDatasetMapper.getTaxonomyIds(datasetResult);
+            ArrayList<String> ids = new ArrayList<>(taxonomyIds);
 
-            QueryResult taxonomies = null;
+            QueryResult taxonomies = new QueryResult();
 
-            if(taxonomyIds.size() > 0){
-                taxonomies   = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, taxonomyIds);
+            if(ids.size() > 0){
+                if(ids.size() < 99)
+                    taxonomies   = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(ids));
+                else{
+                    int i = 0;
+                    while(i+50 < ids.size()){
+                        List<String> idTemp = ids.subList(i, i+50);
+                        taxonomies.addResults(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(idTemp)));
+                        i = i + 50;
+                    }
+                    if(i < ids.size()){
+                        List<String> idTemp = ids.subList(i, ids.size());
+                        taxonomies.addResults(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(idTemp)));
+                    }
+
+                }
             }
 
 
