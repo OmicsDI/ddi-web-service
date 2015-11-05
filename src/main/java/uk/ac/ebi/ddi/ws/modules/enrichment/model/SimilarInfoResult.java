@@ -3,6 +3,7 @@ package uk.ac.ebi.ddi.ws.modules.enrichment.model;
 import uk.ac.ebi.ddi.ws.util.Triplet;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,12 +14,12 @@ public class SimilarInfoResult {
 
     private String accession;
     private String database;
-    private Set<Triplet> Scores ;
+    private List<Triplet> Scores ;
 
-    public SimilarInfoResult(String accession, String database, Set<Triplet> scores) {
+    public SimilarInfoResult(String accession, String database, List<Triplet> scores) {
         this.accession = accession;
         this.database = database;
-        Scores = scores;
+        this.Scores = scores;
     }
 
     public String getAccession() {
@@ -37,11 +38,11 @@ public class SimilarInfoResult {
         this.database = database;
     }
 
-    public Set<Triplet> getScores() {
+    public List<Triplet> getScores() {
         return Scores;
     }
 
-    public void setScores(Set<Triplet> scores) {
+    public void setScores(List<Triplet> scores) {
         Scores = scores;
     }
 }

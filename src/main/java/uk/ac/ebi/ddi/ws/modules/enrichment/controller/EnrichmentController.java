@@ -118,6 +118,10 @@ public class EnrichmentController {
             wordsInField.add(word2);
         }
 
+        for (WordInField word3 : enrichmentInfo.getDataProtocol()) {
+            wordsInField.add(word3);
+        }
+
         for (WordInField wordInField : wordsInField) {
             if (!words.contains(wordInField.getText())) {
                 words.add(wordInField.getText());
@@ -144,26 +148,18 @@ public class EnrichmentController {
         List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
         Map<String, Set<String>> currentIds = new HashMap<String, Set<String>>();
 
-        //"PRIDE Archive" is the name stored in MongoDB
-        String databaseNameInMongoDB = database;
-        if (databaseNameInMongoDB.equals("PRIDE")) {
-            databaseNameInMongoDB = "PRIDE Archive";
-        }
-
-        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, databaseNameInMongoDB);
+        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
             for (IntersectionInfo intersectionInfo : intersectionInfos) {
 
                 if (intersectionInfo.getRelatedDatasetAcc() != null && intersectionInfo.getRelatedDatasetDatabase() != null) {
                     String tempDatabaseName = intersectionInfo.getRelatedDatasetDatabase();
-                    if (tempDatabaseName.equals("PRIDE Archive")) {
-                        tempDatabaseName = "PRIDE";
-                    }
+
                     Set<String> ids = currentIds.get(tempDatabaseName);
                     if (ids == null)
                         ids = new HashSet<String>();
-                    if (!(intersectionInfo.getRelatedDatasetAcc().equalsIgnoreCase(accession) && tempDatabaseName.equalsIgnoreCase(databaseNameInMongoDB)))
+                    if (!(intersectionInfo.getRelatedDatasetAcc().equalsIgnoreCase(accession) && tempDatabaseName.equalsIgnoreCase(database)))
                         ids.add(intersectionInfo.getRelatedDatasetAcc());
                     currentIds.put(database, ids);
                 }
@@ -193,18 +189,13 @@ public class EnrichmentController {
             @ApiParam(value = "Database name, e.g: PRIDE")
             @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
     ) {
-        //"PRIDE Archive" is the name stored in MongoDB
-        String databaseNameInMongoDB = database;
-        if (databaseNameInMongoDB.equals("PRIDE")) {
-            databaseNameInMongoDB = "PRIDE Archive";
-        }
 
         Map<String, String> similarDatasets = new HashMap<>();
-        Set<Triplet> Scores = new HashSet<>();
-        similarDatasets.put(accession, databaseNameInMongoDB);//put itself in the set;
-        String combatName = accession + "@" + databaseNameInMongoDB;
+        List<Triplet> Scores = new ArrayList<>();
+        similarDatasets.put(accession, database);//put itself in the set;
+        String combatName = accession + "@" + database;
 
-        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, databaseNameInMongoDB);
+        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
             int length = intersectionInfos.size();
@@ -220,13 +211,13 @@ public class EnrichmentController {
                 }
             }
         }
-        SimilarInfoResult similarInfoResult = new SimilarInfoResult(accession, databaseNameInMongoDB, Scores);
+        SimilarInfoResult similarInfoResult = new SimilarInfoResult(accession, database, Scores);
         return similarInfoResult;
     }
 
-    private void findSimilarDatasetsFor(String accession, String databaseNameInMongoDB, Map<String, String> similarDatasets, Set<Triplet> Scores) {
-        String combatName = accession + "@" + databaseNameInMongoDB;
-        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, databaseNameInMongoDB);
+    private void findSimilarDatasetsFor(String accession, String database, Map<String, String> similarDatasets, List<Triplet> Scores) {
+        String combatName = accession + "@" + database;
+        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
             int length = intersectionInfos.size();
