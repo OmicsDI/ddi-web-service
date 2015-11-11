@@ -102,26 +102,40 @@ public class EnrichmentController {
     }
 
 
+    /**
+     * Get all enriched words(string) in a dataset, from different fields
+     * @param enrichmentInfo
+     * @return
+     */
     private List<String> getEnrichedWordsInDataset(DatasetEnrichmentInfo enrichmentInfo) {
         List<String> words = new ArrayList<String>();
         List<WordInField> wordsInField = new ArrayList<>();
 
-        for (WordInField word : enrichmentInfo.getTitle()) {
-            wordsInField.add(word);
+        if(enrichmentInfo.getTitle() != null) {
+            for (WordInField word : enrichmentInfo.getTitle()) {
+                wordsInField.add(word);
+            }
         }
 
-        for (WordInField word1 : enrichmentInfo.getAbstractDescription()) {
-            wordsInField.add(word1);
+        if(enrichmentInfo.getAbstractDescription() != null) {
+            for (WordInField word1 : enrichmentInfo.getAbstractDescription()) {
+                wordsInField.add(word1);
+            }
         }
 
-        for (WordInField word2 : enrichmentInfo.getSampleProtocol()) {
-            wordsInField.add(word2);
+        if(enrichmentInfo.getSampleProtocol() != null) {
+            for (WordInField word2 : enrichmentInfo.getSampleProtocol()) {
+                wordsInField.add(word2);
+            }
         }
 
-        for (WordInField word3 : enrichmentInfo.getDataProtocol()) {
-            wordsInField.add(word3);
+        if(enrichmentInfo.getDataProtocol() != null) {
+            for (WordInField word3 : enrichmentInfo.getDataProtocol()) {
+                wordsInField.add(word3);
+            }
         }
 
+        //unique
         for (WordInField wordInField : wordsInField) {
             if (!words.contains(wordInField.getText())) {
                 words.add(wordInField.getText());
@@ -190,10 +204,10 @@ public class EnrichmentController {
             @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
     ) {
 
-        Map<String, String> similarDatasets = new HashMap<>();
+        List<String> similarDatasets = new ArrayList<>();
         List<Triplet> Scores = new ArrayList<>();
-        similarDatasets.put(accession, database);//put itself in the set;
-        String combatName = accession + "@" + database;
+        String combinedName = accession + "@" + database;
+        similarDatasets.add(combinedName);//put itself in the set;
 
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
         if (datasetStatInfo != null) {
@@ -201,13 +215,13 @@ public class EnrichmentController {
             int length = intersectionInfos.size();
             for (int i=0; i<length; i++) {
                 IntersectionInfo intersectionInfo = intersectionInfos.get(i);
-                String combatName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
+                String combinedName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
 
                 if (intersectionInfo.getRelatedDatasetAcc() != null && intersectionInfo.getRelatedDatasetDatabase() != null) {
-                    similarDatasets.put(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase());
-                    Triplet<String, String, Float> score = new Triplet<>(combatName,combatName2,(float)intersectionInfo.getCosineScore());
+                    similarDatasets.add(combinedName2);
+                    Triplet<String, String, Float> score = new Triplet<>(combinedName,combinedName2,(float)intersectionInfo.getCosineScore());
                     Scores.add(score);
-                findSimilarDatasetsFor(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase(), similarDatasets, Scores);
+                findSimilarScoresFor(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase(), similarDatasets, Scores);
                 }
             }
         }
@@ -215,18 +229,24 @@ public class EnrichmentController {
         return similarInfoResult;
     }
 
-    private void findSimilarDatasetsFor(String accession, String database, Map<String, String> similarDatasets, List<Triplet> Scores) {
-        String combatName = accession + "@" + database;
+    /**
+     * This function find the similar scores between this dataset(accession+database) and the other datasets inside the similarDatasets set
+     * @param accession
+     * @param database
+     * @param similarDatasets
+     * @param Scores
+     */
+    private void findSimilarScoresFor(String accession, String database, List<String> similarDatasets, List<Triplet> Scores) {
+        String combinedName = accession + "@" + database;
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
             int length = intersectionInfos.size();
             for (int i=0; i<length; i++) {
                 IntersectionInfo intersectionInfo = intersectionInfos.get(i);
-                String combatName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
-                if (intersectionInfo.getRelatedDatasetAcc() != null && intersectionInfo.getRelatedDatasetDatabase() != null) {
-                    similarDatasets.put(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase());
-                    Triplet<String, String, Float> score = new Triplet<>(combatName,combatName2,(float)intersectionInfo.getCosineScore());
+                String combinedName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
+                if (similarDatasets.contains(combinedName2)) {
+                    Triplet<String, String, Float> score = new Triplet<>(combinedName,combinedName2,(float)intersectionInfo.getCosineScore());
                     if (!Scores.contains(score)) {
                         Scores.add(score);
                     }
