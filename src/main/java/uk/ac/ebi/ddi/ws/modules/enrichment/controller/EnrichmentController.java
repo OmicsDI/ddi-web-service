@@ -27,9 +27,11 @@ import uk.ac.ebi.ddi.service.db.service.similarity.IDatasetStatInfoService;
 import uk.ac.ebi.ddi.service.db.service.similarity.IExpOutputDatasetService;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
+import uk.ac.ebi.ddi.ws.modules.enrichment.model.SimilarInfoResult;
 import uk.ac.ebi.ddi.ws.modules.enrichment.model.SynonymsForDataset;
 import uk.ac.ebi.ddi.ws.modules.enrichment.model.SynonymsForWord;
 import uk.ac.ebi.ddi.ws.util.Constants;
+import uk.ac.ebi.ddi.ws.util.Triplet;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 import java.util.*;
@@ -100,22 +102,40 @@ public class EnrichmentController {
     }
 
 
+    /**
+     * Get all enriched words(string) in a dataset, from different fields
+     * @param enrichmentInfo
+     * @return
+     */
     private List<String> getEnrichedWordsInDataset(DatasetEnrichmentInfo enrichmentInfo) {
         List<String> words = new ArrayList<String>();
         List<WordInField> wordsInField = new ArrayList<>();
 
-        for (WordInField word : enrichmentInfo.getTitle()) {
-            wordsInField.add(word);
+        if(enrichmentInfo.getTitle() != null) {
+            for (WordInField word : enrichmentInfo.getTitle()) {
+                wordsInField.add(word);
+            }
         }
 
-        for (WordInField word1 : enrichmentInfo.getAbstractDescription()) {
-            wordsInField.add(word1);
+        if(enrichmentInfo.getAbstractDescription() != null) {
+            for (WordInField word1 : enrichmentInfo.getAbstractDescription()) {
+                wordsInField.add(word1);
+            }
         }
 
-        for (WordInField word2 : enrichmentInfo.getSampleProtocol()) {
-            wordsInField.add(word2);
+        if(enrichmentInfo.getSampleProtocol() != null) {
+            for (WordInField word2 : enrichmentInfo.getSampleProtocol()) {
+                wordsInField.add(word2);
+            }
         }
 
+        if(enrichmentInfo.getDataProtocol() != null) {
+            for (WordInField word3 : enrichmentInfo.getDataProtocol()) {
+                wordsInField.add(word3);
+            }
+        }
+
+        //unique
         for (WordInField wordInField : wordsInField) {
             if (!words.contains(wordInField.getText())) {
                 words.add(wordInField.getText());
@@ -142,26 +162,18 @@ public class EnrichmentController {
         List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
         Map<String, Set<String>> currentIds = new HashMap<String, Set<String>>();
 
-        //"PRIDE Archive" is the name stored in MongoDB
-        String databaseNameInMongoDB = database;
-        if (databaseNameInMongoDB.equals("PRIDE")) {
-            databaseNameInMongoDB = "PRIDE Archive";
-        }
-
-        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, databaseNameInMongoDB);
+        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
             for (IntersectionInfo intersectionInfo : intersectionInfos) {
 
                 if (intersectionInfo.getRelatedDatasetAcc() != null && intersectionInfo.getRelatedDatasetDatabase() != null) {
                     String tempDatabaseName = intersectionInfo.getRelatedDatasetDatabase();
-                    if (tempDatabaseName.equals("PRIDE Archive")) {
-                        tempDatabaseName = "PRIDE";
-                    }
+
                     Set<String> ids = currentIds.get(tempDatabaseName);
                     if (ids == null)
                         ids = new HashSet<String>();
-                    if (!(intersectionInfo.getRelatedDatasetAcc().equalsIgnoreCase(accession) && tempDatabaseName.equalsIgnoreCase(databaseNameInMongoDB)))
+                    if (!(intersectionInfo.getRelatedDatasetAcc().equalsIgnoreCase(accession) && tempDatabaseName.equalsIgnoreCase(database)))
                         ids.add(intersectionInfo.getRelatedDatasetAcc());
                     currentIds.put(database, ids);
                 }
@@ -185,38 +197,62 @@ public class EnrichmentController {
     @ResponseStatus(HttpStatus.OK) // 200
     public
     @ResponseBody
-    DataSetResult getSimilarityInfo(
+    SimilarInfoResult getSimilarityInfo(
             @ApiParam(value = "Dataset accession")
             @RequestParam(value = "accession", required = true, defaultValue = "PXD000002") String accession,
             @ApiParam(value = "Database name, e.g: PRIDE")
             @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
     ) {
-        //"PRIDE Archive" is the name stored in MongoDB
-        String databaseNameInMongoDB = database;
-        if (databaseNameInMongoDB.equals("PRIDE")) {
-            databaseNameInMongoDB = "PRIDE Archive";
-        }
 
-        Map<String, String> similarDatasets = new HashMap<>();
-        similarDatasets.put(accession, databaseNameInMongoDB);//put itself in the set;
+        List<String> similarDatasets = new ArrayList<>();
+        List<Triplet> Scores = new ArrayList<>();
+        String combinedName = accession + "@" + database;
+        similarDatasets.add(combinedName);//put itself in the set;
 
-        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, databaseNameInMongoDB);
+        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
             int length = intersectionInfos.size();
-            Float[][] Scores = new Float[length+1][length+1];
             for (int i=0; i<length; i++) {
                 IntersectionInfo intersectionInfo = intersectionInfos.get(i);
+                String combinedName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
+
                 if (intersectionInfo.getRelatedDatasetAcc() != null && intersectionInfo.getRelatedDatasetDatabase() != null) {
-                    similarDatasets.put(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase());
-                    Scores[0][i] = (float) intersectionInfo.getCosineScore();
+                    similarDatasets.add(combinedName2);
+                    Triplet<String, String, Float> score = new Triplet<>(combinedName,combinedName2,(float)intersectionInfo.getCosineScore());
+                    Scores.add(score);
+                findSimilarScoresFor(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase(), similarDatasets, Scores);
                 }
             }
         }
+        SimilarInfoResult similarInfoResult = new SimilarInfoResult(accession, database, Scores);
+        return similarInfoResult;
+    }
 
-
-
-        return null;
+    /**
+     * This function find the similar scores between this dataset(accession+database) and the other datasets inside the similarDatasets set
+     * @param accession
+     * @param database
+     * @param similarDatasets
+     * @param Scores
+     */
+    private void findSimilarScoresFor(String accession, String database, List<String> similarDatasets, List<Triplet> Scores) {
+        String combinedName = accession + "@" + database;
+        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
+        if (datasetStatInfo != null) {
+            List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
+            int length = intersectionInfos.size();
+            for (int i=0; i<length; i++) {
+                IntersectionInfo intersectionInfo = intersectionInfos.get(i);
+                String combinedName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
+                if (similarDatasets.contains(combinedName2)) {
+                    Triplet<String, String, Float> score = new Triplet<>(combinedName,combinedName2,(float)intersectionInfo.getCosineScore());
+                    if (!Scores.contains(score)) {
+                        Scores.add(score);
+                    }
+                }
+            }
+        }
     }
 
 
