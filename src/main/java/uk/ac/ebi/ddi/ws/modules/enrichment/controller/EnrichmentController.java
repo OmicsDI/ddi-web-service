@@ -147,11 +147,11 @@ public class EnrichmentController {
 
 
     @ApiOperation(value = "get similar datasets for a dataset", position = 1, notes = "retrieve all similar datasets for the dataset")
-    @RequestMapping(value = "/getSimilarDatasetsByExpData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getSimilarDatasetsByBiologicalData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
     @ResponseBody
-    DataSetResult getSimilarDatasetsByExpData(
+    DataSetResult getSimilarDatasetsByBiologicalData(
             @ApiParam(value = "Dataset accession")
             @RequestParam(value = "accession", required = true, defaultValue = "PXD000002") String accession,
             @ApiParam(value = "Database name, e.g: PRIDE")
@@ -161,21 +161,30 @@ public class EnrichmentController {
         DataSetResult result = new DataSetResult();
         List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
         Map<String, Set<String>> currentIds = new HashMap<String, Set<String>>();
-
+        List<Double> scores = new ArrayList<>();
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
+        List<IntersectionInfo> intersectionInfos;
         if (datasetStatInfo != null) {
-            List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
+            intersectionInfos = datasetStatInfo.getIntersectionInfos();
             for (IntersectionInfo intersectionInfo : intersectionInfos) {
 
-                if (intersectionInfo.getRelatedDatasetAcc() != null && intersectionInfo.getRelatedDatasetDatabase() != null) {
+                if (intersectionInfo.getRelatedDatasetAcc() != null || intersectionInfo.getRelatedDatasetDatabase() != null) {
                     String tempDatabaseName = intersectionInfo.getRelatedDatasetDatabase();
 
+                    if(tempDatabaseName.equals("NA")) {
+                        continue;
+                    }
+
+                    if(tempDatabaseName.equals("MetabolomicsWorkbench")) {
+                        tempDatabaseName = "metabolomics_workbench";
+                    }
+                    scores.add(intersectionInfo.getCosineScore());
                     Set<String> ids = currentIds.get(tempDatabaseName);
                     if (ids == null)
                         ids = new HashSet<String>();
                     if (!(intersectionInfo.getRelatedDatasetAcc().equalsIgnoreCase(accession) && tempDatabaseName.equalsIgnoreCase(database)))
                         ids.add(intersectionInfo.getRelatedDatasetAcc());
-                    currentIds.put(database, ids);
+                    currentIds.put(tempDatabaseName, ids);
                 }
 
             }
@@ -185,14 +194,48 @@ public class EnrichmentController {
                 datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult, currentDomain, null));
             }
 
-        }
+        Collections.sort(scores);
+        Collections.reverse(scores);
+
+        datasetSummaryList = sortDatasetSummaryList(datasetSummaryList, intersectionInfos,scores);
         result.setDatasets(datasetSummaryList);
         result.setCount(datasetSummaryList.size());
-
+        }
         return result;
     }
 
-    @ApiOperation(value = "get similarity information for a dataset", position = 1, notes = "retrieve similarity info between the datasets that is similar to the given dataset")
+    private List<DatasetSummary> sortDatasetSummaryList(List<DatasetSummary> datasetSummaryList, List<IntersectionInfo> intersectionInfos, List<Double> scores) {
+        List<DatasetSummary> newDatasetSummaryList = new ArrayList<>();
+        newDatasetSummaryList.addAll(datasetSummaryList);
+
+        for (DatasetSummary newDatasetSummary : newDatasetSummaryList) {
+            newDatasetSummary = null;
+        }
+
+        for (DatasetSummary datasetSummary : datasetSummaryList) {
+            String accession = datasetSummary.getId();
+            String database = datasetSummary.getSource();
+            if (database.equals("metabolomics_workbench")) {
+                database = "MetabolomicsWorkbench";
+            }
+            Double score = 0.0;
+            for (IntersectionInfo intersectionInfo : intersectionInfos) {
+                if (intersectionInfo.getRelatedDatasetAcc().equals(accession) && intersectionInfo.getRelatedDatasetDatabase().equals(database)) {
+                    score = intersectionInfo.getCosineScore();
+                    break;
+                }
+            }
+
+            int index = scores.indexOf(score);
+            if(index < 0) continue;;
+
+            scores.set(index, 0.0 - index);
+            newDatasetSummaryList.set(index, datasetSummary);
+        }
+        return newDatasetSummaryList;
+    }
+
+    @ApiOperation(value = "get similarity information for a dataset", position = 1, notes = "retrieve similarity info between the datasets that is similar to the given dataset, filtered by similarity threshold score ")
     @RequestMapping(value = "/getSimilarityInfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
@@ -201,7 +244,9 @@ public class EnrichmentController {
             @ApiParam(value = "Dataset accession")
             @RequestParam(value = "accession", required = true, defaultValue = "PXD000002") String accession,
             @ApiParam(value = "Database name, e.g: PRIDE")
-            @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
+            @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database,
+            @ApiParam(value = "Threshold score, e.g: 0.10")
+            @RequestParam(value = "threshold", required = true, defaultValue = "0.10") float threshold
     ) {
 
         List<String> similarDatasets = new ArrayList<>();
@@ -219,9 +264,11 @@ public class EnrichmentController {
 
                 if (intersectionInfo.getRelatedDatasetAcc() != null && intersectionInfo.getRelatedDatasetDatabase() != null) {
                     similarDatasets.add(combinedName2);
-                    Triplet<String, String, Float> score = new Triplet<>(combinedName,combinedName2,(float)intersectionInfo.getCosineScore());
-                    Scores.add(score);
-                findSimilarScoresFor(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase(), similarDatasets, Scores);
+                    if((float)intersectionInfo.getCosineScore() >= threshold){
+                        Triplet<String, String, Float> score = new Triplet<>(combinedName, combinedName2, (float) intersectionInfo.getCosineScore());
+                        Scores.add(score);
+                    }
+                findSimilarScoresFor(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase(), similarDatasets, Scores, threshold);
                 }
             }
         }
@@ -236,7 +283,7 @@ public class EnrichmentController {
      * @param similarDatasets
      * @param Scores
      */
-    private void findSimilarScoresFor(String accession, String database, List<String> similarDatasets, List<Triplet> Scores) {
+    private void findSimilarScoresFor(String accession, String database, List<String> similarDatasets, List<Triplet> Scores, float threshold) {
         String combinedName = accession + "@" + database;
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
         if (datasetStatInfo != null) {
@@ -245,7 +292,7 @@ public class EnrichmentController {
             for (int i=0; i<length; i++) {
                 IntersectionInfo intersectionInfo = intersectionInfos.get(i);
                 String combinedName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
-                if (similarDatasets.contains(combinedName2)) {
+                if (similarDatasets.contains(combinedName2) && (float)intersectionInfo.getCosineScore() >= threshold) {
                     Triplet<String, String, Float> score = new Triplet<>(combinedName,combinedName2,(float)intersectionInfo.getCosineScore());
                     if (!Scores.contains(score)) {
                         Scores.add(score);
