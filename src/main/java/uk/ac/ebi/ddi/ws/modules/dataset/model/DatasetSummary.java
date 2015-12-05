@@ -50,6 +50,11 @@ public class DatasetSummary {
      */
     String publicationDate = null;
 
+    /**
+     * Score for the similarity
+     */
+    String score;
+
     public String getId() {
         return id;
     }
@@ -112,5 +117,13 @@ public class DatasetSummary {
 
     public void setVisitCount(int visitCount) {
         this.visitCount = visitCount;
+    }
+
+    public String getScore() {
+        return score;
+    }
+
+    public void setScore(String score) {
+        this.score = score;
     }
 }

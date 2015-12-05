@@ -344,25 +344,25 @@ public class DatasetController {
         DataSetResult result = new DataSetResult();
         List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
 
-        Map<String, Set<String>> currentIds = new HashMap<String, Set<String>>();
+        Map<String, Map<String, String>> currentIds = new HashMap<String, Map<String, String>>();
 
 
         if(queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0){
 
             for(Entry entry: queryResult.getEntries()){
                 if(entry.getId() != null && entry.getSource() != null){
-                    Set<String> ids = currentIds.get(entry.getSource());
+                    Map<String, String> ids = currentIds.get(entry.getSource());
                     if(ids == null)
-                        ids = new HashSet<String>();
+                        ids = new HashMap<String, String>();
                     if(!(entry.getId().equalsIgnoreCase(acc) && entry.getSource().equalsIgnoreCase(domain)))
-                        ids.add(entry.getId());
+                        ids.put(entry.getId(), entry.getScore());
                     currentIds.put(entry.getSource(), ids);
                 }
             }
 
             for(String currentDomain: currentIds.keySet()){
-                QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, currentIds.get(currentDomain));
-                datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult,currentDomain, null));
+                QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, currentIds.get(currentDomain).keySet());
+                datasetSummaryList.addAll(WsUtilities.transformSimilarDatasetSummary(datasetResult,currentDomain, currentIds.get(currentDomain)));
             }
 
             result.setDatasets(datasetSummaryList);
