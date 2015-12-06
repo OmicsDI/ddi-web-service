@@ -40,6 +40,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static uk.ac.ebi.ddi.ws.util.WsUtilities.*;
+
 
 @Api(value = "dataset", description = "Retrieve the information about the dataset including search functionalities", position = 0)
 @Controller
@@ -287,7 +289,7 @@ public class DatasetController {
                 resource = new DatasetResource("http://www.ebi.ac.uk/Tools/ddi/" + domain + "/" + acc,acc,domain);
                 resource = resourceService.save(resource);
             }
-            HttpEvent event = WsUtilities.tranformServletResquestToEvent(httpServletRequest);
+            HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
             event.setResource(resource);
             eventService.save(event);
         }
@@ -319,7 +321,7 @@ public class DatasetController {
         }
         for(String domain: currentIds.keySet()){
             QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds.get(domain));
-            datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult,domain, mostAccesedIds));
+            datasetSummaryList.addAll(transformDatasetSummary(datasetResult,domain, mostAccesedIds));
         }
         result.setDatasets(datasetSummaryList);
         result.setCount(datasetSummaryList.size());
@@ -362,8 +364,19 @@ public class DatasetController {
 
             for(String currentDomain: currentIds.keySet()){
                 QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, currentIds.get(currentDomain).keySet());
-                datasetSummaryList.addAll(WsUtilities.transformSimilarDatasetSummary(datasetResult,currentDomain, currentIds.get(currentDomain)));
+                datasetSummaryList.addAll(transformSimilarDatasetSummary(datasetResult,currentDomain, currentIds.get(currentDomain)));
             }
+
+            Collections.sort(datasetSummaryList, new Comparator<DatasetSummary>() {
+                @Override
+                public int compare(DatasetSummary o1, DatasetSummary o2) {
+                    Double value1 = Double.valueOf(o1.getScore());
+                    Double value2 = Double.valueOf(o2.getScore());
+                    if (value1 < value2) return 1;
+                    else if (value1 == value2) return 0;
+                    else return -1;
+                }
+            });
 
             result.setDatasets(datasetSummaryList);
             result.setCount(datasetSummaryList.size());

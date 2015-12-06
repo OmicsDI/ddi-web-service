@@ -161,4 +161,11 @@ public class WsUtilities {
         }
         return null;
     }
+
+    public class CustomComparator implements Comparator<DatasetSummary> {
+        @Override
+        public int compare(DatasetSummary o1, DatasetSummary o2) {
+            return Double.valueOf(o1.getScore()).compareTo(Double.valueOf(o2.getScore()));
+        }
+    }
 }
