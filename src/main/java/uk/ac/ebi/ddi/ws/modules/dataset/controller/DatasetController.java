@@ -40,6 +40,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static uk.ac.ebi.ddi.ws.util.WsUtilities.*;
+
 
 @Api(value = "dataset", description = "Retrieve the information about the dataset including search functionalities", position = 0)
 @Controller
@@ -214,6 +216,9 @@ public class DatasetController {
             String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
             datasetDetail.setDescription(descriptions[0]);
 
+            String[] omics_type = fields.get(Constants.OMICS_TYPE_FIELD);
+            datasetDetail.setOmics_type(omics_type[0]);
+
             String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
             if(publication_dates != null && publication_dates.length > 0 && publication_dates[0] != null)
                    datasetDetail.setPublicationDate(publication_dates[0]);
@@ -287,7 +292,7 @@ public class DatasetController {
                 resource = new DatasetResource("http://www.ebi.ac.uk/Tools/ddi/" + domain + "/" + acc,acc,domain);
                 resource = resourceService.save(resource);
             }
-            HttpEvent event = WsUtilities.tranformServletResquestToEvent(httpServletRequest);
+            HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
             event.setResource(resource);
             eventService.save(event);
         }
@@ -319,7 +324,7 @@ public class DatasetController {
         }
         for(String domain: currentIds.keySet()){
             QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds.get(domain));
-            datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult,domain, mostAccesedIds));
+            datasetSummaryList.addAll(transformDatasetSummary(datasetResult,domain, mostAccesedIds));
         }
         result.setDatasets(datasetSummaryList);
         result.setCount(datasetSummaryList.size());
@@ -344,26 +349,37 @@ public class DatasetController {
         DataSetResult result = new DataSetResult();
         List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
 
-        Map<String, Set<String>> currentIds = new HashMap<String, Set<String>>();
+        Map<String, Map<String, String>> currentIds = new HashMap<String, Map<String, String>>();
 
 
         if(queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0){
 
             for(Entry entry: queryResult.getEntries()){
                 if(entry.getId() != null && entry.getSource() != null){
-                    Set<String> ids = currentIds.get(entry.getSource());
+                    Map<String, String> ids = currentIds.get(entry.getSource());
                     if(ids == null)
-                        ids = new HashSet<String>();
+                        ids = new HashMap<String, String>();
                     if(!(entry.getId().equalsIgnoreCase(acc) && entry.getSource().equalsIgnoreCase(domain)))
-                        ids.add(entry.getId());
+                        ids.put(entry.getId(), entry.getScore());
                     currentIds.put(entry.getSource(), ids);
                 }
             }
 
             for(String currentDomain: currentIds.keySet()){
-                QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, currentIds.get(currentDomain));
-                datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult,currentDomain, null));
+                QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, currentIds.get(currentDomain).keySet());
+                datasetSummaryList.addAll(transformSimilarDatasetSummary(datasetResult,currentDomain, currentIds.get(currentDomain)));
             }
+
+            Collections.sort(datasetSummaryList, new Comparator<DatasetSummary>() {
+                @Override
+                public int compare(DatasetSummary o1, DatasetSummary o2) {
+                    Double value1 = Double.valueOf(o1.getScore());
+                    Double value2 = Double.valueOf(o2.getScore());
+                    if (value1 < value2) return 1;
+                    else if (value1 == value2) return 0;
+                    else return -1;
+                }
+            });
 
             result.setDatasets(datasetSummaryList);
             result.setCount(datasetSummaryList.size());

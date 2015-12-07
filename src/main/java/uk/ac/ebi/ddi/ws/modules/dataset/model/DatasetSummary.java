@@ -50,6 +50,22 @@ public class DatasetSummary {
      */
     String publicationDate = null;
 
+    /**
+     * Score for the similarity
+     */
+    String score;
+
+    String omicsType = null;
+
+
+    public String getOmicsType() {
+        return omicsType;
+    }
+
+    public void setOmicsType(String omicsType) {
+        this.omicsType = omicsType;
+    }
+
     public String getId() {
         return id;
     }
@@ -112,5 +128,13 @@ public class DatasetSummary {
 
     public void setVisitCount(int visitCount) {
         this.visitCount = visitCount;
+    }
+
+    public String getScore() {
+        return score;
+    }
+
+    public void setScore(String score) {
+        this.score = score;
     }
 }

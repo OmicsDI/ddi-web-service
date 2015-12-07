@@ -99,6 +99,11 @@ public class RepoDatasetMapper {
                     if(entry.getFields().get(Constants.CURATOR_KEY_FIELD) != null && entry.getFields().get(Constants.CURATOR_KEY_FIELD).length > 0)
                         keywords.addAll(Arrays.asList(entry.getFields().get(Constants.CURATOR_KEY_FIELD)));
 
+                if(entry.getFields().containsKey(Constants.OMICS_TYPE_FIELD))
+                    if(entry.getFields().get(Constants.OMICS_TYPE_FIELD) != null && entry.getFields().get(Constants.OMICS_TYPE_FIELD).length > 0)
+                        datasetSummary.setOmicsType(entry.getFields().get(Constants.OMICS_TYPE_FIELD)[0]);
+
+
                 if(entry.getFields().containsKey(Constants.SUBMITTER_KEY_FIELD))
                     if(entry.getFields().get(Constants.SUBMITTER_KEY_FIELD) != null && entry.getFields().get(Constants.SUBMITTER_KEY_FIELD).length > 0)
                         keywords.addAll(Arrays.asList(entry.getFields().get(Constants.SUBMITTER_KEY_FIELD)));
