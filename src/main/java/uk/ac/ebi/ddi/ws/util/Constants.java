@@ -71,7 +71,8 @@ public class Constants {
     public static final String[] MORELIKE_FIELDS        =  {Constants.NAME_FIELD,
                                                             Constants.DESCRIPTION_FIELD,
                                                             Constants.DATA_PROTOCOL_FIELD,
-                                                            Constants.SAMPLE_PROTOCOL_FIELD
+                                                            Constants.SAMPLE_PROTOCOL_FIELD,
+                                                            Constants.OMICS_TYPE_FIELD
     };
 
 
