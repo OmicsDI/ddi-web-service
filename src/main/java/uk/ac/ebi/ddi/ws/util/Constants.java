@@ -49,7 +49,8 @@ public class Constants {
                                                            Constants.NAME_FIELD,
                                                            Constants.SUBMITTER_KEY_FIELD,Constants.CURATOR_KEY_FIELD,
                                                            Constants.PUB_DATE_FIELD,
-                                                           Constants.TAXONOMY_FIELD};
+                                                           Constants.TAXONOMY_FIELD,
+                                                           Constants.OMICS_TYPE_FIELD};
 
 
     public static final String[] DATASET_DETAIL         = {Constants.NAME_FIELD,

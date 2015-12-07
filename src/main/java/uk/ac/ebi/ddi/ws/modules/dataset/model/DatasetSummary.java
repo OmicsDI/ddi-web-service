@@ -55,6 +55,17 @@ public class DatasetSummary {
      */
     String score;
 
+    String omicsType = null;
+
+
+    public String getOmicsType() {
+        return omicsType;
+    }
+
+    public void setOmicsType(String omicsType) {
+        this.omicsType = omicsType;
+    }
+
     public String getId() {
         return id;
     }
