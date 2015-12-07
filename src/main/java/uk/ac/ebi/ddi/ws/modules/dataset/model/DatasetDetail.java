@@ -94,6 +94,15 @@ public class DatasetDetail {
      */
     List<String> diseases      = null;
 
+    String omics_type          = null;
+
+    public String getOmics_type() {
+        return omics_type;
+    }
+
+    public void setOmics_type(String omics_type) {
+        this.omics_type = omics_type;
+    }
 
     public String getId() {
         return id;

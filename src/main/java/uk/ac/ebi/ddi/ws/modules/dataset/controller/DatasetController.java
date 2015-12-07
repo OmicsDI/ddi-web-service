@@ -216,6 +216,9 @@ public class DatasetController {
             String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
             datasetDetail.setDescription(descriptions[0]);
 
+            String[] omics_type = fields.get(Constants.OMICS_TYPE_FIELD);
+            datasetDetail.setOmics_type(omics_type[0]);
+
             String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
             if(publication_dates != null && publication_dates.length > 0 && publication_dates[0] != null)
                    datasetDetail.setPublicationDate(publication_dates[0]);
