@@ -71,11 +71,14 @@ public class WsUtilities {
                 String[] names = fields.get(Constants.NAME_FIELD);
                 String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
                 String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
+                String[] omics_type = fields.get(Constants.OMICS_TYPE_FIELD);
 
                 datasetSummary.setId(entry.getId());
                 if(names != null && names.length >0) datasetSummary.setTitle(names[0]);
                 if(descriptions != null && descriptions.length >0) datasetSummary.setDescription(descriptions[0]);
                 if(publication_dates != null && publication_dates.length >0) datasetSummary.setPublicationDate(publication_dates[0]);
+                if(omics_type != null && omics_type.length > 0) datasetSummary.setOmicsType(omics_type[0]);
+                
                 datasetSummary.setSource(domain);
                 if(visitMap != null && visitMap.size()> 0){
                     Tuple<String, String> newKey = new Tuple<String, String>(entry.getId(), domain);
