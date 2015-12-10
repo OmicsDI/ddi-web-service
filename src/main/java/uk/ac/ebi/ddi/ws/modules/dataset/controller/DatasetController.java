@@ -359,8 +359,9 @@ public class DatasetController {
                     Map<String, String> ids = currentIds.get(entry.getSource());
                     if(ids == null)
                         ids = new HashMap<String, String>();
-                    if(!(entry.getId().equalsIgnoreCase(acc) && entry.getSource().equalsIgnoreCase(domain)))
+                    if(!(entry.getId().equalsIgnoreCase(acc) && entry.getSource().equalsIgnoreCase(domain))) {
                         ids.put(entry.getId(), entry.getScore());
+                    }
                     currentIds.put(entry.getSource(), ids);
                 }
             }
