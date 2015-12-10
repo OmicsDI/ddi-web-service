@@ -149,7 +149,7 @@ public class Constants {
 
     //Todo: We need to do this dynamic
 
-    public static String[] INITIAL_DOMAINS            = { "pride", "peptide_atlas", "ega", "massive", "metabolights_dataset", "metabolome_workbench"
+    public static String[] INITIAL_DOMAINS            = { "omics"
 
 
     };

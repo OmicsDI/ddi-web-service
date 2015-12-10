@@ -78,7 +78,7 @@ public class WsUtilities {
                 if(descriptions != null && descriptions.length >0) datasetSummary.setDescription(descriptions[0]);
                 if(publication_dates != null && publication_dates.length >0) datasetSummary.setPublicationDate(publication_dates[0]);
                 if(omics_type != null && omics_type.length > 0) datasetSummary.setOmicsType(omics_type[0]);
-                
+
                 datasetSummary.setSource(domain);
                 if(visitMap != null && visitMap.size()> 0){
                     Tuple<String, String> newKey = new Tuple<String, String>(entry.getId(), domain);
