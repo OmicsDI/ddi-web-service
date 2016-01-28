@@ -160,8 +160,6 @@ public class EnrichmentController {
     ) {
 
         DataSetResult result = new DataSetResult();
-        List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
-        Map<String, Set<String>> currentIds = new HashMap<String, Set<String>>();
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
         List<IntersectionInfo> intersectionInfos;
 
@@ -184,41 +182,56 @@ public class EnrichmentController {
                 subListLength = intersectionInfos.size();
             }
             intersectionInfos = intersectionInfos.subList(0, subListLength);
-            for (IntersectionInfo intersectionInfo : intersectionInfos) {
 
-                if (intersectionInfo.getRelatedDatasetAcc() != null || intersectionInfo.getRelatedDatasetDatabase() != null) {
-                    String tempDatabaseName = intersectionInfo.getRelatedDatasetDatabase();
-
-                    if (tempDatabaseName.equals("NA")) {
-                        continue;
-                    }
-
-                    if (tempDatabaseName.equals("MetabolomicsWorkbench")) {
-                        tempDatabaseName = "metabolomics_workbench";
-                    }
-                    Set<String> ids = currentIds.get(tempDatabaseName);
-                    if (ids == null)
-                        ids = new HashSet<String>();
-                    if (!(intersectionInfo.getRelatedDatasetAcc().equalsIgnoreCase(accession) && tempDatabaseName.equalsIgnoreCase(database)))
-                        ids.add(intersectionInfo.getRelatedDatasetAcc());
-                    currentIds.put(tempDatabaseName, ids);
-                }
-
-            }
-
-            for (String currentDomain : currentIds.keySet()) {
-                Set<String> ids = currentIds.get(currentDomain);
-                QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, ids);
-                datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult, currentDomain, null));
-            }
-
+            List<DatasetSummary> datasetSummaryList = getDataFromEBeyeSearch(accession, database, intersectionInfos);
             datasetSummaryList = addScores(datasetSummaryList, intersectionInfos);
-
 
             result.setDatasets(datasetSummaryList);
             result.setCount(datasetSummaryList.size());
         }
         return result;
+    }
+
+    private List<DatasetSummary> getDataFromEBeyeSearch(String accession, String database, List<IntersectionInfo> intersectionInfos) {
+
+        List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
+        Map<String, Set<String>> currentIds = new HashMap<String, Set<String>>();
+        for (IntersectionInfo intersectionInfo : intersectionInfos) {
+
+            if (intersectionInfo.getRelatedDatasetAcc() != null || intersectionInfo.getRelatedDatasetDatabase() != null) {
+                String tempDatabaseName = intersectionInfo.getRelatedDatasetDatabase();
+
+                if (tempDatabaseName.equals("NA")) {
+                    continue;
+                }
+
+                if (tempDatabaseName.equals("MetabolomicsWorkbench")) {
+                    tempDatabaseName = "metabolomics_workbench";
+                }
+                Set<String> ids = currentIds.get(tempDatabaseName);
+                if (ids == null)
+                    ids = new HashSet<String>();
+                if (!(intersectionInfo.getRelatedDatasetAcc().equalsIgnoreCase(accession) && tempDatabaseName.equalsIgnoreCase(database)))
+                    ids.add(intersectionInfo.getRelatedDatasetAcc());
+                currentIds.put(tempDatabaseName, ids);
+            }
+
+        }
+
+        for (String currentDomain : currentIds.keySet()) {
+            Set<String> ids = currentIds.get(currentDomain);
+
+            if(ids.size()<99) {
+                QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, ids);
+                datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult, currentDomain, null));
+            }
+            else{
+                int size = ids.size(),i = 0;
+//                while()
+            }
+        }
+
+        return datasetSummaryList;
     }
 
     private List<DatasetSummary> addScores(List<DatasetSummary> datasetSummaryList, List<IntersectionInfo> intersectionInfos) {
@@ -267,8 +280,8 @@ public class EnrichmentController {
             @RequestParam(value = "accession", required = true, defaultValue = "PXD000002") String accession,
             @ApiParam(value = "Database name, e.g: PRIDE")
             @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database,
-            @ApiParam(value = "Threshold score, e.g: 0.10")
-            @RequestParam(value = "threshold", required = true, defaultValue = "0.10") float threshold
+            @ApiParam(value = "Threshold score, e.g: 0.50")
+            @RequestParam(value = "threshold", required = true, defaultValue = "0.50") float threshold
     ) {
 
         List<String> similarDatasets = new ArrayList<>();
@@ -279,6 +292,16 @@ public class EnrichmentController {
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
+            Collections.sort(intersectionInfos, new Comparator<IntersectionInfo>() {
+                @Override
+                public int compare(IntersectionInfo o1, IntersectionInfo o2) {
+                    Double value1 = Double.valueOf(o1.getCosineScore());
+                    Double value2 = Double.valueOf(o2.getCosineScore());
+                    if (value1 < value2) return 1;
+                    else if (value1 == value2) return 0;
+                    else return -1;
+                }
+            });
             int length = intersectionInfos.size();
             for (int i = 0; i < length; i++) {
                 IntersectionInfo intersectionInfo = intersectionInfos.get(i);
