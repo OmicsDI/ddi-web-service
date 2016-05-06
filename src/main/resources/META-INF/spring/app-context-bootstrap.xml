@@ -50,7 +50,7 @@
                               socket-keep-alive="true"
                               socket-timeout="10000"
                               write-concern="NORMAL"
-                              read-preference="SECONDARY"
+                              read-preference="SECONDARY_PREFERRED"
                 />
     </mongo:mongo-client>
 

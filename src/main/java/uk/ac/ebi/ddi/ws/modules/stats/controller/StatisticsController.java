@@ -185,20 +185,25 @@ public class StatisticsController {
         String proteomicsQuery   =    "*:* AND omics_type:\"Proteomics\"";
         String metabolomicsQuery =    "*:* AND omics_type:\"Metabolomics\"";
         String genomicsQuery     =    "*:* AND omics_type:\"Genomics\"";
+        String transcriptomicsQuery   =    "*:* AND omics_type:\"Transcriptomics\"";
 
         QueryResult queryResultOfProteomics   = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, proteomicsQuery,  Constants.DATASET_SUMMARY, null, order, start, size, facetCount);
         QueryResult queryResultOfGenomics     = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, genomicsQuery,    Constants.DATASET_SUMMARY, null, order, start, size, facetCount);
         QueryResult queryResultOfMetabolomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, metabolomicsQuery, Constants.DATASET_SUMMARY, null, order, start, size, facetCount);
+        QueryResult queryResultOfTranscriptomics = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, transcriptomicsQuery, Constants.DATASET_SUMMARY, null, order, start, size, facetCount);
 
         Facet[]  facetsG = queryResultOfGenomics.getFacets();
         Facet[]  facetsM = queryResultOfMetabolomics.getFacets();
         Facet[]  facetsP = queryResultOfProteomics.getFacets();
+        Facet[]  facetsT = queryResultOfTranscriptomics.getFacets();
 
-        FacetValue[] publicationDateFacetValueOfG = WsUtilities.getFacetValues(facetsG, Constants.PUB_DATE_FIELD);
-        FacetValue[] publicationDateFacetValueOfM = WsUtilities.getFacetValues(facetsM, Constants.PUB_DATE_FIELD);
-        FacetValue[] publicationDateFacetValueOfP = WsUtilities.getFacetValues(facetsP, Constants.PUB_DATE_FIELD);
+        FacetValue[] publicationDateFacetValueOfG = WsUtilities.getFacetValues(facetsG, Constants.PUB_DATES);
+        FacetValue[] publicationDateFacetValueOfM = WsUtilities.getFacetValues(facetsM, Constants.PUB_DATES);
+        FacetValue[] publicationDateFacetValueOfP = WsUtilities.getFacetValues(facetsP, Constants.PUB_DATES);
+        FacetValue[] publicationDateFacetValueOfT = WsUtilities.getFacetValues(facetsT, Constants.PUB_DATES);
 
-        List<String> distinctYears = WsUtilities.distinctYears(publicationDateFacetValueOfG, publicationDateFacetValueOfM, publicationDateFacetValueOfP);
+
+        List<String> distinctYears = WsUtilities.distinctYears(publicationDateFacetValueOfG, publicationDateFacetValueOfM, publicationDateFacetValueOfP, publicationDateFacetValueOfT);
 
         Collections.sort(distinctYears, Collections.reverseOrder());
 
@@ -206,6 +211,7 @@ public class StatisticsController {
         String genomicsNo = "";
         String metabolomicsNo = "";
         String proteomicsNo = "";
+        String transcriptomicsNo = "";
 
 
         for(int i= 0; i < 4; i++){  //latest 4 years
@@ -213,7 +219,9 @@ public class StatisticsController {
             genomicsNo             = WsUtilities.getFacetValueLabel(publicationDateFacetValueOfG, year);
             metabolomicsNo         = WsUtilities.getFacetValueLabel(publicationDateFacetValueOfM, year);
             proteomicsNo           = WsUtilities.getFacetValueLabel(publicationDateFacetValueOfP, year);
-            StatOmicsRecord record = new StatOmicsRecord(year,genomicsNo,metabolomicsNo,proteomicsNo);
+            transcriptomicsNo      = WsUtilities.getFacetValueLabel(publicationDateFacetValueOfT, year);
+
+            StatOmicsRecord record = new StatOmicsRecord(year,genomicsNo,metabolomicsNo,proteomicsNo, transcriptomicsNo);
             resultStat.add(record);
         }
 

@@ -129,11 +129,12 @@ public class WsUtilities {
         return null;
     }
 
-    public static FacetValue[] getFacetValues(Facet[] facetsG, String field) {
-        if(facetsG != null && facetsG.length > 0 && field != null){
+    public static FacetValue[] getFacetValues(Facet[] facetsG, String[] fields) {
+        if(facetsG != null && facetsG.length > 0 && fields != null){
             for(Facet facet: facetsG){
-                if(facet.getId().equalsIgnoreCase(field))
-                    return facet.getFacetValues();
+                for(String field: fields)
+                    if(facet.getId().equalsIgnoreCase(field))
+                        return facet.getFacetValues();
             }
         }
         return null;
@@ -141,11 +142,15 @@ public class WsUtilities {
 
     public static List<String> distinctYears(FacetValue[] publicationDateFacetValueOfG,
                                              FacetValue[] publicationDateFacetValueOfM,
-                                             FacetValue[] publicationDateFacetValueOfP) {
+                                             FacetValue[] publicationDateFacetValueOfP,
+                                             FacetValue[] publicationDateFacetValueOfT
+                                             ) {
         Set<String> finalYears = new HashSet<>();
         finalYears.addAll(WsUtilities.addFacetValues(publicationDateFacetValueOfG));
         finalYears.addAll(WsUtilities.addFacetValues(publicationDateFacetValueOfM));
         finalYears.addAll(WsUtilities.addFacetValues(publicationDateFacetValueOfP));
+        finalYears.addAll(WsUtilities.addFacetValues(publicationDateFacetValueOfT));
+
         return new ArrayList<>(finalYears);
     }
 

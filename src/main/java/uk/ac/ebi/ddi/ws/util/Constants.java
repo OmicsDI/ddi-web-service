@@ -31,6 +31,10 @@ public class Constants {
 
     public static final String PUB_DATE_FIELD           = "publication_date";
 
+    public static final String PUB_DATE_FIELD_OPTIONAL  = "publication";
+
+    public static final String[] PUB_DATES = new String[]{PUB_DATE_FIELD, PUB_DATE_FIELD_OPTIONAL};
+
     public static final String EGA_UPDATED_FIELD        = "updated";
 
     public static final String DATA_PROTOCOL_FIELD      = "data_protocol";
@@ -100,7 +104,23 @@ public class Constants {
             "who","whom","why","will","with","would","yet","you","your",
             "protein", "proteomics", "proteomic", "proteome", "proteomes", "mass", "proteins", "lc", "ms", "based", "from", "using", "during", "LC-MS", "LC-MS/MS","reveals","as","non","data"};
 
-    public static String[] SHORT_EXCLUSION_WORDS              = {"ega", "study", "data", "using", "10", "available", "da", "two", "protein", "proteins", "peptide", "peptides", "20", "80", "24","30","50", "0", "100", "15", "24"};
+    public static String[] SHORT_EXCLUSION_WORDS              = {"ega", "study", "data",
+            "using", "10", "available", "da", "two", "protein", "proteins",
+            "peptide", "peptides", "20", "80", "24","30","50", "0", "100",
+            "15", "24", "rna","cell", "between", "mouse", "used", "human", "each", "dna", "both", "total",
+            "three", "mice", "one", "type", "one", "identify", "here",
+            "response", "identified", "different", "replicates", "high", "profiling",
+            "response", "log2", "raw", "br", "ratio", "values","rma", "cel", "processed", "non",
+            "time", "changes", "role", "profile", "array", "wild", "specific", "br",
+            "version", "files", "file", "array", "arrays", "microarray", "analyzed",
+            "cy5", "intensities", "gene", "results", "tissue", "profiles", "levels",
+            "associated", "agilent", "quantile", "cy3", "set", "affymetrix", "during",
+            "well", "found", "treatment", "treated", "wide", "growth", "chip", "log",
+            "package", "default", "reads", "method", "probe", "standard",
+            "genome", "mrna", "isolated","design", "expressed", "show", "lines", "genechip", "detection", "median", "genes", "images",
+            "protocol", "al", "et", "images", "bioconductor", "four", "microarrays", "development", "seq", "conditions", "based", "involved",
+            "control","mean", "calculated", "parameters","illumina","reference", "3000", "http", "days", "under", "individual"
+    };
 
     public static String TAXONOMY_DOMAIN               = "taxonomy";
 
@@ -153,20 +173,5 @@ public class Constants {
 
 
     };
-
-
-//    public static final String CHROMATOGRAPHY_PROTOCOL  = "chromatography_protocol";
-//
-//    public static final String MASS_SPEC_PROTOCOL       = "mass_spec_protocol";
-//
-//    public static final String METABOLITE_ID_PROTOCOL   = "metabolite_id_protocol";
-//
-//    public static final String NMR_ASSAY_PROTOCOL       = "nmr_assay_protocol";
-//
-//    public static final String NMR_SPEC_PROTOCOL        = "nmr_spec_protocol";
-
-//    public static final String DERIVATIZATION_PROTOCOL  = "derivatization_protocol";
-//
-//    public static final String EXTRACTION_PROTOCOL      = "extraction_protocol";
 
 }
