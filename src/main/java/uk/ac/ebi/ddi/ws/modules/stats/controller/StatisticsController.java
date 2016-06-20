@@ -138,7 +138,7 @@ public class StatisticsController {
 
         String[] subdomains  = WsUtilities.getSubdomainList(domain);
 
-        List<StatRecord> resultStat = new ArrayList<StatRecord>();
+        List<StatRecord> resultStat = new ArrayList<>();
 
         resultStat.add(new StatRecord("Different Repositories/Databases", String.valueOf(subdomains.length), null));
 
@@ -173,7 +173,7 @@ public class StatisticsController {
     public @ResponseBody
     List<StatOmicsRecord> getOmicsByYear() {
 
-        List<StatOmicsRecord> resultStat = new ArrayList<StatOmicsRecord>();
+        List<StatOmicsRecord> resultStat = new ArrayList<>();
 
     //    String sortfield = Constants.DESCRIPTION_FIELD;
         ///Todo: We need to update the fields that can be sorted

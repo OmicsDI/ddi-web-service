@@ -31,7 +31,6 @@ import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
-import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -102,20 +101,20 @@ public class DatasetController {
          */
 
         if(taxonomyIds.size() > Constants.HIGH_QUERY_THRESHOLD){
-            List<QueryResult> resultList = new ArrayList<QueryResult>();
-            List<String> list = new ArrayList<String>(taxonomyIds);
+            List<QueryResult> resultList = new ArrayList<>();
+            List<String> list = new ArrayList<>(taxonomyIds);
             int count = 0;
             for(int i=0 ; i < taxonomyIds.size(); i += Constants.HIGH_QUERY_THRESHOLD){
-                Set<String> currentIds = null;
+                Set<String> currentIds;
                 if((i+Constants.HIGH_QUERY_THRESHOLD) < taxonomyIds.size())
-                    currentIds   = new HashSet<String>(list.subList(i, i+Constants.HIGH_QUERY_THRESHOLD));
+                    currentIds   = new HashSet<>(list.subList(i, i + Constants.HIGH_QUERY_THRESHOLD));
                 else
-                    currentIds   = new HashSet<String>(list.subList(i , taxonomyIds.size()-1));
+                    currentIds   = new HashSet<>(list.subList(i, taxonomyIds.size() - 1));
 
                resultList.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, currentIds));
                count = i;
             }
-            Set<String> currentIds = new HashSet<String>(list.subList(count, taxonomyIds.size()-1));
+            Set<String> currentIds = new HashSet<>(list.subList(count, taxonomyIds.size() - 1));
             resultList.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, currentIds));
             taxonomies = RepoDatasetMapper.mergeQueryResult(resultList);
 
@@ -161,15 +160,15 @@ public class DatasetController {
          */
 
         if(taxonomyIds.size() > Constants.HIGH_QUERY_THRESHOLD){
-            List<QueryResult> resultList = new ArrayList<QueryResult>();
-            List<String> list = new ArrayList<String>(taxonomyIds);
+            List<QueryResult> resultList = new ArrayList<>();
+            List<String> list = new ArrayList<>(taxonomyIds);
             int count = 0;
             for(int i=0 ; i < taxonomyIds.size(); i += Constants.HIGH_QUERY_THRESHOLD){
-                Set<String> currentIds = new HashSet<String>(list.subList(i, Constants.HIGH_QUERY_THRESHOLD));
+                Set<String> currentIds = new HashSet<>(list.subList(i, Constants.HIGH_QUERY_THRESHOLD));
                 resultList.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, currentIds));
                 count = i;
             }
-            Set<String> currentIds = new HashSet<String>(list.subList(count, taxonomyIds.size()-1));
+            Set<String> currentIds = new HashSet<>(list.subList(count, taxonomyIds.size() - 1));
             resultList.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, currentIds));
             taxonomies = RepoDatasetMapper.mergeQueryResult(resultList);
 
@@ -217,7 +216,7 @@ public class DatasetController {
             datasetDetail.setDescription(descriptions[0]);
 
             String[] omics_type = fields.get(Constants.OMICS_TYPE_FIELD);
-            datasetDetail.setOmics_type(omics_type[0]);
+            datasetDetail.setOmics_type(Arrays.asList(omics_type));
 
             String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
             if(publication_dates != null && publication_dates.length > 0 && publication_dates[0] != null)
@@ -311,14 +310,14 @@ public class DatasetController {
     ) {
 
         DataSetResult result = new DataSetResult();
-        List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
+        List<DatasetSummary> datasetSummaryList = new ArrayList<>();
         Map<Tuple<String, String>, Integer> mostAccesedIds = eventService.moreAccessedDatasetResource(size);
-        Map<String, Set<String>> currentIds = new HashMap<String, Set<String>>();
+        Map<String, Set<String>> currentIds = new HashMap<>();
 
         for(Tuple<String, String> dataset: mostAccesedIds.keySet()){
             Set<String> ids = currentIds.get(dataset.getValue());
             if(ids == null)
-                ids = new HashSet<String>();
+                ids = new HashSet<>();
             ids.add(dataset.getKey());
             currentIds.put(dataset.getValue(), ids);
         }
@@ -347,9 +346,9 @@ public class DatasetController {
         SimilarResult queryResult = dataWsClient.getSimilarProjects(domain, acc, Constants.MORELIKE_FIELDS);
 
         DataSetResult result = new DataSetResult();
-        List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
+        List<DatasetSummary> datasetSummaryList = new ArrayList<>();
 
-        Map<String, Map<String, String>> currentIds = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> currentIds = new HashMap<>();
 
 
         if(queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0){
@@ -358,7 +357,7 @@ public class DatasetController {
                 if(entry.getId() != null && entry.getSource() != null){
                     Map<String, String> ids = currentIds.get(entry.getSource());
                     if(ids == null)
-                        ids = new HashMap<String, String>();
+                        ids = new HashMap<>();
                     if(!(entry.getId().equalsIgnoreCase(acc) && entry.getSource().equalsIgnoreCase(domain))) {
                         ids.put(entry.getId(), entry.getScore());
                     }
@@ -377,7 +376,7 @@ public class DatasetController {
                     Double value1 = Double.valueOf(o1.getScore());
                     Double value2 = Double.valueOf(o2.getScore());
                     if (value1 < value2) return 1;
-                    else if (value1 == value2) return 0;
+                    else if (Objects.equals(value1, value2)) return 0;
                     else return -1;
                 }
             });
@@ -393,7 +392,7 @@ public class DatasetController {
 
 
     @ApiOperation(value = "Retrieve all file links for a given dataset", position = 1, notes = "Retrieve all file links for a given dataset")
-    @RequestMapping(value = "/getFileLink", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getFileLinks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     List<String> getFileLinks(
@@ -402,7 +401,7 @@ public class DatasetController {
             @ApiParam(value = "Database accession id, e.g : pride")
             @RequestParam(value = "database", required = true) String domain
     ) {
-        List<String> files = new ArrayList<String>();
+        List<String> files = new ArrayList<>();
 
         String[] fields = {
                 Constants.DATASET_FILE

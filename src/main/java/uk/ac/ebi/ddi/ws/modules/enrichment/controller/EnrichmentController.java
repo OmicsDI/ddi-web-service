@@ -17,20 +17,19 @@ import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.service.db.model.enrichment.DatasetEnrichmentInfo;
-import uk.ac.ebi.ddi.service.db.model.enrichment.Synonym;
 import uk.ac.ebi.ddi.service.db.model.enrichment.WordInField;
 import uk.ac.ebi.ddi.service.db.model.similarity.DatasetStatInfo;
 import uk.ac.ebi.ddi.service.db.model.similarity.IntersectionInfo;
 import uk.ac.ebi.ddi.service.db.service.enrichment.IEnrichmentInfoService;
 import uk.ac.ebi.ddi.service.db.service.enrichment.ISynonymsService;
 import uk.ac.ebi.ddi.service.db.service.similarity.IDatasetStatInfoService;
-import uk.ac.ebi.ddi.service.db.service.similarity.IExpOutputDatasetService;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 import uk.ac.ebi.ddi.ws.modules.enrichment.model.SimilarInfoResult;
 import uk.ac.ebi.ddi.ws.modules.enrichment.model.SynonymsForDataset;
 import uk.ac.ebi.ddi.ws.modules.enrichment.model.SynonymsForWord;
 import uk.ac.ebi.ddi.ws.util.Constants;
+import uk.ac.ebi.ddi.ws.util.Field;
 import uk.ac.ebi.ddi.ws.util.Triplet;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
@@ -67,6 +66,7 @@ public class EnrichmentController {
             @ApiParam(value = "Database name, e.g: PRIDE")
             @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
     ) {
+        database = Constants.Database.retriveAnchorName(database);
         return enrichmentService.readByAccession(accession, database);
     }
 
@@ -82,7 +82,7 @@ public class EnrichmentController {
             @ApiParam(value = "Database name, e.g: PRIDE")
             @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
     ) {
-
+        database = Constants.Database.retriveAnchorName(database);
         DatasetEnrichmentInfo enrichmentInfo = enrichmentService.readByAccession(accession, database);
         if (enrichmentInfo == null) {
             return null;
@@ -109,41 +109,27 @@ public class EnrichmentController {
      * @return
      */
     private List<String> getEnrichedWordsInDataset(DatasetEnrichmentInfo enrichmentInfo) {
-        List<String> words = new ArrayList<String>();
+        Set<String> words = new HashSet<>();
         List<WordInField> wordsInField = new ArrayList<>();
-
-        if (enrichmentInfo.getTitle() != null) {
-            for (WordInField word : enrichmentInfo.getTitle()) {
-                wordsInField.add(word);
-            }
+        if(enrichmentInfo.getSynonyms() != null){
+            if(enrichmentInfo.getSynonyms().containsKey(Field.NAME.getName()))
+                wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.NAME.getName()));
+            if(enrichmentInfo.getSynonyms().containsKey(Field.DESCRIPTION.getName()))
+                wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.DESCRIPTION.getName()));
+            if(enrichmentInfo.getSynonyms().containsKey(Field.DATA.getName()))
+                wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.DATA.getName()));
+            if(enrichmentInfo.getSynonyms().containsKey(Field.SAMPLE.getName()))
+                wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.SAMPLE.getName()));
+            if(enrichmentInfo.getSynonyms().containsKey(Field.PUBMED_TITLE.getName()))
+                wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.PUBMED_TITLE.getName()));
+            if(enrichmentInfo.getSynonyms().containsKey(Field.PUBMED_ABSTRACT.getName()))
+                wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.PUBMED_ABSTRACT.getName()));
         }
-
-        if (enrichmentInfo.getAbstractDescription() != null) {
-            for (WordInField word1 : enrichmentInfo.getAbstractDescription()) {
-                wordsInField.add(word1);
-            }
-        }
-
-        if (enrichmentInfo.getSampleProtocol() != null) {
-            for (WordInField word2 : enrichmentInfo.getSampleProtocol()) {
-                wordsInField.add(word2);
-            }
-        }
-
-        if (enrichmentInfo.getDataProtocol() != null) {
-            for (WordInField word3 : enrichmentInfo.getDataProtocol()) {
-                wordsInField.add(word3);
-            }
-        }
-
         //unique
-        for (WordInField wordInField : wordsInField) {
-            if (!words.contains(wordInField.getText())) {
-                words.add(wordInField.getText());
-            }
-        }
+        for (WordInField wordInField : wordsInField)
+            words.add(wordInField.getText());
 
-        return words;
+        return new ArrayList<>(words);
     }
 
 
@@ -159,8 +145,9 @@ public class EnrichmentController {
             @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
     ) {
 
+        String anchorDatabase = Constants.Database.retriveAnchorName(database);
         DataSetResult result = new DataSetResult();
-        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
+        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, anchorDatabase);
         List<IntersectionInfo> intersectionInfos;
 
 
@@ -170,10 +157,10 @@ public class EnrichmentController {
             Collections.sort(intersectionInfos, new Comparator<IntersectionInfo>() {
                 @Override
                 public int compare(IntersectionInfo o1, IntersectionInfo o2) {
-                    Double value1 = Double.valueOf(o1.getCosineScore());
-                    Double value2 = Double.valueOf(o2.getCosineScore());
+                    Double value1 = o1.getCosineScore();
+                    Double value2 = o2.getCosineScore();
                     if (value1 < value2) return 1;
-                    else if (value1 == value2) return 0;
+                    else if (Objects.equals(value1, value2)) return 0;
                     else return -1;
                 }
             });
@@ -194,23 +181,18 @@ public class EnrichmentController {
 
     private List<DatasetSummary> getDataFromEBeyeSearch(String accession, String database, List<IntersectionInfo> intersectionInfos) {
 
-        List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
-        Map<String, Set<String>> currentIds = new HashMap<String, Set<String>>();
+        List<DatasetSummary> datasetSummaryList = new ArrayList<>();
+        Map<String, Set<String>> currentIds = new HashMap<>();
         for (IntersectionInfo intersectionInfo : intersectionInfos) {
 
             if (intersectionInfo.getRelatedDatasetAcc() != null || intersectionInfo.getRelatedDatasetDatabase() != null) {
                 String tempDatabaseName = intersectionInfo.getRelatedDatasetDatabase();
 
-                if (tempDatabaseName.equals("NA")) {
-                    continue;
-                }
-
-                if (tempDatabaseName.equals("MetabolomicsWorkbench")) {
-                    tempDatabaseName = "metabolomics_workbench";
-                }
+                tempDatabaseName = Constants.Database.retriveSorlName(tempDatabaseName);
                 Set<String> ids = currentIds.get(tempDatabaseName);
+
                 if (ids == null)
-                    ids = new HashSet<String>();
+                    ids = new HashSet<>();
                 if (!(intersectionInfo.getRelatedDatasetAcc().equalsIgnoreCase(accession) && tempDatabaseName.equalsIgnoreCase(database)))
                     ids.add(intersectionInfo.getRelatedDatasetAcc());
                 currentIds.put(tempDatabaseName, ids);
@@ -225,10 +207,6 @@ public class EnrichmentController {
                 QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, ids);
                 datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult, currentDomain, null));
             }
-            else{
-                int size = ids.size(),i = 0;
-//                while()
-            }
         }
 
         return datasetSummaryList;
@@ -239,9 +217,7 @@ public class EnrichmentController {
         for (DatasetSummary datasetSummary : datasetSummaryList) {
             String accession = datasetSummary.getId();
             String database = datasetSummary.getSource();
-            if (database.equals("metabolomics_workbench")) {
-                database = "MetabolomicsWorkbench";
-            }
+            database = Constants.Database.retriveAnchorName(database);
             Double score = 0.0;
             for (IntersectionInfo intersectionInfo : intersectionInfos) {
                 if (intersectionInfo.getRelatedDatasetAcc().equals(accession) && intersectionInfo.getRelatedDatasetDatabase().equals(database)) {
@@ -258,7 +234,7 @@ public class EnrichmentController {
                 Double value1 = Double.valueOf(o1.getScore());
                 Double value2 = Double.valueOf(o2.getScore());
                 if (value1 < value2) return 1;
-                else if (value1 == value2) return 0;
+                else if (Objects.equals(value1, value2)) return 0;
                 else return -1;
             }
         });
@@ -289,22 +265,21 @@ public class EnrichmentController {
         String combinedName = accession + "@" + database;
         similarDatasets.add(combinedName);//put itself in the set;
 
-        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
+        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, Constants.Database.retriveAnchorName(database));
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
             Collections.sort(intersectionInfos, new Comparator<IntersectionInfo>() {
                 @Override
                 public int compare(IntersectionInfo o1, IntersectionInfo o2) {
-                    Double value1 = Double.valueOf(o1.getCosineScore());
-                    Double value2 = Double.valueOf(o2.getCosineScore());
+                    Double value1 = o1.getCosineScore();
+                    Double value2 = o2.getCosineScore();
                     if (value1 < value2) return 1;
-                    else if (value1 == value2) return 0;
+                    else if (Objects.equals(value1, value2)) return 0;
                     else return -1;
                 }
             });
             int length = intersectionInfos.size();
-            for (int i = 0; i < length; i++) {
-                IntersectionInfo intersectionInfo = intersectionInfos.get(i);
+            for (IntersectionInfo intersectionInfo : intersectionInfos) {
                 String combinedName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
 
                 if (intersectionInfo.getRelatedDatasetAcc() != null && intersectionInfo.getRelatedDatasetDatabase() != null) {
@@ -317,8 +292,7 @@ public class EnrichmentController {
                 }
             }
         }
-        SimilarInfoResult similarInfoResult = new SimilarInfoResult(accession, database, Scores);
-        return similarInfoResult;
+        return new SimilarInfoResult(accession, database, Scores);
     }
 
     /**
@@ -335,8 +309,7 @@ public class EnrichmentController {
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
             int length = intersectionInfos.size();
-            for (int i = 0; i < length; i++) {
-                IntersectionInfo intersectionInfo = intersectionInfos.get(i);
+            for (IntersectionInfo intersectionInfo : intersectionInfos) {
                 String combinedName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
                 if (similarDatasets.contains(combinedName2) && (float) intersectionInfo.getCosineScore() >= threshold) {
                     Triplet<String, String, Float> score = new Triplet<>(combinedName, combinedName2, (float) intersectionInfo.getCosineScore());

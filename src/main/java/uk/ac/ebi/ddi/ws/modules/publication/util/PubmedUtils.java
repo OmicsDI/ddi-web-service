@@ -1,19 +1,12 @@
 package uk.ac.ebi.ddi.ws.modules.publication.util;
 
 
-import com.google.gson.JsonObject;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.PubmedPublication;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.google.gson.Gson;
+
 import uk.ac.ebi.ddi.ws.modules.publication.model.PublicationDetail;
 import uk.ac.ebi.ddi.ws.util.Constants;
 
@@ -30,7 +23,7 @@ public class PubmedUtils {
      */
    public static List<PublicationDetail> transformPublication(QueryResult result){
 
-       List<PublicationDetail> publications = new ArrayList<PublicationDetail>();
+       List<PublicationDetail> publications = new ArrayList<>();
 
        if(result != null && result.getEntries() != null && result.getEntries().length > 0){
            for(Entry entry: result.getEntries()){

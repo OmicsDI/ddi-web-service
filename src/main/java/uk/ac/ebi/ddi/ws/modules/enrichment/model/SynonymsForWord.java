@@ -32,7 +32,7 @@ public class SynonymsForWord {
     }
 
     public void addSynonym(String synonym){
-        if(this.synonyms == null) this.synonyms = new ArrayList<String>();
+        if(this.synonyms == null) this.synonyms = new ArrayList<>();
         this.synonyms.add(synonym);
     }
 }

@@ -55,14 +55,14 @@ public class DatasetSummary {
      */
     String score;
 
-    String omicsType = null;
+    List<String> omicsType = null;
 
 
-    public String getOmicsType() {
+    public List<String> getOmicsType() {
         return omicsType;
     }
 
-    public void setOmicsType(String omicsType) {
+    public void setOmicsType(List<String> omicsType) {
         this.omicsType = omicsType;
     }
 

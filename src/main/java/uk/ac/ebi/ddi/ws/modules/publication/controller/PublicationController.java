@@ -46,7 +46,7 @@ public class PublicationController {
 
         PublicationResult publicationResult = new PublicationResult();
         if(accs != null && accs.length > 0){
-            Set<String> ids = new HashSet<String>();
+            Set<String> ids = new HashSet<>();
             for(String acc: accs)
                  if(acc != null && acc.length() >0)
                      ids.add(acc);

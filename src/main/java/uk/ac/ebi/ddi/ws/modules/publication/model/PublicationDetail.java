@@ -1,14 +1,5 @@
 package uk.ac.ebi.ddi.ws.modules.publication.model;
 
-import uk.ac.ebi.ddi.ws.modules.dataset.model.*;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.LabMember;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.Organism;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.Protocol;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.PubmedPublication;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This class handle the information concerning the publication such as abstract, etc .
  *

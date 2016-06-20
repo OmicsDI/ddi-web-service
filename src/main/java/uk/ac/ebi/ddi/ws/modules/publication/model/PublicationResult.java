@@ -14,7 +14,7 @@ public class PublicationResult {
     private List<PublicationDetail> publications;
 
     public PublicationResult(){
-        publications = new ArrayList<PublicationDetail>();
+        publications = new ArrayList<>();
     }
 
     public PublicationResult(Integer count, List<PublicationDetail> publications) {

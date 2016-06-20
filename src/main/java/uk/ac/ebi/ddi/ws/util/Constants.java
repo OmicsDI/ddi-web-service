@@ -1,7 +1,5 @@
 package uk.ac.ebi.ddi.ws.util;
 
-import uk.ac.ebi.ddi.ebe.ws.dao.utils.Constans;
-
 /**
  * @author Yasset Perez-Riverol ypriverol
  */
@@ -107,8 +105,8 @@ public class Constants {
     public static String[] SHORT_EXCLUSION_WORDS              = {"ega", "study", "data",
             "using", "10", "available", "da", "two", "protein", "proteins",
             "peptide", "peptides", "20", "80", "24","30","50", "0", "100",
-            "15", "24", "rna","cell", "between", "mouse", "used", "human", "each", "dna", "both", "total",
-            "three", "mice", "one", "type", "one", "identify", "here",
+            "15", "24", "rna","cell", "between", "mouse", "used", "human", "each",
+            "dna", "both", "total", "three", "mice", "one", "type", "one", "identify", "here",
             "response", "identified", "different", "replicates", "high", "profiling",
             "response", "log2", "raw", "br", "ratio", "values","rma", "cel", "processed", "non",
             "time", "changes", "role", "profile", "array", "wild", "specific", "br",
@@ -117,9 +115,14 @@ public class Constants {
             "associated", "agilent", "quantile", "cy3", "set", "affymetrix", "during",
             "well", "found", "treatment", "treated", "wide", "growth", "chip", "log",
             "package", "default", "reads", "method", "probe", "standard",
-            "genome", "mrna", "isolated","design", "expressed", "show", "lines", "genechip", "detection", "median", "genes", "images",
-            "protocol", "al", "et", "images", "bioconductor", "four", "microarrays", "development", "seq", "conditions", "based", "involved",
-            "control","mean", "calculated", "parameters","illumina","reference", "3000", "http", "days", "under", "individual"
+            "genome", "mrna", "isolated","design", "expressed", "show", "lines", "genechip",
+            "detection", "median", "genes", "images", "protocol", "al", "et", "images",
+            "bioconductor", "four", "microarrays", "development", "seq", "conditions", "based",
+            "involved", "control","mean", "calculated", "parameters","illumina","reference",
+            "3000", "http", "days", "under", "individual",
+            "biological", "compared", "experiment", "transcription", "induced", "global",
+            "genome_build", "scanning", "test", "scanning", "scaning",
+
     };
 
     public static String TAXONOMY_DOMAIN               = "taxonomy";
@@ -173,5 +176,56 @@ public class Constants {
 
 
     };
+
+    public enum Database{
+        PRIDE("pride", "pride"),
+        PEPTIDEATLAS("PeptideAtlas", "peptide_atlas"),
+        MASSIVE("Massive", "massive"),
+        METABOLIGHTS("MetaboLights", "metabolights_dataset"),
+        EGA("EGA", "ega"),
+        GPMDB("GPMDB",  "gpmdb"),
+        GNPS("GNPS", "gnps"),
+        ARRAY_EXPRESS("ArrayExpress", "arrayexpress-repository"),
+        METABOLOMEEXPRESS("MetabolomeExpress", "metabolome_express"),
+        METABOLOMICSWORKBENCH("MetabolomicsWorkbench", "metabolomics_workbench");
+
+        String databaseName;
+        String solarName;
+
+        Database(String databaseName, String solrName) {
+            this.databaseName = databaseName;
+            this.solarName = solrName;
+        }
+
+        public String getDatabaseName() {
+            return databaseName;
+        }
+
+        public void setDatabaseName(String databaseName) {
+            this.databaseName = databaseName;
+        }
+
+        public String getSolarName() {
+            return solarName;
+        }
+
+        public void setSolarName(String solarName) {
+            this.solarName = solarName;
+        }
+
+        public static String retriveAnchorName(String name){
+            for(Database database: values())
+                if(database.solarName.equalsIgnoreCase(name))
+                       return database.getDatabaseName();
+            return name;
+        }
+
+        public static String retriveSorlName(String name) {
+            for(Database database: values())
+                if(database.getDatabaseName().equalsIgnoreCase(name))
+                    return database.getSolarName();
+            return name;
+        }
+    }
 
 }

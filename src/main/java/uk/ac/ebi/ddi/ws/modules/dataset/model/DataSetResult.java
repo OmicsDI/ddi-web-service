@@ -18,12 +18,12 @@ public class DataSetResult {
     /**
      * List of the datasets for the query
      */
-    List<DatasetSummary> datasets = new ArrayList<DatasetSummary>();
+    List<DatasetSummary> datasets = new ArrayList<>();
 
     /**
      * List of the facets for the query
      */
-    List<Facet>          facets   = new ArrayList<Facet>();
+    List<Facet>          facets   = new ArrayList<>();
 
     /**
      * Default constructor without paramters

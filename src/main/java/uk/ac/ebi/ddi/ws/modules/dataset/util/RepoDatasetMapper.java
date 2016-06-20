@@ -14,6 +14,7 @@ import java.util.*;
  * @author Yasset Perez-Riverol ypriverol
  */
 
+@SuppressWarnings("ManualArrayToCollectionCopy")
 public class RepoDatasetMapper {
 
     /**
@@ -27,7 +28,7 @@ public class RepoDatasetMapper {
 
         DataSetResult dataset = new DataSetResult();
 
-        List<DatasetSummary> datasets = new ArrayList<DatasetSummary>();
+        List<DatasetSummary> datasets = new ArrayList<>();
 
         dataset.setCount(queryResults.getCount());
 
@@ -49,7 +50,7 @@ public class RepoDatasetMapper {
      * @return The map of the taxonomies as Map<id, name>
      */
     private static Map<String, String> getTaxonomyMap(QueryResult taxonomies) {
-        Map<String, String> taxonomyMap  = new HashMap<String, String>();
+        Map<String, String> taxonomyMap  = new HashMap<>();
 
         if(taxonomies != null && taxonomies.getEntries() != null && taxonomies.getEntries().length > 0){
             for(Entry entry: taxonomies.getEntries()){
@@ -93,7 +94,7 @@ public class RepoDatasetMapper {
                     if(entry.getFields().get(Constants.PUB_DATE_FIELD) != null && entry.getFields().get(Constants.PUB_DATE_FIELD).length > 0)
                         datasetSummary.setPublicationDate(entry.getFields().get(Constants.PUB_DATE_FIELD)[0]);
 
-                List<String> keywords = new ArrayList<String>();
+                List<String> keywords = new ArrayList<>();
 
                 if(entry.getFields().containsKey(Constants.CURATOR_KEY_FIELD))
                     if(entry.getFields().get(Constants.CURATOR_KEY_FIELD) != null && entry.getFields().get(Constants.CURATOR_KEY_FIELD).length > 0)
@@ -101,7 +102,7 @@ public class RepoDatasetMapper {
 
                 if(entry.getFields().containsKey(Constants.OMICS_TYPE_FIELD))
                     if(entry.getFields().get(Constants.OMICS_TYPE_FIELD) != null && entry.getFields().get(Constants.OMICS_TYPE_FIELD).length > 0)
-                        datasetSummary.setOmicsType(entry.getFields().get(Constants.OMICS_TYPE_FIELD)[0]);
+                        datasetSummary.setOmicsType(Arrays.asList(entry.getFields().get(Constants.OMICS_TYPE_FIELD)));
 
 
                 if(entry.getFields().containsKey(Constants.SUBMITTER_KEY_FIELD))
@@ -115,7 +116,7 @@ public class RepoDatasetMapper {
                     datasetSummary.setKeywords(arrayKeywords);
                 }
 
-                List<Organism> organisms = new ArrayList<Organism>();
+                List<Organism> organisms = new ArrayList<>();
 
                 if(entry.getFields().containsKey(Constants.TAXONOMY_FIELD)){
                     if(entry.getFields().get(Constants.TAXONOMY_FIELD) != null && entry.getFields().get(Constants.TAXONOMY_FIELD).length > 0){
@@ -136,7 +137,7 @@ public class RepoDatasetMapper {
      * @return List of terms
      */
     public static List<Term> asTermResults(TermResult termResult) {
-        List<Term> terms = new ArrayList<Term>();
+        List<Term> terms = new ArrayList<>();
         if(termResult != null && termResult.getTerms() != null && termResult.getTerms().length > 0){
             for(uk.ac.ebi.ddi.ebe.ws.dao.model.common.Term oldTerm: termResult.getTerms())
                 terms.add(new Term(oldTerm.getText(), oldTerm.getFrequency()));
@@ -150,12 +151,11 @@ public class RepoDatasetMapper {
      * @return a list of taxonomy ids
      */
     public static Set<String> getTaxonomyIds(QueryResult queryResult){
-        Set<String> ids = new HashSet<String>();
+        Set<String> ids = new HashSet<>();
         if(queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0){
             for(Entry entry: queryResult.getEntries()){
                if(entry.getFields() != null && entry.getFields().containsKey(Constants.TAXONOMY_FIELD)){
-                   for(String taxonomy: entry.getFields().get(Constants.TAXONOMY_FIELD))
-                       ids.add(taxonomy);
+                   Collections.addAll(ids, entry.getFields().get(Constants.TAXONOMY_FIELD));
                }
             }
         }
@@ -171,7 +171,7 @@ public class RepoDatasetMapper {
     public static QueryResult mergeQueryResult(List<QueryResult> resultList) {
         QueryResult result = new QueryResult();
 
-        List<Entry> entries = new ArrayList<Entry>();
+        List<Entry> entries = new ArrayList<>();
 
         for(QueryResult query: resultList)
             entries.addAll(Arrays.asList(query.getEntries()));
@@ -189,7 +189,7 @@ public class RepoDatasetMapper {
     }
 
     public static DatasetDetail addTaxonomy(DatasetDetail datasetDetail, QueryResult taxonomies) {
-        List<Organism> organismList = new ArrayList<Organism>();
+        List<Organism> organismList = new ArrayList<>();
         if(taxonomies != null && taxonomies.getEntries() != null && taxonomies.getEntries().length > 0){
             for(Entry entry: taxonomies.getEntries()){
                 if(entry != null){

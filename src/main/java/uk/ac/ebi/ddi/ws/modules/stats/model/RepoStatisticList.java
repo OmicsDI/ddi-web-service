@@ -1,8 +1,5 @@
 package uk.ac.ebi.pride.cluster.ws.modules.stats.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * A list of RepoStatistics
  *

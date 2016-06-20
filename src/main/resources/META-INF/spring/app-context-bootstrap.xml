@@ -15,6 +15,7 @@
     <bean class="uk.ac.ebi.pride.web.util.callback.filter.JsonpCallbackFilter" id="jsonpCallbackFilter"/>
 
     <bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigDev"/>
+    <bean id="ebeyeWsConfigProd" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd"/>
 
     <bean id="domainClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient">
         <constructor-arg ref="ebeyeWsConfig"/>
@@ -42,20 +43,19 @@
     <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
 
 
-    <mongo:mongo-client id="mongoClient" replica-set="${ddi.mongo.app.machine.one}:${ddi.mongo.app.port},${ddi.mongo.app.machine.two}:${ddi.mongo.app.port},${ddi.mongo.app.machine.three}:${ddi.mongo.app.port}">
+    <mongo:mongo-client credentials="${ddi.mongo.app.user}:${ddi.mongo.app.password}@${ddi.mongo.app.authenticationDatabase}" id="mongoClient" replica-set="${ddi.mongo.app.machine.one}:${ddi.mongo.app.port},${ddi.mongo.app.machine.two}:${ddi.mongo.app.port},${ddi.mongo.app.machine.three}:${ddi.mongo.app.port}">
         <mongo:client-options connections-per-host="5"
-                              threads-allowed-to-block-for-connection-multiplier="2"
+                              threads-allowed-to-block-for-connection-multiplier="10"
                               connect-timeout="100000"
-                              max-wait-time="10000"
+                              max-wait-time="30000"
                               socket-keep-alive="true"
-                              socket-timeout="10000"
+                              socket-timeout="1000000"
                               write-concern="NORMAL"
-                              read-preference="SECONDARY_PREFERRED"
-                />
+                              read-preference="SECONDARY"/>
     </mongo:mongo-client>
 
-    <mongo:db-factory dbname="${ddi.mongo.app.db}" authentication-dbname="${ddi.mongo.app.authenticationDatabase}"
-                      username="${ddi.mongo.app.user}" password="${ddi.mongo.app.password}" port="${ddi.mongo.app.port}" mongo-ref="mongoClient"/>
+
+    <mongo:db-factory dbname="${ddi.mongo.app.db}" port="${ddi.mongo.app.port}" mongo-ref="mongoClient"/>
 
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
         <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
@@ -68,7 +68,7 @@
 
     <bean class="uk.ac.ebi.ddi.service.db.utils.CascadingMongoEventListener" />
 
-    <!--&lt;!&ndash;<bean id="annotService" class="uk.ac.ebi.ddi.annotation.service.DDIAnnotationService"/>&ndash;&gt;-->
+    <!--&lt;!&ndash;<bean id="annotService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>&ndash;&gt;-->
     <!--<bean id="termService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>-->
     <!--<bean id="synonymsService " class="uk.ac.ebi.ddi.service.db.service.enrichment.SynonymsService"/>-->
 

@@ -28,7 +28,7 @@ public final class RepoStatsToWsStatsMapper {
      */
     public static List<DomainStats> asDomainStatsList(DomainList domainList) {
 
-        List<DomainStats> domains = new ArrayList<DomainStats>();
+        List<DomainStats> domains = new ArrayList<>();
 
         if(domainList != null && domainList.list != null && domainList.list.length > 0){
             for(Domain domain: domainList.list){
@@ -58,7 +58,7 @@ public final class RepoStatsToWsStatsMapper {
             }
             domainStasts.setdomain(record);
             if(domain.getSubDomains() != null && domain.getSubDomains().length >0){
-                List<DomainStats> subdomains = new ArrayList<DomainStats>();
+                List<DomainStats> subdomains = new ArrayList<>();
                 for(Domain subDomain: domain.getSubDomains())
                     subdomains.add(domainStats(subDomain));
                 domainStasts.setSubdomains(subdomains);
@@ -73,7 +73,7 @@ public final class RepoStatsToWsStatsMapper {
      * @return
      */
     public static List<StatRecord> asGeneralStatsList(DomainList domain) {
-        List<StatRecord> general = new ArrayList<StatRecord>();
+        List<StatRecord> general = new ArrayList<>();
         List<DomainStats> domainStatses = asDomainStatsList(domain);
         int count = 0;
         for(DomainStats domainStats: domainStatses)
@@ -89,7 +89,7 @@ public final class RepoStatsToWsStatsMapper {
      * @return The list of stats by Field type
      */
     public static List<StatRecord> asFacetCount(FacetList facets, String field) {
-        List<StatRecord> records = new ArrayList<StatRecord>();
+        List<StatRecord> records = new ArrayList<>();
 
         if(facets != null && facets.getFacets().length != 0){
             records.add(new StatRecord("Total", facets.getHitCount(), null));

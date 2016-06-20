@@ -2,10 +2,7 @@ package uk.ac.ebi.ddi.ws.modules.enrichment.model;
 
 import uk.ac.ebi.ddi.ws.util.Triplet;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by mingze on 02/11/15.

@@ -94,13 +94,13 @@ public class DatasetDetail {
      */
     List<String> diseases      = null;
 
-    String omics_type          = null;
+    List<String> omics_type          = null;
 
-    public String getOmics_type() {
+    public List<String> getOmics_type() {
         return omics_type;
     }
 
-    public void setOmics_type(String omics_type) {
+    public void setOmics_type(List<String> omics_type) {
         this.omics_type = omics_type;
     }
 
@@ -137,7 +137,7 @@ public class DatasetDetail {
     }
 
     public void setKeywords(String[] submitterKeys, String[] curatorKeys){
-        List<String> tmpkeywords = new ArrayList<String>();
+        List<String> tmpkeywords = new ArrayList<>();
         if(submitterKeys != null && submitterKeys.length > 0)
                 tmpkeywords.addAll(Arrays.asList(submitterKeys));
 
@@ -166,7 +166,7 @@ public class DatasetDetail {
 
     public void setArrayPublicationIds(String[] ids){
         if(ids != null && ids.length> 0){
-            publicationIds = new ArrayList<String>();
+            publicationIds = new ArrayList<>();
             for(String id: ids)
                 if(id != null && id.length() > 0)
                     publicationIds.add(id);
@@ -240,7 +240,7 @@ public class DatasetDetail {
      */
     public void addProtocols(String protocolField, String[] protocol_descriptions) {
         if(protocols == null)
-            protocols = new ArrayList<Protocol>();
+            protocols = new ArrayList<>();
         if(protocol_descriptions != null && protocol_descriptions.length > 0 && protocolField != null){
             for(String protocol: protocol_descriptions){
                 if(protocol != null && protocol.length() > 0){
@@ -256,7 +256,7 @@ public class DatasetDetail {
      */
     public void setArrayInstruments(String[] instruments) {
          if(instruments != null && instruments.length > 0){
-             this.instruments = new ArrayList<String>();
+             this.instruments = new ArrayList<>();
              for(String instrument: instruments){
                 if(instrument != null && instrument.length() >0)
                     this.instruments.add(instrument);
@@ -270,7 +270,7 @@ public class DatasetDetail {
      */
     public void setArrayExperimentType(String[] experimentTypes) {
         if(experimentTypes != null && experimentTypes.length > 0){
-            this.experimentType = new ArrayList<String>();
+            this.experimentType = new ArrayList<>();
             for(String experimentType: experimentTypes){
                 if(experimentType != null && experimentType.length() > 0)
                     this.experimentType.add(experimentType);
@@ -284,7 +284,7 @@ public class DatasetDetail {
 
     public void setTissues(String[] tissues) {
         if(tissues != null && tissues.length >0){
-            this.tissues = new ArrayList<String>();
+            this.tissues = new ArrayList<>();
             for(String tissue: tissues)
                 if(tissue != null && tissue.length() > 0)
                     this.tissues.add(tissue);
@@ -298,7 +298,7 @@ public class DatasetDetail {
 
     public void setDiseases(String[] diseases) {
         if(diseases != null && diseases.length >0){
-            this.diseases = new ArrayList<String>();
+            this.diseases = new ArrayList<>();
             for(String disease: diseases)
                 if(disease != null && disease.length() > 0)
                     this.diseases.add(disease);

@@ -27,7 +27,7 @@ public class WsUtilities {
      */
 
     public static String[] getSubdomainList(DomainList domain){
-        List<String> domainList = new ArrayList<String>();
+        List<String> domainList = new ArrayList<>();
         if(domain != null && domain.list.length > 0){
             for(Domain domainInfo: domain.list){
                 domainList.add(domainInfo.getId());
@@ -64,7 +64,7 @@ public class WsUtilities {
     public static List<DatasetSummary> transformDatasetSummary(QueryResult queryResult, String domain, Map<Tuple<String, String>, Integer> visitMap){
 
         if(queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0){
-            List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
+            List<DatasetSummary> datasetSummaryList = new ArrayList<>();
             for(Entry entry: queryResult.getEntries()) {
                 DatasetSummary datasetSummary = new DatasetSummary();
                 Map<String, String[]> fields = entry.getFields();
@@ -77,11 +77,11 @@ public class WsUtilities {
                 if(names != null && names.length >0) datasetSummary.setTitle(names[0]);
                 if(descriptions != null && descriptions.length >0) datasetSummary.setDescription(descriptions[0]);
                 if(publication_dates != null && publication_dates.length >0) datasetSummary.setPublicationDate(publication_dates[0]);
-                if(omics_type != null && omics_type.length > 0) datasetSummary.setOmicsType(omics_type[0]);
+                if(omics_type != null && omics_type.length > 0) datasetSummary.setOmicsType(Arrays.asList(omics_type));
 
                 datasetSummary.setSource(domain);
                 if(visitMap != null && visitMap.size()> 0){
-                    Tuple<String, String> newKey = new Tuple<String, String>(entry.getId(), domain);
+                    Tuple<String, String> newKey = new Tuple<>(entry.getId(), domain);
                     if(visitMap.containsKey(newKey)){
                         datasetSummary.setVisitCount(visitMap.get(newKey));
                     }
@@ -96,7 +96,7 @@ public class WsUtilities {
     public static List<DatasetSummary> transformSimilarDatasetSummary(QueryResult queryResult, String domain, Map<String, String> scores){
 
         if(queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0){
-            List<DatasetSummary> datasetSummaryList = new ArrayList<DatasetSummary>();
+            List<DatasetSummary> datasetSummaryList = new ArrayList<>();
             for(Entry entry: queryResult.getEntries()) {
                 DatasetSummary datasetSummary = new DatasetSummary();
                 Map<String, String[]> fields = entry.getFields();
@@ -109,7 +109,7 @@ public class WsUtilities {
                 if(names != null && names.length >0) datasetSummary.setTitle(names[0]);
                 if(descriptions != null && descriptions.length >0) datasetSummary.setDescription(descriptions[0]);
                 if(publication_dates != null && publication_dates.length >0) datasetSummary.setPublicationDate(publication_dates[0]);
-                if(omics_type != null && omics_type.length > 0) datasetSummary.setOmicsType(omics_type[0]);
+                if(omics_type != null && omics_type.length > 0) datasetSummary.setOmicsType(Arrays.asList(omics_type));
                 datasetSummary.setSource(domain);
                 datasetSummary.setScore(scores.get(entry.getId()));
                 datasetSummaryList.add(datasetSummary);
