@@ -20,8 +20,10 @@ import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
+import uk.ac.ebi.ddi.service.db.model.dataset.DatasetSimilars;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
+import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetSimilarsService;
 import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.utils.Tuple;
@@ -31,6 +33,7 @@ import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
+import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -64,6 +67,9 @@ public class DatasetController {
 
     @Autowired
     private DictionaryClient dictionaryClient;
+
+    @Autowired
+    IDatasetSimilarsService datasetSimilarsService;
 
 
     @ApiOperation(value = "Search for datasets in the resource", position = 1, notes = "retrieve datasets in the resource using different queries")
@@ -281,7 +287,6 @@ public class DatasetController {
                 }
             }
 
-
             datasetDetail = RepoDatasetMapper.addTaxonomy(datasetDetail, taxonomies);
             /**
              * Trace the access to the dataset
@@ -295,6 +300,9 @@ public class DatasetController {
             event.setResource(resource);
             eventService.save(event);
         }
+
+        DatasetSimilars similars = datasetSimilarsService.read(acc, Constants.Database.retriveAnchorName(domain));
+        datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 
         return datasetDetail;
 

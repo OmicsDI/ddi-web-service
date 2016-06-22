@@ -7,8 +7,11 @@ import uk.ac.ebi.ddi.ebe.ws.dao.model.common.IndexInfo;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.Domain;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
+import uk.ac.ebi.ddi.service.db.model.dataset.DatasetSimilars;
+import uk.ac.ebi.ddi.service.db.model.dataset.SimilarDataset;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
 import uk.ac.ebi.ddi.service.db.utils.Tuple;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 
 import javax.servlet.http.HttpServletRequest;
@@ -178,4 +181,15 @@ public class WsUtilities {
             return Double.valueOf(o1.getScore()).compareTo(Double.valueOf(o2.getScore()));
         }
     }
+
+    public static DatasetDetail mapSimilarsToDatasetDetails(DatasetDetail dataset, DatasetSimilars similars){
+
+        if(similars != null && similars.getSimilars() != null){
+            for(SimilarDataset similar: similars.getSimilars()){
+                dataset.addSimilar(similar.getSimilarDataset().getAccession(), similar.getSimilarDataset().getDatabase(), similar.getRelationType());
+            }
+        }
+        return dataset;
+
+     }
 }

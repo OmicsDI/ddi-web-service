@@ -94,7 +94,10 @@ public class DatasetDetail {
      */
     List<String> diseases      = null;
 
-    List<String> omics_type          = null;
+    List<String> omics_type    = null;
+
+    // Dataset Similars from annotation system.
+    List<DatasetSimilar> similars    = null;
 
     public List<String> getOmics_type() {
         return omics_type;
@@ -304,5 +307,19 @@ public class DatasetDetail {
                     this.diseases.add(disease);
 
         }
+    }
+
+    public List<DatasetSimilar> getSimilars() {
+        return similars;
+    }
+
+    public void setSimilars(List<DatasetSimilar> similars) {
+        this.similars = similars;
+    }
+
+    public void addSimilar(String accession, String database, String relationType){
+        if(similars == null)
+            similars = new ArrayList<>();
+        similars.add(new DatasetSimilar(accession, database, relationType));
     }
 }
