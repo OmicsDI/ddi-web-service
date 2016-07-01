@@ -187,6 +187,7 @@ public class Constants {
         GNPS("GNPS", "gnps"),
         ARRAY_EXPRESS("ArrayExpress", "arrayexpress-repository"),
         METABOLOMEEXPRESS("MetabolomeExpress", "metabolome_express"),
+        EXPRESSION_ATLAS("ExpressionAtlas", "atlas-experiments"),
         METABOLOMICSWORKBENCH("MetabolomicsWorkbench", "metabolomics_workbench");
 
         String databaseName;
