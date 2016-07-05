@@ -67,7 +67,8 @@ public class EnrichmentController {
             @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
     ) {
         database = Constants.Database.retriveAnchorName(database);
-        return enrichmentService.readByAccession(accession, database);
+        DatasetEnrichmentInfo enrichmentInfo = enrichmentService.readByAccession(accession, database);
+        return enrichmentInfo;
     }
 
 

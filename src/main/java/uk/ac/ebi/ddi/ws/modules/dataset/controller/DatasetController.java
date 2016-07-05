@@ -369,7 +369,8 @@ public class DatasetController {
                     if(!(entry.getId().equalsIgnoreCase(acc) && entry.getSource().equalsIgnoreCase(domain))) {
                         ids.put(entry.getId(), entry.getScore());
                     }
-                    currentIds.put(entry.getSource(), ids);
+                    if (ids != null && !ids.isEmpty())
+                        currentIds.put(entry.getSource(), ids);
                 }
             }
 
