@@ -1,9 +1,20 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.model;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
+
 /**
  * Created by yperez on 20/06/2016.
  */
-public class DatasetSimilar {
+
+@XmlRootElement(name = "similar")
+public class DatasetSimilar implements Serializable{
+
+    private static final long serialVersionUID = 1L;
 
     String accession;
 
@@ -12,6 +23,8 @@ public class DatasetSimilar {
     String[] omics_type;
 
     String relationType;
+
+    public DatasetSimilar(){}
 
     public DatasetSimilar(String accession, String database, String relationType) {
         this.accession = accession;

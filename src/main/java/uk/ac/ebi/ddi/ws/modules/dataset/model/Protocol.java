@@ -1,5 +1,12 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.model;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
+
 /**
  * The class protocol defines how to describe a general protocol, in Proteomics we have only
  * Data Protocol, Sample Protocol, etc. But For example in Metabolomics different protocols can be added in order
@@ -9,8 +16,10 @@ package uk.ac.ebi.ddi.ws.modules.dataset.model;
  * @date 01/06/2015
  */
 
-public class Protocol {
+@XmlRootElement(name = "protocol")
+public class Protocol implements Serializable{
 
+    private static final long serialVersionUID = 1L;
     /**
      * Name of the protocol
      */
@@ -20,6 +29,8 @@ public class Protocol {
      * Description of the protocol
      */
     String description = null;
+
+    public Protocol(){}
 
     public Protocol(String name, String description) {
         this.name = name;

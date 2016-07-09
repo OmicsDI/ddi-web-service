@@ -10,8 +10,10 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
@@ -36,6 +38,7 @@ import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 import java.util.*;
@@ -187,15 +190,15 @@ public class DatasetController {
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/get", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
-    public @ResponseBody
-    DatasetDetail get(
+    public @ResponseBody DatasetDetail get(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
             @RequestParam(value = "acc", required = true) String acc,
             @ApiParam(value = "Database accession id, e.g: pride")
             @RequestParam(value = "database", required = true) String domain,
-            HttpServletRequest httpServletRequest){
+            @RequestParam(value = "format", required = false) String format,
+            HttpServletRequest httpServletRequest, HttpServletResponse resp){
 
         acc = acc.replaceAll("\\s","");
 
@@ -303,6 +306,13 @@ public class DatasetController {
 
         DatasetSimilars similars = datasetSimilarsService.read(acc, Constants.Database.retriveAnchorName(domain));
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
+
+        System.out.println(format);
+        if (format == null || format.equals("json")) {
+            resp.setHeader("Content-Type", "application/json");
+        }else{
+            resp.setHeader("Content-Type", "application/xml");
+        }
 
         return datasetDetail;
 

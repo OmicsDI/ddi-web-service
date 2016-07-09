@@ -1,5 +1,11 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.model;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +16,11 @@ import java.util.List;
  *
  * @author ypriverol
  */
-public class DatasetDetail {
+
+@XmlRootElement(name = "dataset")
+public class DatasetDetail implements Serializable{
+
+    private static final long serialVersionUID = 1L;
 
 
     /**
@@ -155,6 +165,7 @@ public class DatasetDetail {
         }
     }
 
+    @XmlElement
     public String getPublicationDate() {
         return publicationDate;
     }
@@ -176,10 +187,12 @@ public class DatasetDetail {
         }
     }
 
+    @XmlElement
     public List<String> getPublicationIds() {
         return publicationIds;
     }
 
+    @XmlElement
     public String getSource() {
         return source;
     }
@@ -188,6 +201,7 @@ public class DatasetDetail {
         this.source = source;
     }
 
+    @XmlElement
     public List<Organism> getOrganisms() {
         return organisms;
     }
@@ -196,6 +210,7 @@ public class DatasetDetail {
         this.organisms = organisms;
     }
 
+    @XmlElement
     public List<Protocol> getProtocols() {
         return protocols;
     }
@@ -204,6 +219,7 @@ public class DatasetDetail {
         this.protocols = protocols;
     }
 
+    @XmlElement
     public List<LabMember> getLabMembers() {
         return labMembers;
     }
@@ -212,6 +228,7 @@ public class DatasetDetail {
         this.labMembers = labMembers;
     }
 
+    @XmlElement
     public String getFull_dataset_link() {
         return full_dataset_link;
     }
@@ -220,6 +237,7 @@ public class DatasetDetail {
         this.full_dataset_link = full_dataset_link;
     }
 
+    @XmlElement
     public List<String> getInstruments() {
         return instruments;
     }
@@ -228,6 +246,7 @@ public class DatasetDetail {
         this.instruments = instruments;
     }
 
+    @XmlElement
     public List<String> getExperimentType() {
         return experimentType;
     }
@@ -281,6 +300,7 @@ public class DatasetDetail {
         }
     }
 
+    @XmlElement
     public List<String> getTissues() {
         return tissues;
     }
@@ -295,6 +315,7 @@ public class DatasetDetail {
         }
     }
 
+    @XmlElement
     public List<String> getDiseases() {
         return diseases;
     }
@@ -309,6 +330,7 @@ public class DatasetDetail {
         }
     }
 
+    @XmlElement
     public List<DatasetSimilar> getSimilars() {
         return similars;
     }
