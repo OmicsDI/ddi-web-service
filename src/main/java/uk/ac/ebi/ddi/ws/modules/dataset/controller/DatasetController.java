@@ -22,9 +22,11 @@ import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
+import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.model.dataset.DatasetSimilars;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
+import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetSimilarsService;
 import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
@@ -33,6 +35,7 @@ import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.OmicsDataset;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
@@ -73,6 +76,9 @@ public class DatasetController {
 
     @Autowired
     IDatasetSimilarsService datasetSimilarsService;
+
+    @Autowired
+    IDatasetService datasetService;
 
 
     @ApiOperation(value = "Search for datasets in the resource", position = 1, notes = "retrieve datasets in the resource using different queries")
@@ -190,14 +196,28 @@ public class DatasetController {
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/get", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(value = "/{domain}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody OmicsDataset getDataset(
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
+            @PathVariable(value = "acc") String acc,
+            @ApiParam(value = "Database accession id, e.g: pride")
+            @PathVariable(value = "domain") String domain){
+
+        String database = Constants.Database.retriveAnchorName(domain);
+        Dataset dataset = datasetService.read(acc, database);
+        return new OmicsDataset(dataset);
+
+    }
+
+    @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
+    @RequestMapping(value = "/get", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody DatasetDetail get(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
             @RequestParam(value = "acc", required = true) String acc,
             @ApiParam(value = "Database accession id, e.g: pride")
             @RequestParam(value = "database", required = true) String domain,
-            @RequestParam(value = "format", required = false) String format,
             HttpServletRequest httpServletRequest, HttpServletResponse resp){
 
         acc = acc.replaceAll("\\s","");
@@ -307,16 +327,11 @@ public class DatasetController {
         DatasetSimilars similars = datasetSimilarsService.read(acc, Constants.Database.retriveAnchorName(domain));
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 
-        System.out.println(format);
-        if (format == null || format.equals("json")) {
-            resp.setHeader("Content-Type", "application/json");
-        }else{
-            resp.setHeader("Content-Type", "application/xml");
-        }
-
         return datasetDetail;
 
     }
+
+
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
     @RequestMapping(value = "/mostAccessed", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
