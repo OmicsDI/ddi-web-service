@@ -9,6 +9,7 @@ import uk.ac.ebi.ddi.ws.util.Constants;
 
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @author Yasset Perez-Riverol ypriverol
@@ -98,7 +99,7 @@ public class RepoDatasetMapper {
 
                 if(entry.getFields().containsKey(Constants.CURATOR_KEY_FIELD))
                     if(entry.getFields().get(Constants.CURATOR_KEY_FIELD) != null && entry.getFields().get(Constants.CURATOR_KEY_FIELD).length > 0)
-                        keywords.addAll(Arrays.asList(entry.getFields().get(Constants.CURATOR_KEY_FIELD)));
+                        keywords.addAll(formatKeywords(Arrays.asList(entry.getFields().get(Constants.CURATOR_KEY_FIELD))));
 
                 if(entry.getFields().containsKey(Constants.OMICS_TYPE_FIELD))
                     if(entry.getFields().get(Constants.OMICS_TYPE_FIELD) != null && entry.getFields().get(Constants.OMICS_TYPE_FIELD).length > 0)
@@ -107,7 +108,7 @@ public class RepoDatasetMapper {
 
                 if(entry.getFields().containsKey(Constants.SUBMITTER_KEY_FIELD))
                     if(entry.getFields().get(Constants.SUBMITTER_KEY_FIELD) != null && entry.getFields().get(Constants.SUBMITTER_KEY_FIELD).length > 0)
-                        keywords.addAll(Arrays.asList(entry.getFields().get(Constants.SUBMITTER_KEY_FIELD)));
+                        keywords.addAll(formatKeywords(Arrays.asList(entry.getFields().get(Constants.SUBMITTER_KEY_FIELD))));
 
                 if(keywords.size() > 0){
                     String[] arrayKeywords = new String[keywords.size()];
@@ -129,6 +130,30 @@ public class RepoDatasetMapper {
             }
         }
         return datasetSummary;
+    }
+
+    private static Collection<? extends String> formatKeywords(List<String> strings) {
+        List<String> newKeywords;
+        if(strings != null && !strings.isEmpty()){
+            newKeywords = new ArrayList<>();
+            for(String oldkeyword: strings){
+                Pattern pattern = Pattern.compile(";");
+                Pattern pattern2 = Pattern.compile("；");
+                String[] split = pattern.split(oldkeyword, 0);
+                String[] split2 = pattern2.split(oldkeyword, 0);
+                if(split.length > 1){
+                    for(String newKey: split)
+                        newKeywords.add(newKey);
+                }else if(split2.length >1){
+                    for(String newKey: split2)
+                        newKeywords.add(newKey);
+                }else{
+                    newKeywords.add(oldkeyword);
+                }
+            }
+            strings = newKeywords;
+        }
+        return strings;
     }
 
     /**

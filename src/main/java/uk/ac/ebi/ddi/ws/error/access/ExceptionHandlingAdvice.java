@@ -55,7 +55,7 @@ public class ExceptionHandlingAdvice {
                 HttpStatus.NOT_FOUND.value(),
                 "Not found: " + ex.getMessage(),
                 "Repository search returned no result.",
-                "If this record should exist, please contact pride-support@ebi.ac.uk",
+                "If this record should exist, please contact omicsdi-support@ebi.ac.uk",
                 null);
     }
 
@@ -67,7 +67,7 @@ public class ExceptionHandlingAdvice {
         return new RestError(HttpStatus.INTERNAL_SERVER_ERROR,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error: " + ex.getMessage(),
-                "Please report to pride-support@ebi.ac.uk",
+                "Please report to omicsdi-support@ebi.ac.uk",
                 null,
                 null);
     }

@@ -175,6 +175,27 @@ public class WsUtilities {
         return null;
     }
 
+    public static DatasetDetail reformatKeywords(DatasetDetail datasetDetail) {
+        List<String> newKeywords = new ArrayList<>();
+        if(datasetDetail != null && datasetDetail.getKeywords() != null && datasetDetail.getKeywords().length > 0){
+            for(String oldkeyword: datasetDetail.getKeywords()){
+                if(oldkeyword.split(";").length > 1){
+                    String[] keywordArr = oldkeyword.split(";");
+                    for(String newKey: keywordArr)
+                        newKeywords.add(newKey);
+
+                }else{
+                    newKeywords.add(oldkeyword);
+                }
+            }
+            String[] newKeyWordsArr = new String[newKeywords.size()];
+            for(int i = 0; i < newKeywords.size(); i++)
+                newKeyWordsArr[i] = newKeywords.get(i);
+            datasetDetail.setKeywords(newKeyWordsArr);
+        }
+        return datasetDetail;
+    }
+
     public class CustomComparator implements Comparator<DatasetSummary> {
         @Override
         public int compare(DatasetSummary o1, DatasetSummary o2) {

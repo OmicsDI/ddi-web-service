@@ -45,7 +45,7 @@ public class SwaggerConfig {
                 "Data Discovery Index web service API",
                 "Programmatic access to the Data Discovery Index data via RESTful Web Services.",
                 "http://www.ebi.ac.uk/about/terms-of-use",
-                "pride-support@ebi.ac.uk",
+                "omicsdi-support@ebi.ac.uk",
                 "Apache 2.0",
                 "http://www.apache.org/licenses/LICENSE-2.0.html"
         );
