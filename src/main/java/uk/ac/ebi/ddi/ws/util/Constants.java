@@ -100,7 +100,8 @@ public class Constants {
             "often","on","only","or","other","our","own","rather","should","since","so","some","than","that","the","their","them," +
             "then","there","these","they","this","tis","to","too","us","was","we","were","what","when","where","which","while",
             "who","whom","why","will","with","would","yet","you","your",
-            "protein", "proteomics", "proteomic", "proteome", "proteomes", "mass", "proteins", "lc", "ms", "based", "from", "using", "during", "LC-MS", "LC-MS/MS","reveals","as","non","data"};
+            "protein", "proteomics", "proteomic", "proteome", "proteomes", "mass", "proteins",
+            "lc", "ms", "based", "from", "using", "during", "LC-MS", "LC-MS/MS","reveals","as","non","data"};
 
     public static String[] SHORT_EXCLUSION_WORDS              = {"ega", "study", "data",
             "using", "10", "available", "da", "two", "protein", "proteins",
@@ -121,7 +122,8 @@ public class Constants {
             "involved", "control","mean", "calculated", "parameters","illumina","reference",
             "3000", "http", "days", "under", "individual",
             "biological", "compared", "experiment", "transcription", "induced", "global",
-            "genome_build", "scanning", "test", "scanning", "scaning",
+            "genome_build", "scanning", "test", "scanning", "scaning", "cell", "whole", "model", "performed", "more target", "factors", "hours",
+            "hour", "mutant", "cells", "transcriptional", "regulated", "cancer", "function", "normal", "12"
 
     };
 

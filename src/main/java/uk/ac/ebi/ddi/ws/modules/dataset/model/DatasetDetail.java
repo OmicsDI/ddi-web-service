@@ -1,10 +1,7 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.model;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;

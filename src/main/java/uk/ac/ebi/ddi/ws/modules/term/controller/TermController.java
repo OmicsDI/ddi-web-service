@@ -91,6 +91,7 @@ public class TermController {
 
         if(domain != null)
             termResult = dataWsClient.getFrequentlyTerms(domain, field, Constants.SHORT_EXCLUSION_WORDS, size);
+        System.out.println(termResult.toString());
 
         return RepoDatasetMapper.asTermResults(termResult);
     }

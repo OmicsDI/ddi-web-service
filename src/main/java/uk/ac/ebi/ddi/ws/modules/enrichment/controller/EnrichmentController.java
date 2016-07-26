@@ -262,7 +262,7 @@ public class EnrichmentController {
     ) {
 
         List<String> similarDatasets = new ArrayList<>();
-        List<Triplet> Scores = new ArrayList<>();
+        Set<Triplet> Scores = new HashSet<>();
         String combinedName = accession + "@" + database;
         similarDatasets.add(combinedName);//put itself in the set;
 
@@ -288,12 +288,12 @@ public class EnrichmentController {
                     if ((float) intersectionInfo.getCosineScore() >= threshold) {
                         Triplet<String, String, Float> score = new Triplet<>(combinedName, combinedName2, (float) intersectionInfo.getCosineScore());
                         Scores.add(score);
+                        findSimilarScoresFor(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase(), similarDatasets, Scores, threshold);
                     }
-                    findSimilarScoresFor(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase(), similarDatasets, Scores, threshold);
                 }
             }
         }
-        return new SimilarInfoResult(accession, database, Scores);
+        return new SimilarInfoResult(accession, database, new ArrayList<>(Scores));
     }
 
     /**
@@ -304,7 +304,7 @@ public class EnrichmentController {
      * @param similarDatasets
      * @param Scores
      */
-    private void findSimilarScoresFor(String accession, String database, List<String> similarDatasets, List<Triplet> Scores, float threshold) {
+    private void findSimilarScoresFor(String accession, String database, List<String> similarDatasets, Set<Triplet> Scores, float threshold) {
         String combinedName = accession + "@" + database;
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
         if (datasetStatInfo != null) {

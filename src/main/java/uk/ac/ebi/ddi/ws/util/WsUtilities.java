@@ -207,7 +207,7 @@ public class WsUtilities {
 
         if(similars != null && similars.getSimilars() != null){
             for(SimilarDataset similar: similars.getSimilars()){
-                dataset.addSimilar(similar.getSimilarDataset().getAccession(), similar.getSimilarDataset().getDatabase(), similar.getRelationType());
+                dataset.addSimilar(similar.getSimilarDataset().getAccession(), Constants.Database.retriveSorlName(similar.getSimilarDataset().getDatabase()), similar.getRelationType());
             }
         }
         return dataset;
