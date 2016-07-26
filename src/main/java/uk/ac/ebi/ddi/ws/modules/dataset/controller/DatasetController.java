@@ -86,8 +86,8 @@ public class DatasetController {
     DataSetResult search(
             @ApiParam(value = "general search term against multiple fields including, e.g: cancer human, default is *:* ")
             @RequestParam(value = "query", required = false, defaultValue = "") String query,
-            @ApiParam(value = "field to sort the output of the search results, e.g:  description")
-            @RequestParam(value = "sort_field", required = false, defaultValue = "") String sortfield,
+            @ApiParam(value = "field to sort the output of the search results, e.g:  id, publication_date")
+            @RequestParam(value = "sortfield", required = false, defaultValue = "") String sortfield,
             @ApiParam(value = "type of sorting ascending or descending, e.g: ascending")
             @RequestParam(value = "order", required = false, defaultValue = "") String order,
             @ApiParam(value = "the starting point for the search, e.g: 0")
