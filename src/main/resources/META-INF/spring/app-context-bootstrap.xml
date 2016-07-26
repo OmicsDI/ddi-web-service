@@ -43,30 +43,7 @@
     <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
 
 
-    <!--<mongo:mongo-client credentials="${ddi.mongo.app.user}:${ddi.mongo.app.password}@${ddi.mongo.app.authenticationDatabase}" id="mongoClient" replica-set="${ddi.mongo.app.machine.one}:${ddi.mongo.app.port},${ddi.mongo.app.machine.two}:${ddi.mongo.app.port},${ddi.mongo.app.machine.three}:${ddi.mongo.app.port}">-->
-        <!--<mongo:client-options connections-per-host="5"-->
-                              <!--threads-allowed-to-block-for-connection-multiplier="10"-->
-                              <!--connect-timeout="100000"-->
-                              <!--max-wait-time="30000"-->
-                              <!--socket-keep-alive="true"-->
-                              <!--socket-timeout="1000000"-->
-                              <!--write-concern="NORMAL"-->
-                              <!--read-preference="PRIMARY_PREFERRED"/>-->
-    <!--</mongo:mongo-client>-->
-
-
-    <!--<mongo:db-factory dbname="${ddi.mongo.app.db}" port="${ddi.mongo.app.port}" mongo-ref="mongoClient"/>-->
-
-    <!--<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">-->
-        <!--<constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />-->
-    <!--</bean>-->
-
-    <!-- Maven information an autowired classes -->
-
-    <mongo:repositories base-package="uk.ac.ebi.ddi.service.db.repo" />
-    <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
-
-    <mongo:mongo-client id="mongoClient" host="localhost" port="27017">
+    <mongo:mongo-client credentials="${ddi.mongo.app.user}:${ddi.mongo.app.password}@${ddi.mongo.app.authenticationDatabase}" id="mongoClient" replica-set="${ddi.mongo.app.machine.one}:${ddi.mongo.app.port},${ddi.mongo.app.machine.two}:${ddi.mongo.app.port},${ddi.mongo.app.machine.three}:${ddi.mongo.app.port}">
         <mongo:client-options connections-per-host="5"
                               threads-allowed-to-block-for-connection-multiplier="10"
                               connect-timeout="100000"
@@ -74,19 +51,15 @@
                               socket-keep-alive="true"
                               socket-timeout="1000000"
                               write-concern="NORMAL"
-                              read-preference="SECONDARY"/>
+                              read-preference="PRIMARY_PREFERRED"/>
     </mongo:mongo-client>
 
-    <!--<mongo:db-factory dbname="${ddi.mongo.app.db}" authentication-dbname="${ddi.mongo.app.authenticationDatabase}"-->
-    <!--username="${ddi.mongo.app.user}" password="${ddi.mongo.app.password}" port="${ddi.mongo.app.port}"-->
-    <!--mongo-ref="mongoClient"/>-->
 
     <mongo:db-factory dbname="${ddi.mongo.app.db}" port="${ddi.mongo.app.port}" mongo-ref="mongoClient"/>
 
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
     </bean>
-
 
     <bean id="resourceService" class="uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService"/>
     <bean id="eventService" class="uk.ac.ebi.ddi.service.db.service.logger.HttpEventService"/>
