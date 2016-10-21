@@ -240,7 +240,7 @@ public class DatasetController {
             datasetDetail.setName(names[0]);
 
             String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
-            datasetDetail.setDescription(descriptions[0]);
+            datasetDetail.setDescription((descriptions.length >0 && descriptions[0] != null)? descriptions[0]:null);
 
             String[] omics_type = fields.get(Constants.OMICS_TYPE_FIELD);
             datasetDetail.setOmics_type(Arrays.asList(omics_type));
@@ -314,7 +314,7 @@ public class DatasetController {
              */
             DatasetResource resource = resourceService.read(acc, domain);
             if(resource == null){
-                resource = new DatasetResource("http://www.ebi.ac.uk/Tools/ddi/" + domain + "/" + acc,acc,domain);
+                resource = new DatasetResource("http://www.omicsdi.org/" + domain + "/" + acc,acc,domain);
                 resource = resourceService.save(resource);
             }
             HttpEvent event = tranformServletResquestToEvent(httpServletRequest);

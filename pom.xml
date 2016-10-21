@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>uk.ac.ebi.ddi</groupId>
-    <artifactId>web-service</artifactId>
+    <artifactId>ddi-web-service</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>ddi-web-service</name>
