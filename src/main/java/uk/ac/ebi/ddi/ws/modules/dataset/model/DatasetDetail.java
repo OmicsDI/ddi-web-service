@@ -106,6 +106,17 @@ public class DatasetDetail implements Serializable{
     // Dataset Similars from annotation system.
     List<DatasetSimilar> similars    = null;
 
+    List<String> organization = null;
+
+
+    public List<String> getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(List<String> organization) {
+        this.organization = organization;
+    }
+
     public List<String> getOmics_type() {
         return omics_type;
     }
