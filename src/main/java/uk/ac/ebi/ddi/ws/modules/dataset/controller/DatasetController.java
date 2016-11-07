@@ -30,9 +30,8 @@ import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.utils.Tuple;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
-
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.OmicsDataset;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
@@ -40,8 +39,7 @@ import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -223,69 +221,111 @@ public class DatasetController {
         DatasetDetail datasetDetail= new DatasetDetail();
         Set<String> currentIds =  new HashSet(Arrays.asList(new String[] {acc}));
 
+        //QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds);
+        //Entry[] entries = datasetResult.getEntries();
 
-        QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds);
-        Entry[] entries = datasetResult.getEntries();
+        Dataset dsResult = datasetService.read(acc,domain);
 
-        if(!(entries.length<=0)){
+        datasetDetail = getDatasetInfo(datasetDetail,dsResult);
 
-            Entry entry1 = entries[0];
-            Map<String, String[]> fields = entry1.getFields();
+        //Set<String> taxonomyIds    = RepoDatasetMapper.getTaxonomyIds(datasetResult);
+        /**
+         * Trace the access to the dataset
+         */
+        DatasetResource resource = resourceService.read(acc, domain);
+        if(resource == null){
+            resource = new DatasetResource("http://www.omicsdi.org/" + domain + "/" + acc,acc,domain);
+            resource = resourceService.save(resource);
+        }
+        HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
+        event.setResource(resource);
+        eventService.save(event);
 
-            datasetDetail.setId(acc);
+        DatasetSimilars similars = datasetSimilarsService.read(acc, Constants.Database.retriveAnchorName(domain));
+        datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 
-            datasetDetail.setSource(entry1.getSource());
+        return datasetDetail;
 
-            String[] names = fields.get(Constants.NAME_FIELD);
-            datasetDetail.setName(names[0]);
+    }
 
-            String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
-            datasetDetail.setDescription((descriptions.length >0 && descriptions[0] != null)? descriptions[0]:null);
+    public DatasetDetail getDatasetInfo(DatasetDetail datasetDetail, Dataset argDataset)
+    {
 
-            String[] omics_type = fields.get(Constants.OMICS_TYPE_FIELD);
-            datasetDetail.setOmics_type(Arrays.asList(omics_type));
+        if(argDataset != null)
+        {
 
-            String[] publication_dates = fields.get(Constants.PUB_DATE_FIELD);
-            if(publication_dates != null && publication_dates.length > 0 && publication_dates[0] != null)
-                   datasetDetail.setPublicationDate(publication_dates[0]);
+            Dataset inputDataset = argDataset;
 
-            String[] data_protocols = fields.get(Constants.DATA_PROTOCOL_FIELD);
-            datasetDetail.addProtocols(Constants.DATA_PROTOCOL_FIELD, data_protocols);
+            Map<String, Set<String>> fields = inputDataset.getAdditional();
 
-            String[] sample_protocols = fields.get(Constants.SAMPLE_PROTOCOL_FIELD);
-            datasetDetail.addProtocols(Constants.SAMPLE_PROTOCOL_FIELD, sample_protocols);
+            datasetDetail.setId(argDataset.getAccession());
 
-            String[] full_dataset_links = fields.get(Constants.DATASET_LINK_FIELD);
-            if(full_dataset_links != null && full_dataset_links.length > 0){
-                datasetDetail.setFull_dataset_link(full_dataset_links[0]);
+            datasetDetail.setSource(inputDataset.getDatabase());
+
+            datasetDetail.setName(inputDataset.getName());
+
+            datasetDetail.setDescription((inputDataset.getDescription() != null)? inputDataset.getDescription():null);
+
+            Set<String> omics_type = inputDataset.getAdditional().get("omics_type");
+
+            datasetDetail.setOmics_type(new ArrayList<String>(omics_type));
+
+            Set<String> publication_dates = inputDataset.getDates().get("publication");;
+
+            if(publication_dates != null && publication_dates.isEmpty() != true)
+                datasetDetail.setPublicationDate(publication_dates.iterator().next());
+
+            Set<String> data_protocols = fields.get(Constants.DATA_PROTOCOL_FIELD);
+            datasetDetail.addProtocols(Constants.DATA_PROTOCOL_FIELD, data_protocols.toArray(new String[data_protocols.size()]));
+
+            Set<String> sample_protocols = fields.get(Constants.SAMPLE_PROTOCOL_FIELD);
+            datasetDetail.addProtocols(Constants.SAMPLE_PROTOCOL_FIELD, sample_protocols.toArray(new String[sample_protocols.size()]));
+
+            Set<String> full_dataset_links = fields.get(Constants.DATASET_LINK_FIELD);
+            if(full_dataset_links != null && full_dataset_links.size() > 0){
+                datasetDetail.setFull_dataset_link(full_dataset_links.iterator().next());
             }
 
-            String[] diseases = fields.get(Constants.DISEASE_FIELD);
-            if(diseases != null && diseases.length > 0){
-                datasetDetail.setDiseases(diseases);
+            Set<String> diseases = fields.get(Constants.DISEASE_FIELD);
+            if(diseases != null && diseases.size() > 0){
+                datasetDetail.setDiseases(diseases.toArray(new String[diseases.size()]));
             }
 
-            String[] tissues = fields.get(Constants.TISSUE_FIELD);
-            if(tissues != null && tissues.length > 0){
-                datasetDetail.setTissues(tissues);
+            Set<String> tissues = fields.get(Constants.TISSUE_FIELD);
+            if(tissues != null && tissues.size() > 0){
+                datasetDetail.setTissues(setToArray(tissues,String.class));
             }
 
-            String[] instruments = fields.get(Constants.INSTRUMENT_FIELD);
-            datasetDetail.setArrayInstruments(instruments);
+            Set<String> instruments = fields.get(Constants.INSTRUMENT_FIELD);
 
-            String[] experiment_type = fields.get(Constants.EXPERIMENT_TYPE_FIELD);
-            datasetDetail.setArrayExperimentType(experiment_type);
-
-            String[] pubmedids = fields.get(Constants.PUBMED_FIELD);
-            if ((pubmedids!=null) && (pubmedids.length > 0)) {
-                datasetDetail.setArrayPublicationIds(pubmedids);
+            if(instruments!=null && instruments.size() > 0) {
+                datasetDetail.setArrayInstruments(setToArray(instruments, String.class));
             }
 
-            String[] submitterKeys = fields.get(Constants.SUBMITTER_KEY_FIELD);
-            String[] curatorKeys   = fields.get(Constants.CURATOR_KEY_FIELD);
-            datasetDetail.setKeywords(submitterKeys, curatorKeys);
+            Set<String> experiment_type = fields.get(Constants.EXPERIMENT_TYPE_FIELD);
+            if(experiment_type!=null && experiment_type.size() > 0) {
+                datasetDetail.setArrayExperimentType(setToArray(experiment_type, String.class));
+            }
 
-            Set<String> taxonomyIds    = RepoDatasetMapper.getTaxonomyIds(datasetResult);
+            Set<String> pubmedids = fields.get(Constants.PUBMED_FIELD);
+            if ((pubmedids!=null) && (pubmedids.size() > 0)) {
+                datasetDetail.setArrayPublicationIds(setToArray(pubmedids,String.class));
+            }
+
+            Set<String> submitterKeys = fields.get(Constants.SUBMITTER_KEY_FIELD);
+            Set<String> curatorKeys   = fields.get(Constants.CURATOR_KEY_FIELD);
+
+            if(submitterKeys != null && curatorKeys != null && submitterKeys.size() > 0 && curatorKeys.size() > 0) {
+                datasetDetail.setKeywords(setToArray(submitterKeys, String.class), setToArray(curatorKeys, String.class));
+            }
+
+            Set<String> organization = fields.get(Constants.ORGANIZATION_FIELD);
+            if((organization!=null) && (organization.size() > 0))
+            {
+                datasetDetail.setOrganization(new ArrayList<String>(organization));
+            }
+
+            Set<String> taxonomyIds    = argDataset.getCrossReferences().get(Constants.TAXONOMY_FIELD);
             ArrayList<String> ids = new ArrayList<>(taxonomyIds);
 
             QueryResult taxonomies = new QueryResult();
@@ -309,27 +349,15 @@ public class DatasetController {
             }
 
             datasetDetail = RepoDatasetMapper.addTaxonomy(datasetDetail, taxonomies);
-            /**
-             * Trace the access to the dataset
-             */
-            DatasetResource resource = resourceService.read(acc, domain);
-            if(resource == null){
-                resource = new DatasetResource("http://www.omicsdi.org/" + domain + "/" + acc,acc,domain);
-                resource = resourceService.save(resource);
-            }
-            HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
-            event.setResource(resource);
-            eventService.save(event);
+
         }
-
-        DatasetSimilars similars = datasetSimilarsService.read(acc, Constants.Database.retriveAnchorName(domain));
-        datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
-
         return datasetDetail;
-
     }
 
-
+    public <T> T[] setToArray(Set<T> argSet,Class<T> type)
+    {
+        return  argSet.toArray((T[]) Array.newInstance(type, argSet.size()));
+    }
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
     @RequestMapping(value = "/mostAccessed", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
