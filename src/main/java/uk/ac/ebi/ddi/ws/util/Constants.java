@@ -49,6 +49,8 @@ public class Constants {
 
     public static final String ORGANIZATION_FIELD       = "submitter_affiliation";
 
+    public static final String DATES                    = "dates";
+
     public static final String[] DATASET_SUMMARY        = {Constants.DESCRIPTION_FIELD,
                                                            Constants.NAME_FIELD,
                                                            Constants.SUBMITTER_KEY_FIELD,Constants.CURATOR_KEY_FIELD,
@@ -71,7 +73,8 @@ public class Constants {
                                                            Constants.DISEASE_FIELD,
                                                            Constants.OMICS_TYPE_FIELD,
                                                            Constants.TISSUE_FIELD,
-                                                           Constants.ORGANIZATION_FIELD};
+                                                           Constants.ORGANIZATION_FIELD,
+                                                           Constants.DATES};
 
     public static final String[] MORELIKE_FIELDS        =  {Constants.NAME_FIELD,
                                                             Constants.DESCRIPTION_FIELD,

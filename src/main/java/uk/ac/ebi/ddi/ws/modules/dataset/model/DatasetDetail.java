@@ -3,9 +3,7 @@ package uk.ac.ebi.ddi.ws.modules.dataset.model;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * This is the Detailed dataset entry for all the omics experiments. Using the current ws data model we fill the information of
@@ -107,6 +105,9 @@ public class DatasetDetail implements Serializable{
     List<DatasetSimilar> similars    = null;
 
     List<String> organization = null;
+
+
+    Map<String, Set<String>> dates = null;
 
 
     public List<String> getOrganization() {
@@ -352,4 +353,13 @@ public class DatasetDetail implements Serializable{
             similars = new ArrayList<>();
         similars.add(new DatasetSimilar(accession, database, relationType));
     }
+
+    public Map<String, Set<String>> getDates() {
+        return dates;
+    }
+
+    public void setDates(Map<String, Set<String>> dates) {
+        this.dates = dates;
+    }
+
 }

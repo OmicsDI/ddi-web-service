@@ -256,6 +256,8 @@ public class DatasetController {
 
             Dataset inputDataset = argDataset;
 
+            Map<String, Set<String>> datesField = inputDataset.getDates();
+
             Map<String, Set<String>> fields = inputDataset.getAdditional();
 
             datasetDetail.setId(argDataset.getAccession());
@@ -289,6 +291,11 @@ public class DatasetController {
             Set<String> diseases = fields.get(Constants.DISEASE_FIELD);
             if(diseases != null && diseases.size() > 0){
                 datasetDetail.setDiseases(diseases.toArray(new String[diseases.size()]));
+            }
+
+            Map<String, Set<String>> dates = datesField;
+            if(dates != null && dates.size() > 0){
+                datasetDetail.setDates(dates);
             }
 
             Set<String> tissues = fields.get(Constants.TISSUE_FIELD);
