@@ -106,10 +106,28 @@ public class DatasetDetail implements Serializable{
 
     List<String> organization = null;
 
-
     Map<String, Set<String>> dates = null;
 
+    Set<String> submitter = null;
 
+    Set<String> submitterMail = null;
+
+
+    public Set<String> getSubmitter() {
+        return submitter;
+    }
+
+    public void setSubmitter(Set<String> submitter) {
+        this.submitter = submitter;
+    }
+
+    public Set<String> getSubmitterMail() {
+        return submitterMail;
+    }
+
+    public void setSubmitterMail(Set<String> submitterMail) {
+        this.submitterMail = submitterMail;
+    }
     public List<String> getOrganization() {
         return organization;
     }

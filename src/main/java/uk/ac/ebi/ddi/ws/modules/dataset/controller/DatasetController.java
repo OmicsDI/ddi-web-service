@@ -332,6 +332,18 @@ public class DatasetController {
                 datasetDetail.setOrganization(new ArrayList<String>(organization));
             }
 
+            Set<String> submitter = fields.get(Constants.SUBMITTER_FIELD);
+            if((submitter!=null) && (submitter.size() > 0))
+            {
+                datasetDetail.setSubmitter(submitter);
+            }
+
+            Set<String> submitter_mail = fields.get(Constants.SUBMITTER_MAIL_FIELD);
+            if((submitter_mail!=null) && (submitter_mail.size() > 0))
+            {
+                datasetDetail.setSubmitterMail(submitter_mail);
+            }
+
             Set<String> taxonomyIds    = argDataset.getCrossReferences().get(Constants.TAXONOMY_FIELD);
             ArrayList<String> ids = new ArrayList<>(taxonomyIds);
 
