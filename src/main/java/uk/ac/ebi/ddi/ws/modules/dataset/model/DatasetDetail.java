@@ -112,6 +112,25 @@ public class DatasetDetail implements Serializable{
 
     Set<String> submitterMail = null;
 
+    Set<String> labHead = null;
+
+    Set<String> labHeadMail = null;
+
+    public Set<String> getLabHead() {
+        return labHead;
+    }
+
+    public void setLabHead(Set<String> labHead) {
+        this.labHead = labHead;
+    }
+
+    public Set<String> getLabHeadMail() {
+        return labHeadMail;
+    }
+
+    public void setLabHeadMail(Set<String> labHeadMail) {
+        this.labHeadMail = labHeadMail;
+    }
 
     public Set<String> getSubmitter() {
         return submitter;

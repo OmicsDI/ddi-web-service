@@ -51,9 +51,13 @@ public class Constants {
 
     public static final String DATES_FIELD              = "dates";
 
-    public static String SUBMITTER_FIELD               = "submitter";
+    public static String SUBMITTER_FIELD                = "submitter";
 
-    public static String SUBMITTER_MAIL_FIELD          = "submitter_mail";
+    public static String SUBMITTER_MAIL_FIELD           = "submitter_mail";
+
+    public static String LAB_HEAD_FIELD                 =  "labhead";
+
+    public static String LAB_HEAD_MAIL_FIELD            =  "labhead_mail";
 
     public static final String[] DATASET_SUMMARY        = {Constants.DESCRIPTION_FIELD,
                                                            Constants.NAME_FIELD,
@@ -79,8 +83,10 @@ public class Constants {
                                                            Constants.TISSUE_FIELD,
                                                            Constants.ORGANIZATION_FIELD,
                                                            Constants.DATES_FIELD,
-                                                            Constants.SUBMITTER_FIELD,
-                                                            Constants.SUBMITTER_MAIL_FIELD};
+                                                           Constants.SUBMITTER_FIELD,
+                                                           Constants.SUBMITTER_MAIL_FIELD,
+                                                           Constants.LAB_HEAD_FIELD,
+                                                           Constants.LAB_HEAD_MAIL_FIELD };
 
     public static final String[] MORELIKE_FIELDS        =  {Constants.NAME_FIELD,
                                                             Constants.DESCRIPTION_FIELD,

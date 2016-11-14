@@ -344,6 +344,18 @@ public class DatasetController {
                 datasetDetail.setSubmitterMail(submitter_mail);
             }
 
+            Set<String> labhead = fields.get(Constants.LAB_HEAD_FIELD );
+            if((labhead!=null) && (labhead.size() > 0))
+            {
+                datasetDetail.setLabHead(labhead);
+            }
+
+            Set<String> labHeadMail = fields.get(Constants.LAB_HEAD_MAIL_FIELD);
+            if((labHeadMail!=null) && (labHeadMail.size() > 0))
+            {
+                datasetDetail.setLabHeadMail(labHeadMail);
+            }
+
             Set<String> taxonomyIds    = argDataset.getCrossReferences().get(Constants.TAXONOMY_FIELD);
             ArrayList<String> ids = new ArrayList<>(taxonomyIds);
 
