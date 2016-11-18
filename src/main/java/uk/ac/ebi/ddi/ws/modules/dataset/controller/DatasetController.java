@@ -201,6 +201,7 @@ public class DatasetController {
             @PathVariable(value = "domain") String domain){
 
         String database = Constants.Database.retriveAnchorName(domain);
+
         Dataset dataset = datasetService.read(acc, database);
         return new OmicsDataset(dataset);
 
@@ -223,7 +224,7 @@ public class DatasetController {
 
         //QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds);
         //Entry[] entries = datasetResult.getEntries();
-
+        domain = Constants.Database.retriveAnchorName(domain);
         Dataset dsResult = datasetService.read(acc,domain);
 
         datasetDetail = getDatasetInfo(datasetDetail,dsResult);
@@ -251,8 +252,7 @@ public class DatasetController {
     public DatasetDetail getDatasetInfo(DatasetDetail datasetDetail, Dataset argDataset)
     {
 
-        if(argDataset != null)
-        {
+        if(argDataset != null) {
 
             Dataset inputDataset = argDataset;
 
@@ -266,112 +266,112 @@ public class DatasetController {
 
             datasetDetail.setName(inputDataset.getName());
 
-            datasetDetail.setDescription((inputDataset.getDescription() != null)? inputDataset.getDescription():null);
+            datasetDetail.setDescription((inputDataset.getDescription() != null) ? inputDataset.getDescription() : null);
 
             Set<String> omics_type = inputDataset.getAdditional().get("omics_type");
 
             datasetDetail.setOmics_type(new ArrayList<String>(omics_type));
 
-            Set<String> publication_dates = inputDataset.getDates().get("publication");;
+            Set<String> publication_dates = inputDataset.getDates().get("publication");
+            ;
 
-            if(publication_dates != null && publication_dates.isEmpty() != true)
+            if (publication_dates != null && publication_dates.isEmpty() != true)
                 datasetDetail.setPublicationDate(publication_dates.iterator().next());
 
             Set<String> data_protocols = fields.get(Constants.DATA_PROTOCOL_FIELD);
-            datasetDetail.addProtocols(Constants.DATA_PROTOCOL_FIELD, data_protocols.toArray(new String[data_protocols.size()]));
+            if (data_protocols != null && data_protocols.size() > 0)
+                datasetDetail.addProtocols(Constants.DATA_PROTOCOL_FIELD, data_protocols.toArray(new String[data_protocols.size()]));
 
             Set<String> sample_protocols = fields.get(Constants.SAMPLE_PROTOCOL_FIELD);
-            datasetDetail.addProtocols(Constants.SAMPLE_PROTOCOL_FIELD, sample_protocols.toArray(new String[sample_protocols.size()]));
+            if (sample_protocols != null && sample_protocols.size() > 0)
+                datasetDetail.addProtocols(Constants.SAMPLE_PROTOCOL_FIELD, sample_protocols.toArray(new String[sample_protocols.size()]));
 
             Set<String> full_dataset_links = fields.get(Constants.DATASET_LINK_FIELD);
-            if(full_dataset_links != null && full_dataset_links.size() > 0){
+            if (full_dataset_links != null && full_dataset_links.size() > 0) {
                 datasetDetail.setFull_dataset_link(full_dataset_links.iterator().next());
             }
 
             Set<String> diseases = fields.get(Constants.DISEASE_FIELD);
-            if(diseases != null && diseases.size() > 0){
+            if (diseases != null && diseases.size() > 0) {
                 datasetDetail.setDiseases(diseases.toArray(new String[diseases.size()]));
             }
 
             Map<String, Set<String>> dates = datesField;
-            if(dates != null && dates.size() > 0){
+            if (dates != null && dates.size() > 0) {
                 datasetDetail.setDates(dates);
             }
 
             Set<String> tissues = fields.get(Constants.TISSUE_FIELD);
-            if(tissues != null && tissues.size() > 0){
-                datasetDetail.setTissues(setToArray(tissues,String.class));
+            if (tissues != null && tissues.size() > 0) {
+                datasetDetail.setTissues(setToArray(tissues, String.class));
             }
 
             Set<String> instruments = fields.get(Constants.INSTRUMENT_FIELD);
 
-            if(instruments!=null && instruments.size() > 0) {
+            if (instruments != null && instruments.size() > 0) {
                 datasetDetail.setArrayInstruments(setToArray(instruments, String.class));
             }
 
             Set<String> experiment_type = fields.get(Constants.EXPERIMENT_TYPE_FIELD);
-            if(experiment_type!=null && experiment_type.size() > 0) {
+            if (experiment_type != null && experiment_type.size() > 0) {
                 datasetDetail.setArrayExperimentType(setToArray(experiment_type, String.class));
             }
 
             Set<String> pubmedids = fields.get(Constants.PUBMED_FIELD);
-            if ((pubmedids!=null) && (pubmedids.size() > 0)) {
-                datasetDetail.setArrayPublicationIds(setToArray(pubmedids,String.class));
+            if ((pubmedids != null) && (pubmedids.size() > 0)) {
+                datasetDetail.setArrayPublicationIds(setToArray(pubmedids, String.class));
             }
 
             Set<String> submitterKeys = fields.get(Constants.SUBMITTER_KEY_FIELD);
-            Set<String> curatorKeys   = fields.get(Constants.CURATOR_KEY_FIELD);
+            Set<String> curatorKeys = fields.get(Constants.CURATOR_KEY_FIELD);
 
-            if(submitterKeys != null && curatorKeys != null && submitterKeys.size() > 0 && curatorKeys.size() > 0) {
+            if (submitterKeys != null && curatorKeys != null && submitterKeys.size() > 0 && curatorKeys.size() > 0) {
                 datasetDetail.setKeywords(setToArray(submitterKeys, String.class), setToArray(curatorKeys, String.class));
             }
 
             Set<String> organization = fields.get(Constants.ORGANIZATION_FIELD);
-            if((organization!=null) && (organization.size() > 0))
-            {
+            if ((organization != null) && (organization.size() > 0)) {
                 datasetDetail.setOrganization(new ArrayList<String>(organization));
             }
 
             Set<String> submitter = fields.get(Constants.SUBMITTER_FIELD);
-            if((submitter!=null) && (submitter.size() > 0))
-            {
+            if ((submitter != null) && (submitter.size() > 0)) {
                 datasetDetail.setSubmitter(submitter);
             }
 
             Set<String> submitter_mail = fields.get(Constants.SUBMITTER_MAIL_FIELD);
-            if((submitter_mail!=null) && (submitter_mail.size() > 0))
-            {
+            if ((submitter_mail != null) && (submitter_mail.size() > 0)) {
                 datasetDetail.setSubmitterMail(submitter_mail);
             }
 
-            Set<String> labhead = fields.get(Constants.LAB_HEAD_FIELD );
-            if((labhead!=null) && (labhead.size() > 0))
-            {
+            Set<String> labhead = fields.get(Constants.LAB_HEAD_FIELD);
+            if ((labhead != null) && (labhead.size() > 0)) {
                 datasetDetail.setLabHead(labhead);
             }
 
             Set<String> labHeadMail = fields.get(Constants.LAB_HEAD_MAIL_FIELD);
-            if((labHeadMail!=null) && (labHeadMail.size() > 0))
-            {
+            if ((labHeadMail != null) && (labHeadMail.size() > 0)) {
                 datasetDetail.setLabHeadMail(labHeadMail);
             }
 
-            Set<String> taxonomyIds    = argDataset.getCrossReferences().get(Constants.TAXONOMY_FIELD);
-            ArrayList<String> ids = new ArrayList<>(taxonomyIds);
+            Set<String> taxonomyIds = argDataset.getCrossReferences().get(Constants.TAXONOMY_FIELD);
+            if (taxonomyIds != null && taxonomyIds.size() > 0)
+            {
+                ArrayList<String> ids = new ArrayList<>(taxonomyIds);
 
             QueryResult taxonomies = new QueryResult();
 
-            if(ids.size() > 0){
-                if(ids.size() < 99)
-                    taxonomies   = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(ids));
-                else{
+            if (ids.size() > 0) {
+                if (ids.size() < 99)
+                    taxonomies = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(ids));
+                else {
                     int i = 0;
-                    while(i+50 < ids.size()){
-                        List<String> idTemp = ids.subList(i, i+50);
+                    while (i + 50 < ids.size()) {
+                        List<String> idTemp = ids.subList(i, i + 50);
                         taxonomies.addResults(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(idTemp)));
                         i = i + 50;
                     }
-                    if(i < ids.size()){
+                    if (i < ids.size()) {
                         List<String> idTemp = ids.subList(i, ids.size());
                         taxonomies.addResults(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(idTemp)));
                     }
@@ -380,6 +380,7 @@ public class DatasetController {
             }
 
             datasetDetail = RepoDatasetMapper.addTaxonomy(datasetDetail, taxonomies);
+        }
 
         }
         return datasetDetail;
