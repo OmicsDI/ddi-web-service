@@ -260,6 +260,8 @@ public class DatasetController {
 
             Map<String, Set<String>> fields = inputDataset.getAdditional();
 
+            Map<String, Set<String>> crossFields = inputDataset.getCrossReferences();
+
             datasetDetail.setId(argDataset.getAccession());
 
             datasetDetail.setSource(inputDataset.getDatabase());
@@ -317,7 +319,7 @@ public class DatasetController {
                 datasetDetail.setArrayExperimentType(setToArray(experiment_type, String.class));
             }
 
-            Set<String> pubmedids = fields.get(Constants.PUBMED_FIELD);
+            Set<String> pubmedids = crossFields.get(Constants.PUBMED_FIELD);
             if ((pubmedids != null) && (pubmedids.size() > 0)) {
                 datasetDetail.setArrayPublicationIds(setToArray(pubmedids, String.class));
             }
