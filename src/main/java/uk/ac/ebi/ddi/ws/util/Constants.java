@@ -39,7 +39,7 @@ public class Constants {
 
     public static final String SAMPLE_PROTOCOL_FIELD    = "sample_protocol";
 
-    public static final String PUBMED_FIELD             = "PUBMED";
+    public static final String PUBMED_FIELD             = "pubmed";
 
     public static final String DATASET_LINK_FIELD       = "full_dataset_link";
 
