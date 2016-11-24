@@ -99,6 +99,9 @@ public class DatasetDetail implements Serializable{
      */
     List<String> diseases      = null;
 
+    /*
+     *added omics type to webservice
+     */
     List<String> omics_type    = null;
 
     // Dataset Similars from annotation system.
