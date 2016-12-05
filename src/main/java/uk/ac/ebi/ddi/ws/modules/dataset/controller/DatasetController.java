@@ -236,7 +236,7 @@ public class DatasetController {
          */
         DatasetResource resource = resourceService.read(acc, domain);
         if(resource == null){
-            resource = new DatasetResource("http://www.omicsdi.org/localhost" + domain + "/" + acc,acc,domain);
+            resource = new DatasetResource("http://www.omicsdi.org/" + domain + "/" + acc,acc,domain);
             resource = resourceService.save(resource);
         }
         HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
