@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
@@ -224,8 +225,8 @@ public class DatasetController {
 
         //QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds);
         //Entry[] entries = datasetResult.getEntries();
-        domain = Constants.Database.retriveAnchorName(domain);
-        Dataset dsResult = datasetService.read(acc,domain);
+        //domain = Constants.Database.retriveAnchorName(domain);
+        Dataset dsResult = datasetService.read(acc,Constants.Database.retriveAnchorName(domain));
 
         datasetDetail = getDatasetInfo(datasetDetail,dsResult);
 
@@ -235,18 +236,144 @@ public class DatasetController {
          */
         DatasetResource resource = resourceService.read(acc, domain);
         if(resource == null){
-            resource = new DatasetResource("http://www.omicsdi.org/" + domain + "/" + acc,acc,domain);
+            resource = new DatasetResource("http://www.omicsdi.org/localhost" + domain + "/" + acc,acc,domain);
             resource = resourceService.save(resource);
         }
         HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
         event.setResource(resource);
         eventService.save(event);
 
-        DatasetSimilars similars = datasetSimilarsService.read(acc, Constants.Database.retriveAnchorName(domain));
+        DatasetSimilars similars = datasetSimilarsService.read(acc, domain);
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 
         return datasetDetail;
 
+    }
+
+
+    @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
+    @RequestMapping(value = "/mostAccessed", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    DataSetResult getMostAccessed(
+            @ApiParam(value = "The most accessed datasets size, e.g: 20")
+            @RequestParam(value = "size", required = true, defaultValue = "20") int size
+    ) {
+
+        DataSetResult result = new DataSetResult();
+        List<DatasetSummary> datasetSummaryList = new ArrayList<>();
+        Map<Tuple<String, String>, Integer> mostAccesedIds = eventService.moreAccessedDatasetResource(size);
+        Map<String, Set<String>> currentIds = new HashMap<>();
+
+        for(Tuple<String, String> dataset: mostAccesedIds.keySet()){
+            Set<String> ids = currentIds.get(dataset.getValue());
+            if(ids == null)
+                ids = new HashSet<>();
+            ids.add(dataset.getKey());
+            currentIds.put(dataset.getValue(), ids);
+        }
+        for(String domain: currentIds.keySet()){
+                QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds.get(domain));
+                datasetSummaryList.addAll(transformDatasetSummary(datasetResult, domain, mostAccesedIds));
+        }
+        result.setDatasets(datasetSummaryList);
+        result.setCount(datasetSummaryList.size());
+
+        return result;
+    }
+
+
+    @ApiOperation(value = "Retrieve the related datasets to one Dataset", position = 1, notes = "Retrieve the related datasets to one Dataset")
+    @RequestMapping(value = "/getSimilar", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    DataSetResult moreLikeThis(
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
+            @RequestParam(value = "acc", required = true) String acc,
+            @ApiParam(value = "Database accession id, e.g : pride")
+            @RequestParam(value = "database", required = true) String domain
+    ) {
+
+        SimilarResult queryResult = dataWsClient.getSimilarProjects(domain, acc, Constants.MORELIKE_FIELDS);
+
+        DataSetResult result = new DataSetResult();
+        List<DatasetSummary> datasetSummaryList = new ArrayList<>();
+
+        Map<String, Map<String, String>> currentIds = new HashMap<>();
+
+
+        if(queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0){
+
+            for(Entry entry: queryResult.getEntries()){
+                if(entry.getId() != null && entry.getSource() != null){
+                    Map<String, String> ids = currentIds.get(entry.getSource());
+                    if(ids == null)
+                        ids = new HashMap<>();
+                    if(!(entry.getId().equalsIgnoreCase(acc) && entry.getSource().equalsIgnoreCase(domain))) {
+                        ids.put(entry.getId(), entry.getScore());
+                    }
+                    if (ids != null && !ids.isEmpty())
+                        currentIds.put(entry.getSource(), ids);
+                }
+            }
+
+            for(String currentDomain: currentIds.keySet()){
+                    QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, currentIds.get(currentDomain).keySet());
+                    datasetSummaryList.addAll(transformSimilarDatasetSummary(datasetResult, currentDomain, currentIds.get(currentDomain)));
+            }
+
+            Collections.sort(datasetSummaryList, new Comparator<DatasetSummary>() {
+                @Override
+                public int compare(DatasetSummary o1, DatasetSummary o2) {
+                    Double value1 = Double.valueOf(o1.getScore());
+                    Double value2 = Double.valueOf(o2.getScore());
+                    if (value1 < value2) return 1;
+                    else if (Objects.equals(value1, value2)) return 0;
+                    else return -1;
+                }
+            });
+
+            result.setDatasets(datasetSummaryList);
+            result.setCount(datasetSummaryList.size());
+
+            return result;
+        }
+
+        return null;
+    }
+
+
+    @ApiOperation(value = "Retrieve all file links for a given dataset", position = 1, notes = "Retrieve all file links for a given dataset")
+    @RequestMapping(value = "/getFileLinks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    List<String> getFileLinks(
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
+            @RequestParam(value = "acc", required = true) String acc,
+            @ApiParam(value = "Database accession id, e.g : pride")
+            @RequestParam(value = "database", required = true) String domain
+    ) {
+        List<String> files = new ArrayList<>();
+
+        String[] fields = {
+                Constants.DATASET_FILE
+        };
+
+        Set<String> currentIds =  new HashSet(Arrays.asList(new String[] {acc}));
+
+        QueryResult datasetResult = dataWsClient.getDatasetsById(domain, fields, currentIds);
+
+        if(datasetResult != null && datasetResult.getEntries() != null &&
+                datasetResult.getEntries().length > 0){
+            Entry entry = datasetResult.getEntries()[0];
+            String[] fileNames = entry.getFields().get(Constants.DATASET_FILE);
+            if(fileNames != null && fileNames.length > 0){
+                for(String fileName: fileNames)
+                    if(fileName != null && fileNames.length > 0 )
+                        files.add(fileName);
+            }
+        }
+        return files;
     }
 
     public DatasetDetail getDatasetInfo(DatasetDetail datasetDetail, Dataset argDataset)
@@ -361,28 +488,28 @@ public class DatasetController {
             {
                 ArrayList<String> ids = new ArrayList<>(taxonomyIds);
 
-            QueryResult taxonomies = new QueryResult();
+                QueryResult taxonomies = new QueryResult();
 
-            if (ids.size() > 0) {
-                if (ids.size() < 99)
-                    taxonomies = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(ids));
-                else {
-                    int i = 0;
-                    while (i + 50 < ids.size()) {
-                        List<String> idTemp = ids.subList(i, i + 50);
-                        taxonomies.addResults(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(idTemp)));
-                        i = i + 50;
-                    }
-                    if (i < ids.size()) {
-                        List<String> idTemp = ids.subList(i, ids.size());
-                        taxonomies.addResults(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(idTemp)));
-                    }
+                if (ids.size() > 0) {
+                    if (ids.size() < 99)
+                        taxonomies = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(ids));
+                    else {
+                        int i = 0;
+                        while (i + 50 < ids.size()) {
+                            List<String> idTemp = ids.subList(i, i + 50);
+                            taxonomies.addResults(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(idTemp)));
+                            i = i + 50;
+                        }
+                        if (i < ids.size()) {
+                            List<String> idTemp = ids.subList(i, ids.size());
+                            taxonomies.addResults(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, new HashSet<>(idTemp)));
+                        }
 
+                    }
                 }
-            }
 
-            datasetDetail = RepoDatasetMapper.addTaxonomy(datasetDetail, taxonomies);
-        }
+                datasetDetail = RepoDatasetMapper.addTaxonomy(datasetDetail, taxonomies);
+            }
 
         }
         return datasetDetail;
@@ -392,131 +519,5 @@ public class DatasetController {
     {
         return  argSet.toArray((T[]) Array.newInstance(type, argSet.size()));
     }
-
-    @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/mostAccessed", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public @ResponseBody
-    DataSetResult getMostAccessed(
-            @ApiParam(value = "The most accessed datasets size, e.g: 20")
-            @RequestParam(value = "size", required = true, defaultValue = "20") int size
-    ) {
-
-        DataSetResult result = new DataSetResult();
-        List<DatasetSummary> datasetSummaryList = new ArrayList<>();
-        Map<Tuple<String, String>, Integer> mostAccesedIds = eventService.moreAccessedDatasetResource(size);
-        Map<String, Set<String>> currentIds = new HashMap<>();
-
-        for(Tuple<String, String> dataset: mostAccesedIds.keySet()){
-            Set<String> ids = currentIds.get(dataset.getValue());
-            if(ids == null)
-                ids = new HashSet<>();
-            ids.add(dataset.getKey());
-            currentIds.put(dataset.getValue(), ids);
-        }
-        for(String domain: currentIds.keySet()){
-            QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds.get(domain));
-            datasetSummaryList.addAll(transformDatasetSummary(datasetResult,domain, mostAccesedIds));
-        }
-        result.setDatasets(datasetSummaryList);
-        result.setCount(datasetSummaryList.size());
-
-        return result;
-    }
-
-
-    @ApiOperation(value = "Retrieve the related datasets to one Dataset", position = 1, notes = "Retrieve the related datasets to one Dataset")
-    @RequestMapping(value = "/getSimilar", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public @ResponseBody
-    DataSetResult moreLikeThis(
-            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "acc", required = true) String acc,
-            @ApiParam(value = "Database accession id, e.g : pride")
-            @RequestParam(value = "database", required = true) String domain
-    ) {
-
-        SimilarResult queryResult = dataWsClient.getSimilarProjects(domain, acc, Constants.MORELIKE_FIELDS);
-
-        DataSetResult result = new DataSetResult();
-        List<DatasetSummary> datasetSummaryList = new ArrayList<>();
-
-        Map<String, Map<String, String>> currentIds = new HashMap<>();
-
-
-        if(queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0){
-
-            for(Entry entry: queryResult.getEntries()){
-                if(entry.getId() != null && entry.getSource() != null){
-                    Map<String, String> ids = currentIds.get(entry.getSource());
-                    if(ids == null)
-                        ids = new HashMap<>();
-                    if(!(entry.getId().equalsIgnoreCase(acc) && entry.getSource().equalsIgnoreCase(domain))) {
-                        ids.put(entry.getId(), entry.getScore());
-                    }
-                    if (ids != null && !ids.isEmpty())
-                        currentIds.put(entry.getSource(), ids);
-                }
-            }
-
-            for(String currentDomain: currentIds.keySet()){
-                QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, currentIds.get(currentDomain).keySet());
-                datasetSummaryList.addAll(transformSimilarDatasetSummary(datasetResult,currentDomain, currentIds.get(currentDomain)));
-            }
-
-            Collections.sort(datasetSummaryList, new Comparator<DatasetSummary>() {
-                @Override
-                public int compare(DatasetSummary o1, DatasetSummary o2) {
-                    Double value1 = Double.valueOf(o1.getScore());
-                    Double value2 = Double.valueOf(o2.getScore());
-                    if (value1 < value2) return 1;
-                    else if (Objects.equals(value1, value2)) return 0;
-                    else return -1;
-                }
-            });
-
-            result.setDatasets(datasetSummaryList);
-            result.setCount(datasetSummaryList.size());
-
-            return result;
-        }
-
-        return null;
-    }
-
-
-    @ApiOperation(value = "Retrieve all file links for a given dataset", position = 1, notes = "Retrieve all file links for a given dataset")
-    @RequestMapping(value = "/getFileLinks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public @ResponseBody
-    List<String> getFileLinks(
-            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "acc", required = true) String acc,
-            @ApiParam(value = "Database accession id, e.g : pride")
-            @RequestParam(value = "database", required = true) String domain
-    ) {
-        List<String> files = new ArrayList<>();
-
-        String[] fields = {
-                Constants.DATASET_FILE
-        };
-
-        Set<String> currentIds =  new HashSet(Arrays.asList(new String[] {acc}));
-
-        QueryResult datasetResult = dataWsClient.getDatasetsById(domain, fields, currentIds);
-
-        if(datasetResult != null && datasetResult.getEntries() != null &&
-                datasetResult.getEntries().length > 0){
-            Entry entry = datasetResult.getEntries()[0];
-            String[] fileNames = entry.getFields().get(Constants.DATASET_FILE);
-            if(fileNames != null && fileNames.length > 0){
-                for(String fileName: fileNames)
-                    if(fileName != null && fileNames.length > 0 )
-                        files.add(fileName);
-            }
-        }
-        return files;
-    }
-
 
 }
