@@ -3,6 +3,7 @@ package uk.ac.ebi.ddi.ws.modules.dataset.controller;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,14 +23,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {DatasetController.class,DatasetWsClient.class, DomainWsClient.class,AbstractEbeyeWsConfig.class})
-//@ContextConfiguration({"classpath:src/test/resources/test-context.xml", "classpath:src/mvc-config.xml"})
+//@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-config.xml"})
 public class DatasetControllerTest {
 
-    @Autowired
+    @InjectMocks
     private DatasetController datasetController;
 
-    @Autowired
-    private DatasetWsClient datasetWsClient;
+/*    @Autowired
+    private DatasetWsClient datasetWsClient;*/
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -42,8 +43,6 @@ public class DatasetControllerTest {
     @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
-
-        datasetController = new DatasetController();
 
         // this must be called for the @Mock annotations above to be processed.
         MockitoAnnotations.initMocks(this);

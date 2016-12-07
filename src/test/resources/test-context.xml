@@ -9,11 +9,11 @@
     <!-- define the packages to scan for the test config (see app-context-bootstrap.xml for production config) -->
     <context:component-scan base-package="uk.ac.ebi.ddi.ws"/>
 
-    <bean id="datasetController" class="org.mockito.Mockito" factory-method="mock">
+<!--    <bean id="datasetController" class="org.mockito.Mockito" factory-method="mock">
         <constructor-arg value="uk.ac.ebi.ddi.ws.modules.dataset.controller"/>
-    </bean>
+    </bean>-->
 
-<!--    <bean id="datasetController" class="uk.ac.ebi.ddi.ws.modules.dataset.controller.DatasetController"/>-->
+    <bean id="datasetController" class="uk.ac.ebi.ddi.ws.modules.dataset.controller.DatasetController"/>
 
     <bean id="datasetWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient">
         <constructor-arg ref="ebeyeWsConfigDev"/>
@@ -32,31 +32,6 @@
     <bean id="projectServiceImpl" class="org.mockito.Mockito" factory-method="mock">
         <constructor-arg value="uk.ac.ebi.pride.archive.repo.project.service.ProjectServiceImpl"/>
     </bean>
-    <bean id="projectSearchDao" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.archive.search.service.dao.ProjectSearchDao"/>
-    </bean>
-    <bean id="projectSearchService" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.archive.search.service.ProjectSearchService" />
-    </bean>
 
-    <bean id="assayServiceImpl" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.archive.repo.assay.service.AssayServiceImpl"/>
-    </bean>
-
-    <bean id="fileServiceImpl" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.archive.repo.file.service.FileServiceImpl"/>
-    </bean>
-
-    <bean id="userServiceImpl" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.archive.repo.user.service.UserServiceImpl"/>
-    </bean>
-
-    <bean id="proteinIdentificationSearchService" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.proteinidentificationindex.search.service.ProteinIdentificationSearchService"/>
-    </bean>
-
-    <bean id="psmSearchService" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.psmindex.search.service.PsmSearchService"/>
-    </bean>
 -->
 </beans>
