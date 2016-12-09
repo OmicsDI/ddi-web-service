@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>uk.ac.ebi.ddi</groupId>
+  <artifactId>ddi-ebe-ws-dao</artifactId>
+  <versioning>
+    <versions>
+      <version>1.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20161209172558</lastUpdated>
+  </versioning>
+</metadata>
