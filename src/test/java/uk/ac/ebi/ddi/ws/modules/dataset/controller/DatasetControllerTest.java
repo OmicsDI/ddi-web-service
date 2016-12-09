@@ -96,12 +96,12 @@ public class DatasetControllerTest {
 
     }
 
-    @Test
+    @Test// /dataset/mostaccessed
     public void testmostAccessed() throws Exception{
         mockMvc.perform(get("/dataset/mostAccessed?size=20")).andExpect(status().isOk());
     }
 
-    @Test
+    @Test // /dataset/get?acc={}&database={}
     public void testGet() throws Exception{
         mockMvc.perform(get("/dataset/get?acc=PXD000210&database=pride")).andExpect(status().isOk());
     }
