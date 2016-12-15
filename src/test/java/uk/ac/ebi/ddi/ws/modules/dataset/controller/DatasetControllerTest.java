@@ -43,11 +43,11 @@ public class DatasetControllerTest {
 
     @Test// /dataset/mostaccessed?size
     public void getMostAccessed() throws Exception{
-        mockMvc.perform(get("/dataset/mostAccessed?size=" + OMICS_SIZE))
-                .andExpect(status().isOk());
+        System.out.println(mockMvc.perform(get("/dataset/mostAccessed?size=" + OMICS_SIZE))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentType());
     }
 
-    @Test // /dataset/get?acc={}&database={}
+   /* @Test // /dataset/get?acc={}&database={}
     public void getDataset() throws Exception{
         mockMvc.perform(get("/dataset/get?acc=" + OMICS_DATASET + "&"+ "database=" + OMICS_DATABASE))
                 .andExpect(status().isOk());
@@ -75,6 +75,6 @@ public class DatasetControllerTest {
     public void getSimilar() throws Exception{
         mockMvc.perform(get("/dataset/getSimilar?acc=" + OMICS_DATASET + "&database=" + OMICS_DATABASE))
                 .andExpect(status().isOk());
-    }
+    }*/
 
 }
