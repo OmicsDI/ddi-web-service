@@ -109,8 +109,9 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <version>3.2.14.RELEASE</version>
+            <scope>test</scope>
         </dependency>
-
         <!-- Servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>
