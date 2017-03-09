@@ -24,12 +24,12 @@
         <swagger.version>0.8.6</swagger.version>
         <web-service-model.version>0.2.10</web-service-model.version>
         <ddi.mongo.db>ddi_db</ddi.mongo.db>
-        <ddi.mongo.user></ddi.mongo.user>
-        <ddi.mongo.password></ddi.mongo.password>
+        <ddi.mongo.user>ddi_user</ddi.mongo.user>
+        <ddi.mongo.password>abcd</ddi.mongo.password>
         <ddi.mongo.port>27017</ddi.mongo.port>
-        <ddi.mongo.machine.one>localhost</ddi.mongo.machine.one>
-        <ddi.mongo.machine.two>localhost</ddi.mongo.machine.two>
-        <ddi.mongo.machine.three>localhost</ddi.mongo.machine.three>
+        <ddi.mongo.machine.one>abcd</ddi.mongo.machine.one>
+        <ddi.mongo.machine.two>abcd</ddi.mongo.machine.two>
+        <ddi.mongo.machine.three>abcd</ddi.mongo.machine.three>
         <ddi.mongo.authenticationDatabase>admin</ddi.mongo.authenticationDatabase>
         <database.environment>mongoDB</database.environment>
     </properties>
@@ -105,12 +105,12 @@
             <artifactId>spring-context-support</artifactId>
         </dependency>
 
-        <!-- Spring test-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <version>3.2.14.RELEASE</version>
+            <scope>test</scope>
         </dependency>
-
         <!-- Servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>

@@ -59,12 +59,21 @@ public class Constants {
 
     public static String LAB_HEAD_MAIL_FIELD            =  "labhead_mail";
 
+    public static String ENSEMBL                        =   "ENSEMBL";
+
+    public static String UNIPROT                        =   "UNIPROT";
+
+    public static String CHEBI                          =   "CHEBI";
+
     public static final String[] DATASET_SUMMARY        = {Constants.DESCRIPTION_FIELD,
                                                            Constants.NAME_FIELD,
                                                            Constants.SUBMITTER_KEY_FIELD,Constants.CURATOR_KEY_FIELD,
                                                            Constants.PUB_DATE_FIELD,
                                                            Constants.TAXONOMY_FIELD,
-                                                           Constants.OMICS_TYPE_FIELD};
+                                                           Constants.OMICS_TYPE_FIELD,
+                                                           Constants. ENSEMBL,
+                                                           Constants.UNIPROT,
+                                                            Constants.CHEBI};
 
 
     public static final String[] DATASET_DETAIL         = {Constants.NAME_FIELD,
