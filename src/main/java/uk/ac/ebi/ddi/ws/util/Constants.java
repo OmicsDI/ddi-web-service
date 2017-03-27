@@ -218,7 +218,11 @@ public class Constants {
         ARRAY_EXPRESS("ArrayExpress", "arrayexpress-repository"),
         METABOLOMEEXPRESS("MetabolomeExpress", "metabolome_express"),
         EXPRESSION_ATLAS("ExpressionAtlas", "atlas-experiments"),
-        METABOLOMICSWORKBENCH("MetabolomicsWorkbench", "metabolomics_workbench");
+        METABOLOMICSWORKBENCH("MetabolomicsWorkbench", "metabolomics_workbench"),
+        BIOMODELS("BioModels Database","biomodels"),
+        LINCS("LINCS","LINCS"),
+        PAXDB("PAXDB","PAXDB"),
+        JPOST("JPOST Repository","JPOST");
 
         String databaseName;
         String solarName;

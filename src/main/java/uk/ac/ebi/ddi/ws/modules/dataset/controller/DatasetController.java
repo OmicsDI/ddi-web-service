@@ -78,6 +78,7 @@ public class DatasetController {
     IDatasetService datasetService;
 
 
+    //@CrossOrigin
     @ApiOperation(value = "Search for datasets in the resource", position = 1, notes = "retrieve datasets in the resource using different queries")
     @RequestMapping(value = "/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -361,7 +362,7 @@ public class DatasetController {
 
         Set<String> currentIds =  new HashSet(Arrays.asList(new String[] {acc}));
 
-        QueryResult datasetResult = dataWsClient.getDatasetsById(domain, fields, currentIds);
+        QueryResult datasetResult = dataWsClient.getDatasetsById(Constants.Database.retriveAnchorName(domain), fields, currentIds);
 
         if(datasetResult != null && datasetResult.getEntries() != null &&
                 datasetResult.getEntries().length > 0){
@@ -402,7 +403,6 @@ public class DatasetController {
             datasetDetail.setOmics_type(new ArrayList<String>(omics_type));
 
             Set<String> publication_dates = inputDataset.getDates().get("publication");
-            ;
 
             if (publication_dates != null && publication_dates.isEmpty() != true)
                 datasetDetail.setPublicationDate(publication_dates.iterator().next());
