@@ -22,8 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by gaur on 6/12/16.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {DatasetController.class,DatasetWsClient.class, DomainWsClient.class,AbstractEbeyeWsConfig.class})
-//@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-config.xml"})
+@ContextConfiguration({"classpath:test-context.xml"})
 public class DatasetControllerTest {
 
     @InjectMocks
