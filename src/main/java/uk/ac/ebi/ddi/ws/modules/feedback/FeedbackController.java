@@ -38,17 +38,16 @@ public class FeedbackController {
     IFeedbackService feedbackService;
 
 
-   // @ApiOperation(value = "save feedback report", position = 1, notes = "save feedback for search query results")
-    //@CrossOrigin(origins="*")
+    @CrossOrigin(origins="*")
     //@CrossOrigin(origins = "http://localhost:8080",allowedHeaders = "Content-Type",methods = PUT)
-    @CrossOrigin(origins = "http://localhost:8080")
-    @RequestMapping(value = "/saveFeedback/", method = PUT)
+    //@CrossOrigin(origins = "http://localhost:8080")
+    @RequestMapping(value = "/saveFeedback", method = PUT)
     @ResponseStatus(HttpStatus.OK) // 200
     public
     @ResponseBody void saveFeedback(@RequestBody Feedback feedback,HttpServletRequest httpServletRequest)
     {
-       //String address = request.getRemoteAddr();
-       feedbackService.save(feedback);
+        feedback.setUserInfo(httpServletRequest.getRemoteAddr());
+        feedbackService.save(feedback);
     }
 
     //@CrossOrigin
