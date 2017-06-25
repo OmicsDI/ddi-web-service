@@ -119,6 +119,16 @@ public class DatasetDetail implements Serializable{
 
     Set<String> labHeadMail = null;
 
+    Boolean isClaimed = false;
+
+    public Boolean getClaimed() {
+        return isClaimed;
+    }
+
+    public void setClaimed(Boolean claimed) {
+        isClaimed = claimed;
+    }
+
     public Set<String> getLabHead() {
         return labHead;
     }
