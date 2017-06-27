@@ -10,6 +10,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -23,10 +24,12 @@ import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.model.dataset.DatasetSimilars;
+import uk.ac.ebi.ddi.service.db.model.dataset.MostAccessedDatasets;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetSimilarsService;
+import uk.ac.ebi.ddi.service.db.service.dataset.IMostAccessedDatasetService;
 import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.utils.Tuple;
@@ -76,6 +79,9 @@ public class DatasetController {
 
     @Autowired
     IDatasetService datasetService;
+
+    @Autowired
+    IMostAccessedDatasetService mostAccessedDatasetService;
 
 
     //@CrossOrigin
@@ -263,7 +269,7 @@ public class DatasetController {
 
         DataSetResult result = new DataSetResult();
         List<DatasetSummary> datasetSummaryList = new ArrayList<>();
-        Map<Tuple<String, String>, Integer> mostAccesedIds = eventService.moreAccessedDatasetResource(size);
+/*        Map<Tuple<String, String>, Integer> mostAccesedIds = eventService.moreAccessedDatasetResource(size);
         Map<String, Set<String>> currentIds = new HashMap<>();
 
         for(Tuple<String, String> dataset: mostAccesedIds.keySet()){
@@ -281,6 +287,17 @@ public class DatasetController {
         result.setCount(datasetSummaryList.size());
 
         //eventService.moreAccessedDataset(20);
+        DataSetResult result = new DataSetResult();*/
+        Page<MostAccessedDatasets> datasets = mostAccessedDatasetService.readAll(0,size);
+        for(MostAccessedDatasets dataset:datasets.getContent())
+        {
+            DatasetSummary datasetSummary = new DatasetSummary();
+            datasetSummary.setTitle(dataset.getName());
+            datasetSummary.setVisitCount(dataset.getTotal());
+            datasetSummary.setSource(Constants.Database.retriveSorlName(dataset.getDatabase()));
+            datasetSummary.setId(dataset.getAccession());
+            datasetSummaryList.add(datasetSummary);
+        }
         return result;
     }
 
