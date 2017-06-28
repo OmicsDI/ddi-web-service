@@ -298,6 +298,8 @@ public class DatasetController {
             datasetSummary.setId(dataset.getAccession());
             datasetSummaryList.add(datasetSummary);
         }
+        result.setDatasets(datasetSummaryList);
+        result.setCount(size);
         return result;
     }
 
