@@ -10,7 +10,6 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -24,7 +23,6 @@ import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.model.dataset.DatasetSimilars;
-import uk.ac.ebi.ddi.service.db.model.dataset.MostAccessedDatasets;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
@@ -37,6 +35,8 @@ import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.OmicsDataset;
+import uk.ac.ebi.ddi.ws.modules.dataset.repository.FacetSettingsRepository;
+import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
@@ -47,8 +47,11 @@ import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.*;
+import uk.ac.ebi.ddi.service.db.model.dataset.MostAccessedDatasets;
 
 
 @Api(value = "dataset", description = "Retrieve the information about the dataset including search functionalities", position = 0)
@@ -81,8 +84,10 @@ public class DatasetController {
     IDatasetService datasetService;
 
     @Autowired
-    IMostAccessedDatasetService mostAccessedDatasetService;
+    FacetSettingsRepository facetSettingsRepository;
 
+    @Autowired
+    IMostAccessedDatasetService mostAccessedDatasetService;
 
     //@CrossOrigin
     @ApiOperation(value = "Search for datasets in the resource", position = 1, notes = "retrieve datasets in the resource using different queries")
@@ -140,6 +145,8 @@ public class DatasetController {
         }else if(taxonomyIds.size() > 0){
            taxonomies   = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, taxonomyIds);
         }
+
+        queryResult.setFacets((new FacetViewAdapter(facetSettingsRepository)).process(queryResult.getFacets()));
 
         return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
 
@@ -267,27 +274,9 @@ public class DatasetController {
             @RequestParam(value = "size", required = true, defaultValue = "20") int size
     ) {
 
+
         DataSetResult result = new DataSetResult();
         List<DatasetSummary> datasetSummaryList = new ArrayList<>();
-/*        Map<Tuple<String, String>, Integer> mostAccesedIds = eventService.moreAccessedDatasetResource(size);
-        Map<String, Set<String>> currentIds = new HashMap<>();
-
-        for(Tuple<String, String> dataset: mostAccesedIds.keySet()){
-            Set<String> ids = currentIds.get(dataset.getValue());
-            if(ids == null)
-                ids = new HashSet<>();
-            ids.add(dataset.getKey());
-            currentIds.put(dataset.getValue(), ids);
-        }
-        for(String domain: currentIds.keySet()){
-                QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds.get(domain));
-                datasetSummaryList.addAll(transformDatasetSummary(datasetResult, domain, mostAccesedIds));
-        }
-        result.setDatasets(datasetSummaryList);
-        result.setCount(datasetSummaryList.size());
-
-        //eventService.moreAccessedDataset(20);
-        DataSetResult result = new DataSetResult();*/
         Page<MostAccessedDatasets> datasets = mostAccessedDatasetService.readAll(0,size);
         for(MostAccessedDatasets dataset:datasets.getContent())
         {
@@ -296,6 +285,8 @@ public class DatasetController {
             datasetSummary.setVisitCount(dataset.getTotal());
             datasetSummary.setSource(Constants.Database.retriveSorlName(dataset.getDatabase()));
             datasetSummary.setId(dataset.getAccession());
+            List<String> omics_type = Collections.list(Collections.enumeration(dataset.getAdditional().get(Constants.OMICS_TYPE_FIELD)));
+            datasetSummary.setOmicsType(omics_type);
             datasetSummaryList.add(datasetSummary);
         }
         result.setDatasets(datasetSummaryList);
@@ -412,11 +403,13 @@ public class DatasetController {
 
             datasetDetail.setId(argDataset.getAccession());
 
-            datasetDetail.setSource(inputDataset.getDatabase());
+            datasetDetail.setSource(Constants.Database.retriveSorlName(argDataset.getDatabase()));
 
             datasetDetail.setName(inputDataset.getName());
 
             datasetDetail.setDescription((inputDataset.getDescription() != null) ? inputDataset.getDescription() : null);
+
+            datasetDetail.setClaimable(inputDataset.isClaimable());
 
             Set<String> omics_type = inputDataset.getAdditional().get("omics_type");
 
