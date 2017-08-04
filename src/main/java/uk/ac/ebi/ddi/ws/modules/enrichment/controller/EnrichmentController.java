@@ -340,7 +340,7 @@ public class EnrichmentController {
     @RequestMapping(value = "/getReanalysis", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     private void reanalysisScore(){
-        datasetStatInfoService.reanalysisCount();
+        //datasetStatInfoService.reanalysisCount();
     }
 
 
