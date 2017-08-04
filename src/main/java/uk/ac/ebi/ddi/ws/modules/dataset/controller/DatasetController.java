@@ -4,6 +4,7 @@ package uk.ac.ebi.ddi.ws.modules.dataset.controller;
  * @author Yasset Perez-Riverol ypriverol
  */
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
