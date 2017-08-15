@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.ebi.ddi.service.db.service.dataset.DatabaseService;
 import uk.ac.ebi.ddi.ws.modules.database.model.DatabaseDetail;
 import uk.ac.ebi.ddi.ws.modules.database.service.DatabaseDetailService;
 
@@ -23,6 +24,10 @@ public class DatabaseController {
 
     @Autowired
     DatabaseDetailService databaseDetailService;
+
+    @Autowired
+    DatabaseService databaseService;
+
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     @CrossOrigin
     public List<DatabaseDetail> getDatabaseList(){
