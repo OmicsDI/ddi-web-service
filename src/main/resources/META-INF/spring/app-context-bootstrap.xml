@@ -74,6 +74,7 @@
     <bean id="mostAccessedDatasetService" class="uk.ac.ebi.ddi.service.db.service.dataset.MostAccessedDatasetService"/>
 
     <bean class="uk.ac.ebi.ddi.service.db.utils.CascadingMongoEventListener" />
+    <bean id = "databaseService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatabaseService"/>
 
     <!--&lt;!&ndash;<bean id="annotService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>&ndash;&gt;-->
     <!--<bean id="termService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>-->
