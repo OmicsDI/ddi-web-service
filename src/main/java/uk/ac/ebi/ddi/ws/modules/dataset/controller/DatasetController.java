@@ -147,8 +147,9 @@ public class DatasetController {
            taxonomies   = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, taxonomyIds);
         }
 
-        queryResult.setFacets((new FacetViewAdapter(facetSettingsRepository)).process(queryResult.getFacets()));
-
+        if(queryResult.getCount() > 0) {
+            queryResult.setFacets((new FacetViewAdapter(facetSettingsRepository)).process(queryResult.getFacets()));
+        }
         return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
 
     }
