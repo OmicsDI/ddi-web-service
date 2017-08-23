@@ -15,6 +15,7 @@ public class DatabaseDetail implements Serializable {
 
     @Id
     String databaseName;
+    //TODO:rename
 
     String title;
 
@@ -23,6 +24,26 @@ public class DatabaseDetail implements Serializable {
     String imgAlt;
 
     String repository;
+
+    String source;
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
+    String domain;
 
     String description;
 
