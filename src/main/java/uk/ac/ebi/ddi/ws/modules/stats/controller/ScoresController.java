@@ -12,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.europmc.Citation;
 import uk.ac.ebi.ddi.service.db.model.similarity.Citations;
+import uk.ac.ebi.ddi.service.db.model.similarity.EBISearchPubmedCount;
+import uk.ac.ebi.ddi.service.db.model.similarity.ReanalysisData;
 import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
 import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
 import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
@@ -39,10 +41,10 @@ public class ScoresController {
     private ReanalysisDataService reanalysisDataService;
 
     @ApiOperation(value = "Retrieve an Specific Dataset Citation Count", position = 1, notes = "Retrieve an specific dataset citation count")
-    @RequestMapping(value = "/{domain}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(value = "/citation/{domain}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
-    Citations getDataset(
+    Citations getDatasetCitations(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : E-TIGR-123")
             @PathVariable(value = "acc") String acc,
             @ApiParam(value = "Database accession id, e.g: arrayexpress_repository")
@@ -51,4 +53,29 @@ public class ScoresController {
         return citationService.read(acc,database);
     }
 
+    @ApiOperation(value = "Retrieve an Specific Dataset search Count", position = 1, notes = "Retrieve an specific dataset search count")
+    @RequestMapping(value = "/search/{domain}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    EBISearchPubmedCount getDataSearchCount(
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : E-TIGR-123")
+            @PathVariable(value = "acc") String acc,
+            @ApiParam(value = "Database accession id, e.g: arrayexpress_repository")
+            @PathVariable(value = "domain") String domain){
+        String database = Constants.Database.retriveAnchorName(domain);
+        return ebiPubmedSearchService.getSearchCount(acc,database);
+    }
+
+    @ApiOperation(value = "Retrieve an Specific Dataset reanalysis Count", position = 1, notes = "Retrieve an specific dataset reanalysis count")
+    @RequestMapping(value = "/renalysis/{domain}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    ReanalysisData getDataReanalysisCount(
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : E-TIGR-123")
+            @PathVariable(value = "acc") String acc,
+            @ApiParam(value = "Database accession id, e.g: arrayexpress_repository")
+            @PathVariable(value = "domain") String domain){
+        String database = Constants.Database.retriveAnchorName(domain);
+        return reanalysisDataService.getReanalysisCount(acc,database);
+    }
 }
