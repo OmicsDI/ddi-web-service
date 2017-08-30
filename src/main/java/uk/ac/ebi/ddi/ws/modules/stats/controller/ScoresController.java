@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.europmc.Citation;
 import uk.ac.ebi.ddi.service.db.model.similarity.Citations;
 import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
+import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
+import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
 import uk.ac.ebi.ddi.ws.modules.dataset.controller.DatasetController;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.OmicsDataset;
 import uk.ac.ebi.ddi.ws.util.Constants;
@@ -29,6 +31,12 @@ public class ScoresController {
 
     @Autowired
     private CitationService citationService;
+
+    @Autowired
+    private EBIPubmedSearchService ebiPubmedSearchService;
+
+    @Autowired
+    private ReanalysisDataService reanalysisDataService;
 
     @ApiOperation(value = "Retrieve an Specific Dataset Citation Count", position = 1, notes = "Retrieve an specific dataset citation count")
     @RequestMapping(value = "/{domain}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
