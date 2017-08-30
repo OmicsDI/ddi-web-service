@@ -54,16 +54,14 @@ public class ScoresController {
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset search Count", position = 1, notes = "Retrieve an specific dataset search count")
-    @RequestMapping(value = "/search/{domain}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(value = "/search/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     EBISearchPubmedCount getDataSearchCount(
-            @ApiParam(value = "Accession of the Dataset in the resource, e.g : E-TIGR-123")
-            @PathVariable(value = "acc") String acc,
-            @ApiParam(value = "Database accession id, e.g: arrayexpress_repository")
-            @PathVariable(value = "domain") String domain){
-        String database = Constants.Database.retriveAnchorName(domain);
-        return ebiPubmedSearchService.getSearchCount(acc,database);
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : E-GEOD-24657")
+            @PathVariable(value = "acc") String acc){
+
+        return ebiPubmedSearchService.getSearchCount(acc);
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset reanalysis Count", position = 1, notes = "Retrieve an specific dataset reanalysis count")
@@ -71,9 +69,9 @@ public class ScoresController {
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     ReanalysisData getDataReanalysisCount(
-            @ApiParam(value = "Accession of the Dataset in the resource, e.g : E-TIGR-123")
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : E-GEOD-2198")
             @PathVariable(value = "acc") String acc,
-            @ApiParam(value = "Database accession id, e.g: arrayexpress_repository")
+            @ApiParam(value = "Database accession id, e.g: ExpressionAtlas")
             @PathVariable(value = "domain") String domain){
         String database = Constants.Database.retriveAnchorName(domain);
         return reanalysisDataService.getReanalysisCount(acc,database);
