@@ -75,6 +75,10 @@
 
     <bean class="uk.ac.ebi.ddi.service.db.utils.CascadingMongoEventListener" />
     <bean id = "databaseService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatabaseService"/>
+    <bean id="citationService" class="uk.ac.ebi.ddi.service.db.service.similarity.CitationService"/>
+    <bean id="ebiPubmedSearchService" class="uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService"/>
+    <bean id="reanalysisDataService" class="uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService"/>
+
 
     <!--&lt;!&ndash;<bean id="annotService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>&ndash;&gt;-->
     <!--<bean id="termService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>-->
