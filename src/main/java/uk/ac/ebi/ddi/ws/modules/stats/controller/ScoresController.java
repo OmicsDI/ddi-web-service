@@ -41,15 +41,15 @@ public class ScoresController {
     private ReanalysisDataService reanalysisDataService;
 
     @ApiOperation(value = "Retrieve an Specific Dataset Citation Count", position = 1, notes = "Retrieve an specific dataset citation count")
-    @RequestMapping(value = "/citation/{domain}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(value = "/citation/{source}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     Citations getDatasetCitations(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : E-TIGR-123")
             @PathVariable(value = "acc") String acc,
-            @ApiParam(value = "Database accession id, e.g: arrayexpress_repository")
-            @PathVariable(value = "domain") String domain){
-        String database = Constants.Database.retriveAnchorName(domain);
+            @ApiParam(value = "source, e.g: arrayexpress_repository")
+            @PathVariable(value = "source") String source){
+        String database = Constants.Database.retriveAnchorName(source);
         return citationService.read(acc,database);
     }
 
@@ -65,15 +65,15 @@ public class ScoresController {
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset reanalysis Count", position = 1, notes = "Retrieve an specific dataset reanalysis count")
-    @RequestMapping(value = "/renalysis/{domain}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(value = "/renalysis/{source}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     ReanalysisData getDataReanalysisCount(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : E-GEOD-2198")
             @PathVariable(value = "acc") String acc,
-            @ApiParam(value = "Database accession id, e.g: ExpressionAtlas")
-            @PathVariable(value = "domain") String domain){
-        String database = Constants.Database.retriveAnchorName(domain);
+            @ApiParam(value = "source, e.g: atlas-experiments")
+            @PathVariable(value = "source") String source){
+        String database = Constants.Database.retriveAnchorName(source);
         return reanalysisDataService.getReanalysisCount(acc,database);
     }
 }
