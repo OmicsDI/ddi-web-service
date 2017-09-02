@@ -1,14 +1,17 @@
 package uk.ac.ebi.ddi.ws.modules.database.controller;
 
+import com.wordnik.swagger.annotations.Api;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.service.db.service.dataset.DatabaseService;
-import uk.ac.ebi.ddi.ws.modules.database.model.DatabaseDetail;
-import uk.ac.ebi.ddi.ws.modules.database.service.DatabaseDetailService;
+import uk.ac.ebi.ddi.service.db.model.database.DatabaseDetail;
+import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +21,8 @@ import java.util.List;
 /**
  * Created by root on 16.05.17.
  */
+
+@Api(value = "database", description = "Retrieve information about databases")
 @RestController
 @RequestMapping("/database")
 public class DatabaseController {
@@ -28,8 +33,8 @@ public class DatabaseController {
     @Autowired
     DatabaseService databaseService;
 
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
-    @CrossOrigin
+    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
     public List<DatabaseDetail> getDatabaseList(){
         List<DatabaseDetail> list = databaseDetailService.getDatabaseList();
         return list;
@@ -48,7 +53,7 @@ public class DatabaseController {
         }
         return b;
     }
-    @RequestMapping("/initDefaultLocal")
+    /********************* Function for initial load, not used *****************/
     private void initLocalData(){
 
         InputStream databasesInputStream = this.getClass().getResourceAsStream("/databases.json");

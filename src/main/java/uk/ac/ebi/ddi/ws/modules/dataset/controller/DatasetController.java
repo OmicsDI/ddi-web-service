@@ -4,7 +4,6 @@ package uk.ac.ebi.ddi.ws.modules.dataset.controller;
  * @author Yasset Perez-Riverol ypriverol
  */
 
-import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -15,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
@@ -31,12 +29,11 @@ import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetSimilarsService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IMostAccessedDatasetService;
 import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
-import uk.ac.ebi.ddi.service.db.utils.Tuple;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.OmicsDataset;
-import uk.ac.ebi.ddi.ws.modules.dataset.repository.FacetSettingsRepository;
+import uk.ac.ebi.ddi.service.db.repo.facetsettings.FacetSettingsRepository;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
@@ -48,7 +45,6 @@ import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.*;
