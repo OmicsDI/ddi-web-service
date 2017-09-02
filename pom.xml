@@ -45,16 +45,8 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/props/*.properties</include>
+                    <include>*.properties</include>
                 </includes>
-            </resource>
-            <!-- Maven should not filter other files -->
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/props/*.properties</exclude>
-                </excludes>
             </resource>
         </resources>
         <!-- maven-jetty-plugin -->
