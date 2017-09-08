@@ -59,7 +59,7 @@ public class ScoresController {
     Citations getDatasetCitations(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : E-TIGR-123")
             @PathVariable(value = "acc") String acc,
-            @ApiParam(value = "source, e.g: arrayexpress_repository")
+            @ApiParam(value = "source, e.g: arrayexpress-repository")
             @PathVariable(value = "source") String source){
         String database = Constants.Database.retriveAnchorName(source);
         return citationService.read(acc,database);
@@ -77,7 +77,7 @@ public class ScoresController {
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset reanalysis Count", position = 1, notes = "Retrieve an specific dataset reanalysis count")
-    @RequestMapping(value = "/renalysis/{source}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(value = "/reanalysis/{source}/{acc}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     ReanalysisData getDataReanalysisCount(
@@ -102,7 +102,9 @@ public class ScoresController {
     {
         String database = Constants.Database.retriveAnchorName(source);
         MostAccessedDatasets datasets = mostAccessedDatasetService.getDatasetView(acc,database);
-        return datasets.getTotal();
+        if(null==datasets)
+            return 0;
+        else
+            return datasets.getTotal();
     }
-
 }
