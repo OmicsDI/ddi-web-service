@@ -1,11 +1,11 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Facet;
-import uk.ac.ebi.ddi.ws.modules.dataset.repository.FacetSettingsRepository;
+import uk.ac.ebi.ddi.service.db.model.facetsettings.FacetProperty;
+import uk.ac.ebi.ddi.service.db.model.facetsettings.FacetSettings;
+import uk.ac.ebi.ddi.service.db.repo.facetsettings.FacetSettingsRepository;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
