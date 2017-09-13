@@ -255,7 +255,7 @@ public class DatasetController {
         event.setResource(resource);
         eventService.save(event);
 
-        DatasetSimilars similars = datasetSimilarsService.read(acc, domain);
+        DatasetSimilars similars = datasetSimilarsService.read(acc, Constants.Database.retriveAnchorName(domain));
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 
         return datasetDetail;
