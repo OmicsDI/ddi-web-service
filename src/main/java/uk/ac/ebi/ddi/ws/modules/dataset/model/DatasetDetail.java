@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.model;
 
+import uk.ac.ebi.ddi.service.db.model.dataset.Scores;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
@@ -157,6 +159,16 @@ public class DatasetDetail implements Serializable{
     }
 
     Boolean isClaimable;
+
+    Scores scores;
+
+    public Scores getScores() {
+        return scores;
+    }
+
+    public void setScores(Scores scores) {
+        this.scores = scores;
+    }
 
     public Boolean getClaimable() {
         return isClaimable;

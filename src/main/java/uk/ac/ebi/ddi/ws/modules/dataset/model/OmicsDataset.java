@@ -1,6 +1,7 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.model;
 
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
+import uk.ac.ebi.ddi.service.db.model.dataset.Scores;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
@@ -22,6 +23,8 @@ public class OmicsDataset implements Serializable {
 
     String description;
 
+    Scores scores;
+
     private List<OmicsDate> dates;
 
     private ArrayList<Additional> additionals;
@@ -41,7 +44,7 @@ public class OmicsDataset implements Serializable {
         this.additionals = new ArrayList<Additional>(convertAdditional(dataset.getAdditional()));
         this.crossReferences = new ArrayList<>(convertRef(dataset.getCrossReferences()));
         this.isClaimable = dataset.isClaimable();
-
+        this.scores = dataset.getScores();
 
     }
 
@@ -137,5 +140,13 @@ public class OmicsDataset implements Serializable {
 
     public void setClaimable(boolean claimable) {
         isClaimable = claimable;
+    }
+
+    public Scores getScores() {
+        return scores;
+    }
+
+    public void setScores(Scores scores) {
+        this.scores = scores;
     }
 }
