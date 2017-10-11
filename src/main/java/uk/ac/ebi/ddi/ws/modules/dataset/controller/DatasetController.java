@@ -413,6 +413,8 @@ public class DatasetController {
 
             datasetDetail.setOmics_type(new ArrayList<String>(omics_type));
 
+            datasetDetail.setScores(inputDataset.getScores());
+
             Set<String> publication_dates = inputDataset.getDates().get("publication");
 
             if (publication_dates != null && publication_dates.isEmpty() != true)
