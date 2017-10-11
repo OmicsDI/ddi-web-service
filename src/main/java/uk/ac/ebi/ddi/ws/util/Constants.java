@@ -1,5 +1,8 @@
 package uk.ac.ebi.ddi.ws.util;
 
+import scala.collection.immutable.Stream;
+import scala.tools.nsc.backend.icode.analysis.CopyPropagation;
+
 /**
  * @author Yasset Perez-Riverol ypriverol
  */
@@ -65,6 +68,14 @@ public class Constants {
 
     public static String CHEBI                          =   "CHEBI";
 
+    public static String CITATION_COUNT                 =   "citationCount";
+
+    public static String VIEW_COUNT                     =   "viewCount";
+
+    public static String REANALYZED_COUNT               =   "reanalysisCount";
+
+    public static String SEARCH_COUNT                   =   "searchCount";
+
     public static final String[] DATASET_SUMMARY        = {Constants.DESCRIPTION_FIELD,
                                                            Constants.NAME_FIELD,
                                                            Constants.SUBMITTER_KEY_FIELD,Constants.CURATOR_KEY_FIELD,
@@ -73,7 +84,11 @@ public class Constants {
                                                            Constants.OMICS_TYPE_FIELD,
                                                            Constants. ENSEMBL,
                                                            Constants.UNIPROT,
-                                                            Constants.CHEBI};
+                                                            Constants.CHEBI,
+                                                            Constants.CITATION_COUNT,
+                                                            Constants.VIEW_COUNT,
+                                                            Constants.REANALYZED_COUNT,
+                                                            Constants.SEARCH_COUNT};
 
 
     public static final String[] DATASET_DETAIL         = {Constants.NAME_FIELD,
