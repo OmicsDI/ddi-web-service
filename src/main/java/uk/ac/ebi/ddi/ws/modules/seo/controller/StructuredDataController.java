@@ -11,9 +11,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.OmicsDataset;
 import uk.ac.ebi.ddi.ws.modules.seo.model.*;
 import uk.ac.ebi.ddi.ws.util.Constants;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by azorin on 28/07/2017.
@@ -168,7 +173,7 @@ public class StructuredDataController {
                     "author":{  "@type":"Person",
                                 "name":${submitter}},
                     "publisher": {  "@type":"Organization",
-                                    "name":"${datasetDomain.toUpperCase()}"},
+                                    "name":"${datasetDomain.toUpperCase()}"},cd
                     "name":"${name}",
                     "url":"${meta_ddiURL}"
                     },
@@ -190,6 +195,14 @@ public class StructuredDataController {
 
         Dataset dataset = datasetService.read(acc, database);
 
+        DatasetDetail datasetDetail= new DatasetDetail();
+        Set<String> currentIds =  new HashSet(Arrays.asList(new String[] {acc}));
+
+        //QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds);
+        //Entry[] entries = datasetResult.getEntries();
+        //domain = Constants.Database.retriveAnchorName(domain);
+        Dataset dsResult = datasetService.read(acc,Constants.Database.retriveAnchorName(domain));
+
         data.setType("Dataset");
         data.setContext("http://schema.org");
 
@@ -197,10 +210,15 @@ public class StructuredDataController {
             data.setName(dataset.getName());
         }
         if(StringUtils.isNotEmpty(dataset.getDescription())){
-            data.setName(dataset.getDescription());
+            data.setDescription(dataset.getDescription());
         }
 
-        data.setSameAs("http://www.omicsdi.org/dataset/"+domain+"/"+acc);
+        try {
+            data.setSameAs(dataset.getAdditional().get(Constants.DATASET_LINK_FIELD).iterator().next());
+        }
+        catch(Exception ex){
+            data.setSameAs("unknown");
+        }
 
         if(null!=dataset.getAdditional())
             if(null!=dataset.getAdditional().get("submitter_keywords")){
@@ -240,11 +258,6 @@ public class StructuredDataController {
 
                 data.setCitation(citation);
             }
-
-        data.setName("Databases");
-        data.setUrl("http://www.omicsdi.org/database");
-        data.setDescription("Databases and Providers");
-        data.setKeywords("OmicsDI Help Page, Training, Examples");
 
         return data;
     }

@@ -1,8 +1,20 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.util;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
+import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
+import uk.ac.ebi.ddi.service.db.model.dataset.MostAccessedDatasets;
+import uk.ac.ebi.ddi.service.db.model.similarity.Citations;
+import uk.ac.ebi.ddi.service.db.model.similarity.EBISearchPubmedCount;
+import uk.ac.ebi.ddi.service.db.model.similarity.ReanalysisData;
+import uk.ac.ebi.ddi.service.db.service.dataset.DatasetService;
+import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
+import uk.ac.ebi.ddi.service.db.service.dataset.IMostAccessedDatasetService;
+import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
+import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
+import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.*;
 import uk.ac.ebi.ddi.ws.modules.term.model.Term;
 import uk.ac.ebi.ddi.ws.util.Constants;
@@ -14,9 +26,19 @@ import java.util.regex.Pattern;
 /**
  * @author Yasset Perez-Riverol ypriverol
  */
-
 @SuppressWarnings("ManualArrayToCollectionCopy")
 public class RepoDatasetMapper {
+
+    public static CitationService citationService;
+
+    public static EBIPubmedSearchService ebiPubmedSearchService;
+
+    public static ReanalysisDataService reanalysisDataService;
+
+    public static IMostAccessedDatasetService mostAccessedDatasetService;
+
+    public static IDatasetService datasetService;
+
 
     /**
      * Transform the information form the query to the Web service strucutre
@@ -129,6 +151,32 @@ public class RepoDatasetMapper {
                 datasetSummary.setOrganisms(organisms);
             }
         }
+
+        String acc = entry.getId();
+        String source = entry.getSource();
+        String database = Constants.Database.retriveAnchorName(source);
+
+        Dataset dsResult = datasetService.read(acc,database);
+
+        datasetSummary.setClaimable(true);
+
+        MostAccessedDatasets r1 = mostAccessedDatasetService.getDatasetView(acc,database);
+        if(null!=r1){
+            datasetSummary.setViewsCount(r1.getTotal());
+        }
+        Citations r2 = citationService.read(acc,database);
+        if(null!=r2){
+            datasetSummary.setCitationsCount(r2.getPubmedCount());
+        }
+        ReanalysisData r3 = reanalysisDataService.getReanalysisCount(acc,database);
+        if(null!=r3){
+            datasetSummary.setReanalysisCount(r3.getTotal());
+        }
+        EBISearchPubmedCount r4 = ebiPubmedSearchService.getSearchCount(acc);
+        if(null!=r4){
+            datasetSummary.setConnectionsCount(r4.getPubmedCount());
+        }
+
         return datasetSummary;
     }
 

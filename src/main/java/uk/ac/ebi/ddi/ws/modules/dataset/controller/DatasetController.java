@@ -24,11 +24,17 @@ import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.model.dataset.DatasetSimilars;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
+import uk.ac.ebi.ddi.service.db.model.similarity.Citations;
+import uk.ac.ebi.ddi.service.db.model.similarity.EBISearchPubmedCount;
+import uk.ac.ebi.ddi.service.db.model.similarity.ReanalysisData;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetSimilarsService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IMostAccessedDatasetService;
 import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
+import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
+import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
+import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
@@ -77,14 +83,36 @@ public class DatasetController {
     @Autowired
     IDatasetSimilarsService datasetSimilarsService;
 
-    @Autowired
     IDatasetService datasetService;
 
     @Autowired
     FacetSettingsRepository facetSettingsRepository;
 
-    @Autowired
+    //autowired by ctor param
     IMostAccessedDatasetService mostAccessedDatasetService;
+    CitationService citationService;
+    EBIPubmedSearchService ebiPubmedSearchService;
+    ReanalysisDataService reanalysisDataService;
+
+    @Autowired
+    public DatasetController(  CitationService citationService,
+                                EBIPubmedSearchService ebiPubmedSearchService,
+                                ReanalysisDataService reanalysisDataService,
+                                IMostAccessedDatasetService mostAccessedDatasetService,
+                                IDatasetService datasetService)
+    {
+        RepoDatasetMapper.ebiPubmedSearchService = ebiPubmedSearchService;
+        RepoDatasetMapper.mostAccessedDatasetService = mostAccessedDatasetService;
+        RepoDatasetMapper.citationService = citationService;
+        RepoDatasetMapper.reanalysisDataService = reanalysisDataService;
+        RepoDatasetMapper.datasetService = datasetService;
+
+        this.mostAccessedDatasetService = mostAccessedDatasetService;
+        this.citationService = citationService;
+        this.ebiPubmedSearchService = ebiPubmedSearchService;
+        this.reanalysisDataService = reanalysisDataService;
+        this.datasetService = datasetService;
+    }
 
     //@CrossOrigin
     @ApiOperation(value = "Search for datasets in the resource", position = 1, notes = "retrieve datasets in the resource using different queries")
@@ -146,6 +174,7 @@ public class DatasetController {
         if(queryResult.getCount() > 0) {
             queryResult.setFacets((new FacetViewAdapter(facetSettingsRepository)).process(queryResult.getFacets()));
         }
+
         return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
 
     }
@@ -523,6 +552,27 @@ public class DatasetController {
             }
 
         }
+
+        String acc = argDataset.getAccession();
+        String database = argDataset.getDatabase();
+
+        MostAccessedDatasets r1 = mostAccessedDatasetService.getDatasetView(acc,database);
+        if(null!=r1){
+            datasetDetail.setViewsCount(r1.getTotal());
+        }
+        Citations r2 = citationService.read(acc,database);
+        if(null!=r2){
+            datasetDetail.setCitationsCount(r2.getPubmedCount());
+        }
+        ReanalysisData r3 = reanalysisDataService.getReanalysisCount(acc,database);
+        if(null!=r3){
+            datasetDetail.setReanalysisCount(r3.getTotal());
+        }
+        EBISearchPubmedCount r4 = ebiPubmedSearchService.getSearchCount(acc);
+        if(null!=r4){
+            datasetDetail.setConnectionsCount(r4.getPubmedCount());
+        }
+
         return datasetDetail;
     }
 

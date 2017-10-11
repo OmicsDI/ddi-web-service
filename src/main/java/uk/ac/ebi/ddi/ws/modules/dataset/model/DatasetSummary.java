@@ -57,6 +57,52 @@ public class DatasetSummary {
 
     List<String> omicsType = null;
 
+    int citationsCount = 0;
+    int connectionsCount = 0;
+    int reanalysisCount = 0;
+    int viewsCount = 0;
+
+    public int getCitationsCount() {
+        return citationsCount;
+    }
+
+    public void setCitationsCount(int citationsCount) {
+        this.citationsCount = citationsCount;
+    }
+
+    public int getConnectionsCount() {
+        return connectionsCount;
+    }
+
+    public void setConnectionsCount(int connectionsCount) {
+        this.connectionsCount = connectionsCount;
+    }
+
+    public int getReanalysisCount() {
+        return reanalysisCount;
+    }
+
+    public void setReanalysisCount(int reanalysisCount) {
+        this.reanalysisCount = reanalysisCount;
+    }
+
+    public int getViewsCount() {
+        return viewsCount;
+    }
+
+    public void setViewsCount(int viewsCount) {
+        this.viewsCount = viewsCount;
+    }
+
+    public Boolean getClaimable() {
+        return isClaimable;
+    }
+
+    public void setClaimable(Boolean claimable) {
+        isClaimable = claimable;
+    }
+
+    Boolean isClaimable = false;
 
     public List<String> getOmicsType() {
         return omicsType;
