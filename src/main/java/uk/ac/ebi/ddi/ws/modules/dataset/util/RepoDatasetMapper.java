@@ -158,7 +158,7 @@ public class RepoDatasetMapper {
 
         Dataset dsResult = datasetService.read(acc,database);
 
-        datasetSummary.setClaimable(true);
+        datasetSummary.setClaimable(dsResult.isClaimable());
 
         MostAccessedDatasets r1 = mostAccessedDatasetService.getDatasetView(acc,database);
         if(null!=r1){
