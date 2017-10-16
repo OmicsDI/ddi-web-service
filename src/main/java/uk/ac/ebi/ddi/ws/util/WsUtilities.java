@@ -86,7 +86,7 @@ public class WsUtilities {
                 if(visitMap != null && visitMap.size()> 0){
                     Tuple<String, String> newKey = new Tuple<>(entry.getId(), domain);
                     if(visitMap.containsKey(newKey)){
-                        datasetSummary.setVisitCount(visitMap.get(newKey));
+                        datasetSummary.setViewsCount(visitMap.get(newKey));
                     }
                 }
                 datasetSummaryList.add(datasetSummary);
