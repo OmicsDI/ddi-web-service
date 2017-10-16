@@ -134,15 +134,15 @@ public class RepoDatasetMapper {
 
                 if(entry.getFields().containsKey(Constants.CITATION_COUNT))
                     if(entry.getFields().get(Constants.CITATION_COUNT) != null && entry.getFields().get(Constants.CITATION_COUNT).length > 0)
-                        datasetSummary.setCitationCount(Integer.valueOf(entry.getFields().get(Constants.CITATION_COUNT)[0]));
+                        datasetSummary.setCitationsCount(Integer.valueOf(entry.getFields().get(Constants.CITATION_COUNT)[0]));
 
                 if(entry.getFields().containsKey(Constants.SEARCH_COUNT))
                     if(entry.getFields().get(Constants.SEARCH_COUNT) != null && entry.getFields().get(Constants.SEARCH_COUNT).length > 0)
-                        datasetSummary.setSearchCount(Integer.valueOf(entry.getFields().get(Constants.SEARCH_COUNT)[0]));
+                        datasetSummary.setConnectionsCount(Integer.valueOf(entry.getFields().get(Constants.SEARCH_COUNT)[0]));
 
                 if(entry.getFields().containsKey(Constants.VIEW_COUNT))
                     if(entry.getFields().get(Constants.VIEW_COUNT) != null && entry.getFields().get(Constants.VIEW_COUNT).length > 0)
-                        datasetSummary.setVisitCount(Integer.valueOf(entry.getFields().get(Constants.VIEW_COUNT)[0]));
+                        datasetSummary.setViewsCount(Integer.valueOf(entry.getFields().get(Constants.VIEW_COUNT)[0]));
 
                 if(entry.getFields().containsKey(Constants.REANALYZED_COUNT))
                     if(entry.getFields().get(Constants.REANALYZED_COUNT) != null && entry.getFields().get(Constants.REANALYZED_COUNT).length > 0)
@@ -168,31 +168,6 @@ public class RepoDatasetMapper {
             }
         }
 
-        /*String acc = entry.getId();
-        String source = entry.getSource();
-        String database = Constants.Database.retriveAnchorName(source);
-
-        Dataset dsResult = datasetService.read(acc,database);
-
-        datasetSummary.setClaimable(dsResult.isClaimable());
-
-        MostAccessedDatasets r1 = mostAccessedDatasetService.getDatasetView(acc,database);
-        if(null!=r1){
-            datasetSummary.setViewsCount(r1.getTotal());
-        }
-        Citations r2 = citationService.read(acc,database);
-        if(null!=r2){
-            datasetSummary.setCitationsCount(r2.getPubmedCount());
-        }
-        ReanalysisData r3 = reanalysisDataService.getReanalysisCount(acc,database);
-        if(null!=r3){
-            datasetSummary.setReanalysisCount(r3.getTotal());
-        }
-        EBISearchPubmedCount r4 = ebiPubmedSearchService.getSearchCount(acc);
-        if(null!=r4){
-            datasetSummary.setConnectionsCount(r4.getPubmedCount());
-        }
-*/
         return datasetSummary;
     }
 
