@@ -41,15 +41,6 @@ public class DatasetSummary {
     List<Organism> organisms;
 
     /**
-     * Number of visits
-     */
-    int visitCount  = 0;
-
-    int searchCount  = 0;
-
-    int citationCount  = 0;
-
-    /**
      * Publication date
      */
     String publicationDate = null;
@@ -172,14 +163,6 @@ public class DatasetSummary {
         this.source = source;
     }
 
-    public int getVisitCount() {
-        return visitCount;
-    }
-
-    public void setVisitCount(int visitCount) {
-        this.visitCount = visitCount;
-    }
-
     public String getScore() {
         return score;
     }
@@ -188,21 +171,7 @@ public class DatasetSummary {
         this.score = score;
     }
 
-    public int getSearchCount() {
-        return searchCount;
-    }
 
-    public void setSearchCount(int searchCount) {
-        this.searchCount = searchCount;
-    }
-
-    public int getCitationCount() {
-        return citationCount;
-    }
-
-    public void setCitationCount(int citationCount) {
-        this.citationCount = citationCount;
-    }
 
 
 }
