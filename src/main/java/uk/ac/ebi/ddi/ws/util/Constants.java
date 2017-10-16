@@ -68,13 +68,13 @@ public class Constants {
 
     public static String CHEBI                          =   "CHEBI";
 
-    public static String CITATION_COUNT                 =   "citationCount";
+    public static String CITATION_COUNT                 =   "citation_count";
 
-    public static String VIEW_COUNT                     =   "viewCount";
+    public static String VIEW_COUNT                     =   "view_count";
 
-    public static String REANALYZED_COUNT               =   "reanalysisCount";
+    public static String REANALYZED_COUNT               =   "reanalysis_count";
 
-    public static String SEARCH_COUNT                   =   "searchCount";
+    public static String SEARCH_COUNT                   =   "search_count";
 
     public static final String[] DATASET_SUMMARY        = {Constants.DESCRIPTION_FIELD,
                                                            Constants.NAME_FIELD,
