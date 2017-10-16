@@ -309,7 +309,7 @@ public class DatasetController {
         {
             DatasetSummary datasetSummary = new DatasetSummary();
             datasetSummary.setTitle(dataset.getName());
-            datasetSummary.setVisitCount(dataset.getTotal());
+            datasetSummary.setViewsCount(dataset.getTotal());
             datasetSummary.setSource(Constants.Database.retriveSorlName(dataset.getDatabase()));
             datasetSummary.setId(dataset.getAccession());
             List<String> omics_type = Collections.list(Collections.enumeration(dataset.getAdditional().get(Constants.OMICS_TYPE_FIELD)));
