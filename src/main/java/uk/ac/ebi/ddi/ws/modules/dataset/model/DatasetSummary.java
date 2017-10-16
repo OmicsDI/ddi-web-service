@@ -49,7 +49,6 @@ public class DatasetSummary {
 
     int citationCount  = 0;
 
-    int reanalysisCount  = 0;
     /**
      * Publication date
      */
@@ -205,12 +204,5 @@ public class DatasetSummary {
         this.citationCount = citationCount;
     }
 
-    public int getReanalysisCount() {
-        return reanalysisCount;
-    }
-
-    public void setReanalysisCount(int reanalysisCount) {
-        this.reanalysisCount = reanalysisCount;
-    }
 
 }
