@@ -132,6 +132,22 @@ public class RepoDatasetMapper {
                     if(entry.getFields().get(Constants.SUBMITTER_KEY_FIELD) != null && entry.getFields().get(Constants.SUBMITTER_KEY_FIELD).length > 0)
                         keywords.addAll(formatKeywords(Arrays.asList(entry.getFields().get(Constants.SUBMITTER_KEY_FIELD))));
 
+                if(entry.getFields().containsKey(Constants.CITATION_COUNT))
+                    if(entry.getFields().get(Constants.CITATION_COUNT) != null && entry.getFields().get(Constants.CITATION_COUNT).length > 0)
+                        datasetSummary.setCitationCount(Integer.valueOf(entry.getFields().get(Constants.CITATION_COUNT)[0]));
+
+                if(entry.getFields().containsKey(Constants.SEARCH_COUNT))
+                    if(entry.getFields().get(Constants.SEARCH_COUNT) != null && entry.getFields().get(Constants.SEARCH_COUNT).length > 0)
+                        datasetSummary.setSearchCount(Integer.valueOf(entry.getFields().get(Constants.SEARCH_COUNT)[0]));
+
+                if(entry.getFields().containsKey(Constants.VIEW_COUNT))
+                    if(entry.getFields().get(Constants.VIEW_COUNT) != null && entry.getFields().get(Constants.VIEW_COUNT).length > 0)
+                        datasetSummary.setVisitCount(Integer.valueOf(entry.getFields().get(Constants.VIEW_COUNT)[0]));
+
+                if(entry.getFields().containsKey(Constants.REANALYZED_COUNT))
+                    if(entry.getFields().get(Constants.REANALYZED_COUNT) != null && entry.getFields().get(Constants.REANALYZED_COUNT).length > 0)
+                        datasetSummary.setReanalysisCount(Integer.valueOf(entry.getFields().get(Constants.REANALYZED_COUNT)[0]));
+
                 if(keywords.size() > 0){
                     String[] arrayKeywords = new String[keywords.size()];
                     for(int i = 0; i < keywords.size(); i++)
@@ -152,7 +168,7 @@ public class RepoDatasetMapper {
             }
         }
 
-        String acc = entry.getId();
+        /*String acc = entry.getId();
         String source = entry.getSource();
         String database = Constants.Database.retriveAnchorName(source);
 
@@ -176,7 +192,7 @@ public class RepoDatasetMapper {
         if(null!=r4){
             datasetSummary.setConnectionsCount(r4.getPubmedCount());
         }
-
+*/
         return datasetSummary;
     }
 
