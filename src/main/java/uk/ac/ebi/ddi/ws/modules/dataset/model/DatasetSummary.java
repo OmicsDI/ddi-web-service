@@ -45,6 +45,11 @@ public class DatasetSummary {
      */
     int visitCount  = 0;
 
+    int searchCount  = 0;
+
+    int citationCount  = 0;
+
+    int reanalysisCount  = 0;
     /**
      * Publication date
      */
@@ -137,4 +142,29 @@ public class DatasetSummary {
     public void setScore(String score) {
         this.score = score;
     }
+
+    public int getSearchCount() {
+        return searchCount;
+    }
+
+    public void setSearchCount(int searchCount) {
+        this.searchCount = searchCount;
+    }
+
+    public int getCitationCount() {
+        return citationCount;
+    }
+
+    public void setCitationCount(int citationCount) {
+        this.citationCount = citationCount;
+    }
+
+    public int getReanalysisCount() {
+        return reanalysisCount;
+    }
+
+    public void setReanalysisCount(int reanalysisCount) {
+        this.reanalysisCount = reanalysisCount;
+    }
+
 }
