@@ -45,6 +45,7 @@ import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
+import javax.lang.model.element.ExecutableElement;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Array;
@@ -301,24 +302,25 @@ public class DatasetController {
             @RequestParam(value = "size", required = true, defaultValue = "20") int size
     ) {
 
+            DataSetResult result = new DataSetResult();
+            List<DatasetSummary> datasetSummaryList = new ArrayList<>();
+            Page<MostAccessedDatasets> datasets = mostAccessedDatasetService.readAll(0, size);
+            for (MostAccessedDatasets dataset : datasets.getContent()) {
+                    DatasetSummary datasetSummary = new DatasetSummary();
+                    datasetSummary.setTitle(dataset.getName());
+                    datasetSummary.setViewsCount(dataset.getTotal());
+                    datasetSummary.setSource(Constants.Database.retriveSorlName(dataset.getDatabase()));
+                    datasetSummary.setId(dataset.getAccession());
+                    if(dataset.getAdditional().containsKey(Constants.OMICS_TYPE_FIELD)) {
+                        List<String> omics_type = Collections.list(Collections.enumeration(dataset.getAdditional().get(Constants.OMICS_TYPE_FIELD)));
+                        datasetSummary.setOmicsType(omics_type);
+                    }
+                    datasetSummaryList.add(datasetSummary);
+            }
+            result.setDatasets(datasetSummaryList);
+            result.setCount(size);
+            return result;
 
-        DataSetResult result = new DataSetResult();
-        List<DatasetSummary> datasetSummaryList = new ArrayList<>();
-        Page<MostAccessedDatasets> datasets = mostAccessedDatasetService.readAll(0,size);
-        for(MostAccessedDatasets dataset:datasets.getContent())
-        {
-            DatasetSummary datasetSummary = new DatasetSummary();
-            datasetSummary.setTitle(dataset.getName());
-            datasetSummary.setViewsCount(dataset.getTotal());
-            datasetSummary.setSource(Constants.Database.retriveSorlName(dataset.getDatabase()));
-            datasetSummary.setId(dataset.getAccession());
-            List<String> omics_type = Collections.list(Collections.enumeration(dataset.getAdditional().get(Constants.OMICS_TYPE_FIELD)));
-            datasetSummary.setOmicsType(omics_type);
-            datasetSummaryList.add(datasetSummary);
-        }
-        result.setDatasets(datasetSummaryList);
-        result.setCount(size);
-        return result;
     }
 
 
