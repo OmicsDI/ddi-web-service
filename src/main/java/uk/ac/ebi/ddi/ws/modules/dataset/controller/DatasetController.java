@@ -417,6 +417,18 @@ public class DatasetController {
         return files;
     }
 
+    @ApiOperation(value = "Get dataset by Url", notes = "Retrieve dataset by source url")
+    @RequestMapping(value = "/getDatasetByUrl", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    Dataset getDatasetByUrl(
+            @ApiParam(value = "Url of the Dataset in the resource, e.g : https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-5789")
+            @RequestBody() String url
+    ) {
+
+        return datasetService.findByFullDatasetLink(url);
+    }
+
     public DatasetDetail getDatasetInfo(DatasetDetail datasetDetail, Dataset argDataset)
     {
 
@@ -442,7 +454,7 @@ public class DatasetController {
 
             Set<String> omics_type = inputDataset.getAdditional().get("omics_type");
 
-            datasetDetail.setOmics_type(new ArrayList<String>(omics_type));
+            //datasetDetail.setOmics_type(new ArrayList<String>(omics_type));
 
             datasetDetail.setScores(inputDataset.getScores());
 
