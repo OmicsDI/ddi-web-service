@@ -592,4 +592,16 @@ public class DatasetController {
                                                 @RequestParam(value = "pubmed", required = true) String pubmed){
         return datasetService.getSimilarByPubmed(pubmed);
     }
+
+    @ApiOperation(value = "Retrieve all datasets based on submitter", position = 1, notes = "Retrieve all datasets of submitter")
+    @RequestMapping(value = "/getUserDatasets", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody List<Dataset> getUserDatasets(@ApiParam(value = "Submitter name")
+                                                           @RequestParam(value = "name", required = true) String name,
+                                                       @ApiParam(value = "submitter email id")
+                                                       @RequestParam(value = "emailid", required = true) String emailid
+    ){
+        return datasetService.findBySubmitter(name, emailid);
+    }
+
 }
