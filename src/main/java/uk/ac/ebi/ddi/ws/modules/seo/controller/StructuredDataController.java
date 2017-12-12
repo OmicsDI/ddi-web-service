@@ -10,9 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
+import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.OmicsDataset;
 import uk.ac.ebi.ddi.ws.modules.seo.model.*;
 import uk.ac.ebi.ddi.ws.util.Constants;
 
@@ -31,6 +31,9 @@ public class StructuredDataController {
     @Autowired
     IDatasetService datasetService;
 
+
+    @Autowired
+    DatabaseDetailService databaseDetailService;
 
     /******* about ****************************************************
      "@context": "http://schema.org",
@@ -191,7 +194,7 @@ public class StructuredDataController {
     {
         StructuredData data = new StructuredData();
 
-        String database = Constants.Database.retriveAnchorName(domain);
+        String database = databaseDetailService.retriveAnchorName(domain);
 
         Dataset dataset = datasetService.read(acc, database);
 
@@ -201,7 +204,7 @@ public class StructuredDataController {
         //QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds);
         //Entry[] entries = datasetResult.getEntries();
         //domain = Constants.Database.retriveAnchorName(domain);
-        Dataset dsResult = datasetService.read(acc,Constants.Database.retriveAnchorName(domain));
+        Dataset dsResult = datasetService.read(acc, databaseDetailService.retriveAnchorName(domain));
 
         data.setType("Dataset");
         data.setContext("http://schema.org");

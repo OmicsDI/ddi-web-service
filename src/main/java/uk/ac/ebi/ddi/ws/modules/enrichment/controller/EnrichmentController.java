@@ -10,24 +10,18 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
-import uk.ac.ebi.ddi.service.db.model.dataset.DatasetSimilars;
 import uk.ac.ebi.ddi.service.db.model.enrichment.DatasetEnrichmentInfo;
 import uk.ac.ebi.ddi.service.db.model.enrichment.WordInField;
-import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
-import uk.ac.ebi.ddi.service.db.model.logger.ResourceStatVisit;
 import uk.ac.ebi.ddi.service.db.model.similarity.DatasetStatInfo;
 import uk.ac.ebi.ddi.service.db.model.similarity.IntersectionInfo;
+import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
 import uk.ac.ebi.ddi.service.db.service.enrichment.IEnrichmentInfoService;
 import uk.ac.ebi.ddi.service.db.service.enrichment.ISynonymsService;
 import uk.ac.ebi.ddi.service.db.service.similarity.IDatasetStatInfoService;
@@ -42,9 +36,6 @@ import uk.ac.ebi.ddi.ws.util.Triplet;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 import java.util.*;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-import static org.springframework.data.mongodb.core.aggregation.Fields.fields;
 
 @Api(value = "enrichment", description = "Retrieve the information about the enrichment and synonyms ", position = 0)
 @Controller
@@ -69,6 +60,9 @@ public class EnrichmentController {
     @Autowired
     DatasetWsClient dataWsClient;
 
+    @Autowired
+    DatabaseDetailService databaseDetailService;
+
     @ApiOperation(value = "get enrichment Info", position = 1, notes = "retrieve the enrichment data for a dataset")
     @RequestMapping(value = "/getEnrichmentInfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -80,7 +74,7 @@ public class EnrichmentController {
             @ApiParam(value = "Database name, e.g: PRIDE")
             @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
     ) {
-        database = Constants.Database.retriveAnchorName(database);
+        database = databaseDetailService.retriveAnchorName(database);
         DatasetEnrichmentInfo enrichmentInfo = enrichmentService.readByAccession(accession, database);
         return enrichmentInfo;
     }
@@ -97,7 +91,7 @@ public class EnrichmentController {
             @ApiParam(value = "Database name, e.g: PRIDE")
             @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
     ) {
-        database = Constants.Database.retriveAnchorName(database);
+        database = databaseDetailService.retriveAnchorName(database);
         DatasetEnrichmentInfo enrichmentInfo = enrichmentService.readByAccession(accession, database);
         if (enrichmentInfo == null) {
             return null;
@@ -160,7 +154,7 @@ public class EnrichmentController {
             @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
     ) {
 
-        String anchorDatabase = Constants.Database.retriveAnchorName(database);
+        String anchorDatabase = databaseDetailService.retriveAnchorName(database);
         DataSetResult result = new DataSetResult();
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, anchorDatabase);
         List<IntersectionInfo> intersectionInfos;
@@ -203,7 +197,7 @@ public class EnrichmentController {
             if (intersectionInfo.getRelatedDatasetAcc() != null || intersectionInfo.getRelatedDatasetDatabase() != null) {
                 String tempDatabaseName = intersectionInfo.getRelatedDatasetDatabase();
 
-                tempDatabaseName = Constants.Database.retriveSorlName(tempDatabaseName);
+                tempDatabaseName = databaseDetailService.retriveSolrName(tempDatabaseName);
                 Set<String> ids = currentIds.get(tempDatabaseName);
 
                 if (ids == null)
@@ -232,7 +226,7 @@ public class EnrichmentController {
         for (DatasetSummary datasetSummary : datasetSummaryList) {
             String accession = datasetSummary.getId();
             String database = datasetSummary.getSource();
-            database = Constants.Database.retriveAnchorName(database);
+            database = databaseDetailService.retriveAnchorName(database);
             Double score = 0.0;
             for (IntersectionInfo intersectionInfo : intersectionInfos) {
                 if (intersectionInfo.getRelatedDatasetAcc().equals(accession) && intersectionInfo.getRelatedDatasetDatabase().equals(database)) {
@@ -280,7 +274,7 @@ public class EnrichmentController {
         String combinedName = accession + "@" + database;
         similarDatasets.add(combinedName);//put itself in the set;
 
-        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, Constants.Database.retriveAnchorName(database));
+        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, databaseDetailService.retriveAnchorName(database));
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
             Collections.sort(intersectionInfos, new Comparator<IntersectionInfo>() {

@@ -57,6 +57,8 @@ public class Constants {
     public static String SUBMITTER_FIELD                = "submitter";
 
     public static String SUBMITTER_MAIL_FIELD           = "submitter_mail";
+    public static String SUBMITTER_EMAIL_FIELD           = "submitter_email";
+    //some datasets have submitter_mail, some submitter_email. Lets display correctly, and then fix processing
 
     public static String LAB_HEAD_FIELD                 =  "labhead";
 
@@ -222,6 +224,7 @@ public class Constants {
 
     };
 
+    /***********
     public enum Database{
         PRIDE("Pride", "pride"),
         PEPTIDEATLAS("PeptideAtlas", "peptide_atlas"),
@@ -278,5 +281,6 @@ public class Constants {
             return name;
         }
     }
+     ***********/
 
 }

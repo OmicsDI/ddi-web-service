@@ -27,6 +27,7 @@ import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
 import uk.ac.ebi.ddi.service.db.model.similarity.Citations;
 import uk.ac.ebi.ddi.service.db.model.similarity.EBISearchPubmedCount;
 import uk.ac.ebi.ddi.service.db.model.similarity.ReanalysisData;
+import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetSimilarsService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IMostAccessedDatasetService;
@@ -45,7 +46,6 @@ import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Array;
@@ -88,6 +88,9 @@ public class DatasetController {
 
     @Autowired
     FacetSettingsRepository facetSettingsRepository;
+
+    @Autowired
+    DatabaseDetailService databaseDetailService;
 
     //autowired by ctor param
     IMostAccessedDatasetService mostAccessedDatasetService;
@@ -243,7 +246,7 @@ public class DatasetController {
             @ApiParam(value = "Database accession id, e.g: pride")
             @PathVariable(value = "domain") String domain){
 
-        String database = Constants.Database.retriveAnchorName(domain);
+        String database = databaseDetailService.retriveAnchorName(domain);
 
         Dataset dataset = datasetService.read(acc, database);
         return new OmicsDataset(dataset);
@@ -268,7 +271,7 @@ public class DatasetController {
         //QueryResult datasetResult = dataWsClient.getDatasetsById(domain, Constants.DATASET_DETAIL, currentIds);
         //Entry[] entries = datasetResult.getEntries();
         //domain = Constants.Database.retriveAnchorName(domain);
-        Dataset dsResult = datasetService.read(acc,Constants.Database.retriveAnchorName(domain));
+        Dataset dsResult = datasetService.read(acc, databaseDetailService.retriveAnchorName(domain));
 
         datasetDetail = getDatasetInfo(datasetDetail,dsResult);
 
@@ -285,7 +288,7 @@ public class DatasetController {
         event.setResource(resource);
         eventService.save(event);
 
-        DatasetSimilars similars = datasetSimilarsService.read(acc, Constants.Database.retriveAnchorName(domain));
+        DatasetSimilars similars = datasetSimilarsService.read(acc, databaseDetailService.retriveAnchorName(domain));
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 
         return datasetDetail;
@@ -309,7 +312,7 @@ public class DatasetController {
                     DatasetSummary datasetSummary = new DatasetSummary();
                     datasetSummary.setTitle(dataset.getName());
                     datasetSummary.setViewsCount(dataset.getTotal());
-                    datasetSummary.setSource(Constants.Database.retriveSorlName(dataset.getDatabase()));
+                    datasetSummary.setSource(databaseDetailService.retriveSolrName(dataset.getDatabase()));
                     datasetSummary.setId(dataset.getAccession());
                     if(dataset.getAdditional().containsKey(Constants.OMICS_TYPE_FIELD)) {
                         List<String> omics_type = Collections.list(Collections.enumeration(dataset.getAdditional().get(Constants.OMICS_TYPE_FIELD)));
@@ -402,7 +405,7 @@ public class DatasetController {
 
         Set<String> currentIds =  new HashSet(Arrays.asList(new String[] {acc}));
 
-        QueryResult datasetResult = dataWsClient.getDatasetsById(Constants.Database.retriveAnchorName(domain), fields, currentIds);
+        QueryResult datasetResult = dataWsClient.getDatasetsById(databaseDetailService.retriveAnchorName(domain), fields, currentIds);
 
         if(datasetResult != null && datasetResult.getEntries() != null &&
                 datasetResult.getEntries().length > 0){
@@ -444,7 +447,7 @@ public class DatasetController {
 
             datasetDetail.setId(argDataset.getAccession());
 
-            datasetDetail.setSource(Constants.Database.retriveSorlName(argDataset.getDatabase()));
+            datasetDetail.setSource(databaseDetailService.retriveSolrName(argDataset.getDatabase()));
 
             datasetDetail.setName(inputDataset.getName());
 
@@ -527,6 +530,11 @@ public class DatasetController {
             Set<String> submitter_mail = fields.get(Constants.SUBMITTER_MAIL_FIELD);
             if ((submitter_mail != null) && (submitter_mail.size() > 0)) {
                 datasetDetail.setSubmitterMail(submitter_mail);
+            }
+
+            Set<String> submitter_email = fields.get(Constants.SUBMITTER_EMAIL_FIELD);
+            if ((submitter_email != null) && (submitter_email.size() > 0)) {
+                datasetDetail.setSubmitterMail(submitter_email);
             }
 
             Set<String> labhead = fields.get(Constants.LAB_HEAD_FIELD);
