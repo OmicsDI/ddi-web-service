@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+
+
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,8 +19,8 @@
 
     <context:component-scan base-package="uk.ac.ebi.ddi.ws.modules"/>
 
-    <bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigDev"/>
-    <bean id="ebeyeWsConfigDev" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigDev" />
+
+    <bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigDev" />
     <bean id="ebeyeWsConfigProd" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd" />
 
     <!-- Swagger config (REST service documentation)-->
@@ -36,23 +39,23 @@
     <bean class="uk.ac.ebi.pride.web.util.callback.filter.JsonpCallbackFilter" id="jsonpCallbackFilter"/>
 
     <bean id="domainClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient">
-        <constructor-arg ref="ebeyeWsConfigProd"/>
+        <constructor-arg ref="ebeyeWsConfig"/>
     </bean>
 
     <bean id="facetWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.facet.FacetWsClient">
-        <constructor-arg ref="ebeyeWsConfigProd"/>
+        <constructor-arg ref="ebeyeWsConfig"/>
     </bean>
 
     <bean id="dataWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient">
-        <constructor-arg ref="ebeyeWsConfigProd"/>
+        <constructor-arg ref="ebeyeWsConfig"/>
     </bean>
 
     <bean id="dictionaryClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient">
-        <constructor-arg ref="ebeyeWsConfigProd"/>
+        <constructor-arg ref="ebeyeWsConfig"/>
     </bean>
 
     <bean id="publicationWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.publication.PublicationWsClient">
-        <constructor-arg ref="ebeyeWsConfigProd"/>
+        <constructor-arg ref="ebeyeWsConfig"/>
     </bean>
 
     <!-- Maven information an autowired classes -->

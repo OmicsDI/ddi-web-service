@@ -575,6 +575,16 @@ public class DatasetController {
                 datasetDetail = RepoDatasetMapper.addTaxonomy(datasetDetail, taxonomies);
             }
 
+            Set<String> secondaryAccession = fields.get(Constants.SECONDARY_ACCESSION_FIELD);
+            if ((secondaryAccession != null) && (secondaryAccession.size() > 0)) {
+                datasetDetail.setSecondary_accession(secondaryAccession);
+            }
+
+            Set<String> repositories = fields.get(Constants.REPOSITORY_FIELD);
+            if (repositories != null && repositories.size() > 0) {
+                datasetDetail.setRepositories(repositories);
+            }
+
         }
 
         String acc = argDataset.getAccession();

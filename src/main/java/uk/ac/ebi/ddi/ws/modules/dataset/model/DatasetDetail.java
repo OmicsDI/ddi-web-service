@@ -121,6 +121,18 @@ public class DatasetDetail implements Serializable{
 
     Set<String> labHeadMail = null;
 
+    Set<String> secondary_accession = null;
+
+    public Set<String> getRepositories() {
+        return repositories;
+    }
+
+    public void setRepositories(Set<String> repositories) {
+        this.repositories = repositories;
+    }
+
+    Set<String> repositories = null;
+
     int citationsCount = 0;
     int connectionsCount = 0;
     int reanalysisCount = 0;
@@ -192,6 +204,14 @@ public class DatasetDetail implements Serializable{
 
     public void setLabHeadMail(Set<String> labHeadMail) {
         this.labHeadMail = labHeadMail;
+    }
+
+    public Set<String> getSecondary_accession() {
+        return secondary_accession;
+    }
+
+    public void setSecondary_accession(Set<String> secondary_accession) {
+        this.secondary_accession = secondary_accession;
     }
 
     public Set<String> getSubmitter() {

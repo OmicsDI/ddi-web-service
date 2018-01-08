@@ -59,6 +59,9 @@ public class Constants {
     public static String SUBMITTER_MAIL_FIELD           = "submitter_mail";
     public static String SUBMITTER_EMAIL_FIELD           = "submitter_email";
     //some datasets have submitter_mail, some submitter_email. Lets display correctly, and then fix processing
+    public static String SECONDARY_ACCESSION_FIELD       = "additional_accession";
+
+    public static String REPOSITORY_FIELD       = "repository";
 
     public static String LAB_HEAD_FIELD                 =  "labhead";
 
