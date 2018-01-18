@@ -20,8 +20,8 @@
     <context:component-scan base-package="uk.ac.ebi.ddi.ws.modules"/>
 
 
-    <bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigDev" />
-    <bean id="ebeyeWsConfigProd" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd" />
+    <bean id="ebeyeWsConfigDev" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigDev" />
+    <bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd" />
 
     <!-- Swagger config (REST service documentation)-->
     <!-- Swagger beans -->
