@@ -457,7 +457,7 @@ public class DatasetController {
 
             Set<String> omics_type = inputDataset.getAdditional().get("omics_type");
 
-            //datasetDetail.setOmics_type(new ArrayList<String>(omics_type));
+            datasetDetail.setOmics_type(new ArrayList<String>(omics_type));
 
             datasetDetail.setScores(inputDataset.getScores());
 
