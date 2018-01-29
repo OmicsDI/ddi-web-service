@@ -31,6 +31,7 @@ import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetSimilarsService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IMostAccessedDatasetService;
+import uk.ac.ebi.ddi.service.db.service.enrichment.EnrichmentInfoService;
 import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
@@ -97,13 +98,15 @@ public class DatasetController {
     CitationService citationService;
     EBIPubmedSearchService ebiPubmedSearchService;
     ReanalysisDataService reanalysisDataService;
+    EnrichmentInfoService enrichmentService;
 
     @Autowired
-    public DatasetController(  CitationService citationService,
-                                EBIPubmedSearchService ebiPubmedSearchService,
-                                ReanalysisDataService reanalysisDataService,
-                                IMostAccessedDatasetService mostAccessedDatasetService,
-                                IDatasetService datasetService)
+    public DatasetController(CitationService citationService,
+                             EBIPubmedSearchService ebiPubmedSearchService,
+                             ReanalysisDataService reanalysisDataService,
+                             IMostAccessedDatasetService mostAccessedDatasetService,
+                             IDatasetService datasetService,
+                             EnrichmentInfoService enrichmentService)
     {
         RepoDatasetMapper.ebiPubmedSearchService = ebiPubmedSearchService;
         RepoDatasetMapper.mostAccessedDatasetService = mostAccessedDatasetService;
@@ -116,6 +119,7 @@ public class DatasetController {
         this.ebiPubmedSearchService = ebiPubmedSearchService;
         this.reanalysisDataService = reanalysisDataService;
         this.datasetService = datasetService;
+        this.enrichmentService = enrichmentService;
     }
 
     //@CrossOrigin
@@ -575,9 +579,25 @@ public class DatasetController {
                 datasetDetail = RepoDatasetMapper.addTaxonomy(datasetDetail, taxonomies);
             }
 
+            //secondary accessions resolved via identifiers collection
+            List<String> secondaryAccessionsPlus = new ArrayList<String>();
+            List<String> SecondaryAccession1 = enrichmentService.getAdditionalAccession(argDataset.getAccession());
+            if(null!=SecondaryAccession1) {
+                    secondaryAccessionsPlus.addAll(SecondaryAccession1);
+            }
             Set<String> secondaryAccession = fields.get(Constants.SECONDARY_ACCESSION_FIELD);
             if ((secondaryAccession != null) && (secondaryAccession.size() > 0)) {
                 datasetDetail.setSecondary_accession(secondaryAccession);
+                for(String s: secondaryAccession) {
+                    List<String> SecondaryAccession2 = enrichmentService.getAdditionalAccession(s);
+                    if (null != SecondaryAccession2) {
+                        secondaryAccessionsPlus.addAll(SecondaryAccession2);
+                    }
+                }
+            }
+
+            for(String acc : secondaryAccessionsPlus){
+                datasetDetail.getSecondary_accession().add(acc);
             }
 
             Set<String> repositories = fields.get(Constants.REPOSITORY_FIELD);
