@@ -597,6 +597,8 @@ public class DatasetController {
             }
 
             for(String acc : secondaryAccessionsPlus){
+                if(null==datasetDetail.getSecondary_accession())
+                    datasetDetail.setSecondary_accession(new HashSet<String>());
                 datasetDetail.getSecondary_accession().add(acc);
             }
 
