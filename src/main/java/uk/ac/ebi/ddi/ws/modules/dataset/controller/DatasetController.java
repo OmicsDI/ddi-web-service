@@ -22,6 +22,7 @@ import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.model.dataset.DatasetSimilars;
+import uk.ac.ebi.ddi.service.db.model.dataset.Scores;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
 import uk.ac.ebi.ddi.service.db.model.similarity.Citations;
@@ -589,22 +590,22 @@ public class DatasetController {
 
         String acc = argDataset.getAccession();
         String database = argDataset.getDatabase();
-
+        Scores scores = argDataset.getScores();
         MostAccessedDatasets r1 = mostAccessedDatasetService.getDatasetView(acc,database);
         if(null!=r1){
-            datasetDetail.setViewsCount(r1.getTotal());
+            datasetDetail.setViewsCount(scores.getViewCount());
         }
         Citations r2 = citationService.read(acc,database);
         if(null!=r2){
-            datasetDetail.setCitationsCount(r2.getPubmedCount());
+            datasetDetail.setCitationsCount(scores.getCitationCount());
         }
         ReanalysisData r3 = reanalysisDataService.getReanalysisCount(acc,database);
         if(null!=r3){
-            datasetDetail.setReanalysisCount(r3.getTotal());
+            datasetDetail.setReanalysisCount(scores.getReanalysisCount());
         }
         EBISearchPubmedCount r4 = ebiPubmedSearchService.getSearchCount(acc);
         if(null!=r4){
-            datasetDetail.setConnectionsCount(r4.getPubmedCount());
+            datasetDetail.setConnectionsCount(scores.getSearchCount());
         }
 
         return datasetDetail;
