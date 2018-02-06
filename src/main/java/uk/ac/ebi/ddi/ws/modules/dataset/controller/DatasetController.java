@@ -610,23 +610,15 @@ public class DatasetController {
 
         }
 
-        String acc = argDataset.getAccession();
-        String database = argDataset.getDatabase();
-        Scores scores = argDataset.getScores();
-        MostAccessedDatasets r1 = mostAccessedDatasetService.getDatasetView(acc,database);
-        if(null!=r1){
+        if(argDataset.getAdditional() != null) {
+            Scores scores = argDataset.getScores();
+
             datasetDetail.setViewsCount(scores.getViewCount());
-        }
-        Citations r2 = citationService.read(acc,database);
-        if(null!=r2){
+
             datasetDetail.setCitationsCount(scores.getCitationCount());
-        }
-        ReanalysisData r3 = reanalysisDataService.getReanalysisCount(acc,database);
-        if(null!=r3){
+
             datasetDetail.setReanalysisCount(scores.getReanalysisCount());
-        }
-        EBISearchPubmedCount r4 = ebiPubmedSearchService.getSearchCount(acc);
-        if(null!=r4){
+
             datasetDetail.setConnectionsCount(scores.getSearchCount());
         }
 
