@@ -610,7 +610,7 @@ public class DatasetController {
 
         }
 
-        if(argDataset.getAdditional() != null) {
+        if(argDataset.getScores() != null ) {
             Scores scores = argDataset.getScores();
 
             datasetDetail.setViewsCount(scores.getViewCount());
