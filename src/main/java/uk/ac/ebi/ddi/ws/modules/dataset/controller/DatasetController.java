@@ -20,14 +20,9 @@ import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
-import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
-import uk.ac.ebi.ddi.service.db.model.dataset.DatasetSimilars;
-import uk.ac.ebi.ddi.service.db.model.dataset.Scores;
+import uk.ac.ebi.ddi.service.db.model.dataset.*;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
-import uk.ac.ebi.ddi.service.db.model.similarity.Citations;
-import uk.ac.ebi.ddi.service.db.model.similarity.EBISearchPubmedCount;
-import uk.ac.ebi.ddi.service.db.model.similarity.ReanalysisData;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetSimilarsService;
@@ -38,10 +33,7 @@ import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
 import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
 import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.OmicsDataset;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.*;
 import uk.ac.ebi.ddi.service.db.repo.facetsettings.FacetSettingsRepository;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
@@ -57,7 +49,6 @@ import java.util.regex.Pattern;
 
 import org.springframework.data.domain.Page;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.*;
-import uk.ac.ebi.ddi.service.db.model.dataset.MostAccessedDatasets;
 
 
 @Api(value = "dataset", description = "Retrieve the information about the dataset including search functionalities", position = 0)
@@ -634,7 +625,20 @@ public class DatasetController {
     @RequestMapping(value = "/getSimilarByPubmed", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody List<Dataset> getSimilarDatasets(@ApiParam(value = "Pubmed Id of the Dataset in the resource, e.g : 16585740")
-                                                @RequestParam(value = "pubmed", required = true) String pubmed){
+                                                          @RequestParam(value = "pubmed", required = true) String pubmed){
         return datasetService.getSimilarByPubmed(pubmed);
     }
+
+    @ApiOperation(value = "Retrieve merge candidates", notes = "Retrieve merge candidates")
+    @RequestMapping(value = "/getMergeCandidates", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody List<MergeCandidate> getMergeCandidates(
+            @ApiParam(value = "the starting point for the search, e.g: 0")
+            @RequestParam(value = "start", required = false, defaultValue = "0") int start,
+            @ApiParam(value = "the number of records to be retrieved, e.g: maximum 100")
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size){
+            return datasetService.getMergeCandidates(start, size);
+    }
 }
+
+
