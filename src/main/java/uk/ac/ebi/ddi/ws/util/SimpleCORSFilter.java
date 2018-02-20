@@ -21,7 +21,7 @@ public class SimpleCORSFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         //
 
-        if (((request.getHeader("Access-Control-Request-Method") != null || ( "GET".equals(request.getMethod()) )) && !("OPTIONS".equals(request.getMethod())) && !("PUT".equals(request.getMethod())))) {
+        if (((request.getHeader("Access-Control-Request-Method") != null || ( "GET".equals(request.getMethod()) ) || ( "POST".equals(request.getMethod()) )) && !("OPTIONS".equals(request.getMethod())) && !("PUT".equals(request.getMethod())))) {
             // CORS "pre-flight" request
             //response.addHeader("Access-Control-Allow-Origin","http://ves-hx-43.ebi.ac.uk:8080");
             //response.addHeader("Access-Control-Allow-Origin", "http://www.omicsdi.org");

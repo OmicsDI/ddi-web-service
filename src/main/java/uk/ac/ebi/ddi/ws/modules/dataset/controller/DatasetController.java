@@ -639,6 +639,21 @@ public class DatasetController {
             @RequestParam(value = "size", required = false, defaultValue = "20") int size){
             return datasetService.getMergeCandidates(start, size);
     }
+
+    @ApiOperation(value = "merge datasets", notes = "Мerge datasets")
+    @RequestMapping(value = "/merge", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public void mergeDatasets(@RequestBody MergeCandidate mergeCandidate){
+        datasetService.mergeDatasets(mergeCandidate);
+    }
+
+    @ApiOperation(value = "Retrieve merge candidate counts", notes = "Retrieve merge candidate counts")
+    @RequestMapping(value = "/getMergeCandidateCount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody Integer getMergeCandidateCount(){
+        return datasetService.getMergeCandidateCount();
+    }
+
 }
 
 
