@@ -654,6 +654,13 @@ public class DatasetController {
         return datasetService.getMergeCandidateCount();
     }
 
+    @ApiOperation(value = "Retrieve all dataset counts by database", position = 1, notes = "Retrieve all datasets count by database")
+    @RequestMapping(value = "/getDbDatasetCount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody List<DbDatasetCount> getDbDatasetsCount(){
+        return datasetService.getDbDatasetsCount();
+    }
+
 }
 
 
