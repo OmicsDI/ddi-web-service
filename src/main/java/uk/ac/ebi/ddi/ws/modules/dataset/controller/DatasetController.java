@@ -578,6 +578,16 @@ public class DatasetController {
                     secondaryAccessionsPlus.addAll(SecondaryAccession1);
             }
             Set<String> secondaryAccession = fields.get(Constants.SECONDARY_ACCESSION_FIELD);
+
+            Set<String> additionalAccession = fields.get(Constants.ADDITIONAL_ACCESSION_FIELD);
+
+            if(additionalAccession != null && additionalAccession.size() > 0) {
+                for (String acc : additionalAccession) {
+                    if (null == datasetDetail.getSecondary_accession())
+                        datasetDetail.setSecondary_accession(new HashSet<String>());
+                    datasetDetail.getSecondary_accession().add(acc);
+                }
+            }
             if ((secondaryAccession != null) && (secondaryAccession.size() > 0)) {
                 datasetDetail.setSecondary_accession(secondaryAccession);
                 for(String s: secondaryAccession) {
