@@ -657,6 +657,13 @@ public class DatasetController {
         datasetService.mergeDatasets(mergeCandidate);
     }
 
+    @ApiOperation(value = "skip merging datasets", notes = "skip merging datasets")
+    @RequestMapping(value = "/skipMerge", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public void skipDatasets(@RequestBody MergeCandidate mergeCandidate){
+        datasetService.skipMerge(mergeCandidate);
+    }
+
     @ApiOperation(value = "Retrieve merge candidate counts", notes = "Retrieve merge candidate counts")
     @RequestMapping(value = "/getMergeCandidateCount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
