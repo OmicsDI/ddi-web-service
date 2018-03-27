@@ -664,6 +664,13 @@ public class DatasetController {
         datasetService.skipMerge(mergeCandidate);
     }
 
+    @ApiOperation(value = "multiomics merging datasets", notes = "multiomics merging datasets")
+    @RequestMapping(value = "/multiomicsMerge", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public void multiomicsMergeDatasets(@RequestBody MergeCandidate mergeCandidate){
+        datasetService.addMultiomics(mergeCandidate);
+    }
+
     @ApiOperation(value = "Retrieve merge candidate counts", notes = "Retrieve merge candidate counts")
     @RequestMapping(value = "/getMergeCandidateCount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
