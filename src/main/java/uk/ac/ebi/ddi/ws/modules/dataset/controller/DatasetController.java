@@ -138,6 +138,7 @@ public class DatasetController {
 
         query = (query == null || query.isEmpty() || query.length() == 0)? "*:*": query;
 
+        query = query + " AND NOT (isprivate:true)";
         query = modifyIfSearchByYear(query);
 
         QueryResult queryResult = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
