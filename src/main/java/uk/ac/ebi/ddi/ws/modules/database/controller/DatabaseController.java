@@ -8,12 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseService;
 import uk.ac.ebi.ddi.service.db.model.database.DatabaseDetail;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.List;
 
@@ -84,5 +87,30 @@ public class DatabaseController {
             databaseDetail.setDescription(database.getString("description"));
             databaseDetailService.saveDatabase(databaseDetail);
         }
+    }
+
+    @RequestMapping(value = "/db/picturebyte", method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
+    public void getStreamFromImage() throws IOException{
+        DatabaseDetail databaseDetail = new DatabaseDetail();
+        BufferedImage bi = ImageIO.read(new File("/home/gaur/Downloads/EVA_twitter copy 2_200px.jpg"));
+        databaseDetail.setDatabaseName("EVA");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(bi, "jpg", baos );
+        baos.flush();
+
+        byte[] imageInByte = baos.toByteArray();
+        baos.close();
+
+        InputStream is = new ByteArrayInputStream(imageInByte);
+
+        InputStream imgInputStream = this.getClass().getResourceAsStream("/"+"home/gaur/Downloads/EVA_twitter copy 2_200px.jpg");
+        byte[] imgBytes = null ;
+        try {
+            imgBytes = IOUtils.toByteArray(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        databaseDetail.setImage(imgBytes);
+        databaseDetailService.saveDatabase(databaseDetail);
     }
 }
