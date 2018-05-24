@@ -202,7 +202,7 @@ public class DatasetController {
             HttpServletRequest httpServletRequest) {
 
 
-        String query = "*:*";
+        String query = "*:*" + " AND NOT (isprivate:true)";
 
         QueryResult queryResult = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, Constants.PUB_DATE_FIELD, "descending", 0, size, 10);
 
@@ -277,14 +277,14 @@ public class DatasetController {
          * Trace the access to the dataset
          */
         DatasetResource resource = resourceService.read(acc, domain);
-        if(resource == null){
-            resource = new DatasetResource("http://www.omicsdi.org/" + domain + "/" + acc,acc,domain);
+        if (resource == null) {
+            resource = new DatasetResource("http://www.omicsdi.org/" + domain + "/" + acc, acc, domain);
             resource = resourceService.save(resource);
         }
+
         HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
         event.setResource(resource);
         eventService.save(event);
-
         DatasetSimilars similars = datasetSimilarsService.read(acc, databaseDetailService.retriveAnchorName(domain));
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 

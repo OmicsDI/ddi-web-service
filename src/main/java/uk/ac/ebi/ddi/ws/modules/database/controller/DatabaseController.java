@@ -92,10 +92,10 @@ public class DatabaseController {
     @RequestMapping(value = "/db/picturebyte", method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
     public void getStreamFromImage() throws IOException{
         DatabaseDetail databaseDetail = new DatabaseDetail();
-        BufferedImage bi = ImageIO.read(new File("/home/gaur/Downloads/EVA_twitter copy 2_200px.jpg"));
-        databaseDetail.setDatabaseName("EVA");
+        BufferedImage bi = ImageIO.read(new File("/home/gaur/Downloads/EGA_LOGO.png"));
+        databaseDetail.setDatabaseName("Test");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(bi, "jpg", baos );
+        ImageIO.write(bi, "png", baos );
         baos.flush();
 
         byte[] imageInByte = baos.toByteArray();
@@ -103,7 +103,7 @@ public class DatabaseController {
 
         InputStream is = new ByteArrayInputStream(imageInByte);
 
-        InputStream imgInputStream = this.getClass().getResourceAsStream("/"+"home/gaur/Downloads/EVA_twitter copy 2_200px.jpg");
+        InputStream imgInputStream = this.getClass().getResourceAsStream("/home/gaur/Downloads/EGA_LOGO.png");
         byte[] imgBytes = null ;
         try {
             imgBytes = IOUtils.toByteArray(is);
