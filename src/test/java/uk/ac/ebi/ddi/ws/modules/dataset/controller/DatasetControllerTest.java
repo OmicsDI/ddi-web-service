@@ -74,4 +74,9 @@ public class DatasetControllerTest {
         mockMvc.perform(get("/dataset/get?acc=PXD001416&database=pride")).andExpect(status().isOk());
     }
 
+    @Test
+    public void testSearchDataset()throws Exception{
+        mockMvc.perform(get("/dataset/search?query= (tissue: (\"Liver\"))")).andExpect(status().isOk());
+    }
+
 }
