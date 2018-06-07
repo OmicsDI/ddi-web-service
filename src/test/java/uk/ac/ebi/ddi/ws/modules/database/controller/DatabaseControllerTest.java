@@ -27,5 +27,8 @@ public class DatabaseControllerTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(databaseController).build();
     }
 
-
+    @Test
+    public void testDatabase() throws Exception{
+        mockMvc.perform(get("/database/all")).andExpect(status().isOk());
+    }
 }
