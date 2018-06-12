@@ -24,9 +24,7 @@ import uk.ac.ebi.ddi.service.db.model.dataset.*;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
-import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
-import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetSimilarsService;
-import uk.ac.ebi.ddi.service.db.service.dataset.IMostAccessedDatasetService;
+import uk.ac.ebi.ddi.service.db.service.dataset.*;
 import uk.ac.ebi.ddi.service.db.service.enrichment.EnrichmentInfoService;
 import uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
@@ -79,6 +77,9 @@ public class DatasetController {
 
     IDatasetService datasetService;
 
+   
+    IUnMergeDatasetService iUnMergeDatasetService;
+
     @Autowired
     FacetSettingsRepository facetSettingsRepository;
 
@@ -91,6 +92,7 @@ public class DatasetController {
     EBIPubmedSearchService ebiPubmedSearchService;
     ReanalysisDataService reanalysisDataService;
     EnrichmentInfoService enrichmentService;
+    UnMergeDatasetService unMergeDatasetService;
 
     @Autowired
     public DatasetController(CitationService citationService,
@@ -98,13 +100,15 @@ public class DatasetController {
                              ReanalysisDataService reanalysisDataService,
                              IMostAccessedDatasetService mostAccessedDatasetService,
                              IDatasetService datasetService,
-                             EnrichmentInfoService enrichmentService)
+                             EnrichmentInfoService enrichmentService,
+                             UnMergeDatasetService unMergeDatasetService)
     {
         RepoDatasetMapper.ebiPubmedSearchService = ebiPubmedSearchService;
         RepoDatasetMapper.mostAccessedDatasetService = mostAccessedDatasetService;
         RepoDatasetMapper.citationService = citationService;
         RepoDatasetMapper.reanalysisDataService = reanalysisDataService;
         RepoDatasetMapper.datasetService = datasetService;
+
 
         this.mostAccessedDatasetService = mostAccessedDatasetService;
         this.citationService = citationService;
@@ -686,6 +690,13 @@ public class DatasetController {
         return datasetService.getDbDatasetsCount();
     }
 
+
+    @ApiOperation(value = "unmerge datasets", notes = "un merge datasets")
+    @RequestMapping(value = "/unmerge", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public void unMergeDatasets(@RequestBody MergeCandidate mergeCandidate){
+        datasetService.mergeDatasets(mergeCandidate);
+    }
 }
 
 
