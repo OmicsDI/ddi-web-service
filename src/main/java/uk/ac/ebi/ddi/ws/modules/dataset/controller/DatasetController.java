@@ -77,7 +77,7 @@ public class DatasetController {
 
     IDatasetService datasetService;
 
-   
+    @Autowired
     IUnMergeDatasetService iUnMergeDatasetService;
 
     @Autowired
@@ -116,6 +116,7 @@ public class DatasetController {
         this.reanalysisDataService = reanalysisDataService;
         this.datasetService = datasetService;
         this.enrichmentService = enrichmentService;
+        this.unMergeDatasetService = unMergeDatasetService;
     }
 
     //@CrossOrigin
@@ -696,6 +697,13 @@ public class DatasetController {
     @ResponseStatus(HttpStatus.OK) // 200
     public void unMergeDatasets(@RequestBody MergeCandidate mergeCandidate){
         datasetService.mergeDatasets(mergeCandidate);
+    }
+
+    @ApiOperation(value = "get all merged datasets", notes = "all merged datasets")
+    @RequestMapping(value = "/getAllmerged", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody List<UnMergeDatasets> getAllMergedDatasets(){
+        return unMergeDatasetService.findAll();
     }
 }
 
