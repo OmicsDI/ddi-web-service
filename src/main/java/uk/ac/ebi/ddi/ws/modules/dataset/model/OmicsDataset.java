@@ -36,15 +36,17 @@ public class OmicsDataset implements Serializable {
     public OmicsDataset(){}
 
     public OmicsDataset(Dataset dataset) {
-        this.accession = dataset.getAccession();
-        this.name = dataset.getName();
-        this.database = dataset.getDatabase();
-        this.description = dataset.getDescription();
-        this.dates = new ArrayList<OmicsDate>(convert(dataset.getDates()));
-        this.additionals = new ArrayList<Additional>(convertAdditional(dataset.getAdditional()));
-        this.crossReferences = new ArrayList<>(convertRef(dataset.getCrossReferences()));
-        this.isClaimable = dataset.isClaimable();
-        this.scores = dataset.getScores();
+        if(dataset != null) {
+            this.accession = dataset.getAccession();
+            this.name = dataset.getName();
+            this.database = dataset.getDatabase();
+            this.description = dataset.getDescription();
+            this.dates = new ArrayList<OmicsDate>(convert(dataset.getDates()));
+            this.additionals = new ArrayList<Additional>(convertAdditional(dataset.getAdditional()));
+            this.crossReferences = new ArrayList<>(convertRef(dataset.getCrossReferences()));
+            this.isClaimable = dataset.isClaimable();
+            this.scores = dataset.getScores();
+        }
 
     }
 
