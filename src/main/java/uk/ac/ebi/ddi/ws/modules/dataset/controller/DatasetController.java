@@ -695,8 +695,8 @@ public class DatasetController {
     @ApiOperation(value = "unmerge datasets", notes = "un merge datasets")
     @RequestMapping(value = "/unmerge", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void unMergeDatasets(@RequestBody MergeCandidate mergeCandidate){
-        datasetService.mergeDatasets(mergeCandidate);
+    public void unMergeDatasets(@RequestBody List<UnMergeDatasets> mergeCandidate){
+        unMergeDatasetService.unmergeDataset(mergeCandidate);
     }
 
     @ApiOperation(value = "get all merged datasets", notes = "all merged datasets")
