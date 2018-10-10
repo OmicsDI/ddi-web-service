@@ -457,7 +457,7 @@ public class DatasetController {
 
             datasetDetail.setClaimable(inputDataset.isClaimable());
 
-            Set<String> omics_type = inputDataset.getAdditional().get("omics_type");
+            Set<String> omics_type = inputDataset.getAdditional().get(Constants.OMICS_TYPE_FIELD);
 
             datasetDetail.setOmics_type(new ArrayList<String>(omics_type));
 
@@ -484,6 +484,25 @@ public class DatasetController {
             Set<String> diseases = fields.get(Constants.DISEASE_FIELD);
             if (diseases != null && diseases.size() > 0) {
                 datasetDetail.setDiseases(diseases.toArray(new String[diseases.size()]));
+            }
+            Set<String> viewCountScaled = fields.get(Constants.VIEW_COUNT_SCALED);
+            if (viewCountScaled != null && viewCountScaled.size() > 0) {
+                datasetDetail.setViewsCountScaled(Double.valueOf(viewCountScaled.iterator().next()));
+            }
+
+            Set<String> citationCountScaled = fields.get(Constants.CITATION_COUNT_SCALED);
+            if (citationCountScaled != null && citationCountScaled.size() > 0) {
+                datasetDetail.setCitationsCountScaled(Double.valueOf(citationCountScaled.iterator().next()));
+            }
+
+            Set<String> reanalysisCountScaled = fields.get(Constants.REANALYZED_COUNT_SCALED);
+            if (reanalysisCountScaled != null && reanalysisCountScaled.size() > 0) {
+                datasetDetail.setReanalysisCountScaled(Double.valueOf(reanalysisCountScaled.iterator().next()));
+            }
+
+            Set<String> searchCountScaled = fields.get(Constants.SEARCH_COUNT_SCALED);
+            if (searchCountScaled != null && searchCountScaled.size() > 0) {
+                datasetDetail.setConnectionsCountScaled(Double.valueOf(searchCountScaled.iterator().next()));
             }
 
             Map<String, Set<String>> dates = datesField;
