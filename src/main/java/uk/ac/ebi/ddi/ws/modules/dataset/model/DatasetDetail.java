@@ -133,10 +133,55 @@ public class DatasetDetail implements Serializable{
 
     Set<String> repositories = null;
 
-    int citationsCount = 0;
-    int connectionsCount = 0;
-    int reanalysisCount = 0;
-    int viewsCount = 0;
+    int citationsCount ;
+
+    int connectionsCount;
+
+    int reanalysisCount;
+
+    int viewsCount;
+
+    double citationsCountScaled;
+
+    double connectionsCountScaled;
+
+    double reanalysisCountScaled;
+
+    double viewsCountScaled;
+
+    public double getCitationsCountScaled() {
+        return citationsCountScaled;
+    }
+
+    public void setCitationsCountScaled(double citationsCountScaled) {
+        this.citationsCountScaled = citationsCountScaled;
+    }
+
+    public double getConnectionsCountScaled() {
+        return connectionsCountScaled;
+    }
+
+    public void setConnectionsCountScaled(double connectionsCountScaled) {
+        this.connectionsCountScaled = connectionsCountScaled;
+    }
+
+    public double getReanalysisCountScaled() {
+        return reanalysisCountScaled;
+    }
+
+    public void setReanalysisCountScaled(double reanalysisCountScaled) {
+        this.reanalysisCountScaled = reanalysisCountScaled;
+    }
+
+    public double getViewsCountScaled() {
+        return viewsCountScaled;
+    }
+
+    public void setViewsCountScaled(double viewsCountScaled) {
+        this.viewsCountScaled = viewsCountScaled;
+    }
+
+
 
     public int getCitationsCount() {
         return citationsCount;
