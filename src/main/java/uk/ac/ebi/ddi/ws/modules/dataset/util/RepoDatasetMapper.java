@@ -148,6 +148,22 @@ public class RepoDatasetMapper {
                     if(entry.getFields().get(Constants.REANALYZED_COUNT) != null && entry.getFields().get(Constants.REANALYZED_COUNT).length > 0)
                         datasetSummary.setReanalysisCount(Integer.valueOf(entry.getFields().get(Constants.REANALYZED_COUNT)[0]));
 
+                if(entry.getFields().containsKey(Constants.CITATION_COUNT_SCALED))
+                    if(entry.getFields().get(Constants.CITATION_COUNT_SCALED) != null && entry.getFields().get(Constants.CITATION_COUNT_SCALED).length > 0)
+                        datasetSummary.setCitationsCountScaled(Double.valueOf(entry.getFields().get(Constants.CITATION_COUNT_SCALED)[0]));
+
+                if(entry.getFields().containsKey(Constants.SEARCH_COUNT_SCALED))
+                    if(entry.getFields().get(Constants.SEARCH_COUNT_SCALED) != null && entry.getFields().get(Constants.SEARCH_COUNT_SCALED).length > 0)
+                        datasetSummary.setConnectionsCountScaled(Double.valueOf(entry.getFields().get(Constants.SEARCH_COUNT_SCALED)[0]));
+
+                if(entry.getFields().containsKey(Constants.VIEW_COUNT_SCALED))
+                    if(entry.getFields().get(Constants.VIEW_COUNT_SCALED) != null && entry.getFields().get(Constants.VIEW_COUNT_SCALED).length > 0)
+                        datasetSummary.setViewsCountScaled(Double.valueOf(entry.getFields().get(Constants.VIEW_COUNT_SCALED)[0]));
+
+                if(entry.getFields().containsKey(Constants.REANALYZED_COUNT_SCALED))
+                    if(entry.getFields().get(Constants.REANALYZED_COUNT_SCALED) != null && entry.getFields().get(Constants.REANALYZED_COUNT_SCALED).length > 0)
+                        datasetSummary.setReanalysisCountScaled(Double.valueOf(entry.getFields().get(Constants.REANALYZED_COUNT_SCALED)[0]));
+
                 if(keywords.size() > 0){
                     String[] arrayKeywords = new String[keywords.size()];
                     for(int i = 0; i < keywords.size(); i++)
