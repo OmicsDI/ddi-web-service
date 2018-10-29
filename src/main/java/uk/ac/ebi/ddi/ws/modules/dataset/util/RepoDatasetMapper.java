@@ -148,6 +148,14 @@ public class RepoDatasetMapper {
                     if(entry.getFields().get(Constants.REANALYZED_COUNT) != null && entry.getFields().get(Constants.REANALYZED_COUNT).length > 0)
                         datasetSummary.setReanalysisCount(Integer.valueOf(entry.getFields().get(Constants.REANALYZED_COUNT)[0]));
 
+                if(entry.getFields().containsKey(Constants.DOWNLOAD_COUNT))
+                    if(entry.getFields().get(Constants.DOWNLOAD_COUNT) != null && entry.getFields().get(Constants.DOWNLOAD_COUNT).length > 0)
+                        datasetSummary.setDownloadCount(Integer.valueOf(entry.getFields().get(Constants.DOWNLOAD_COUNT)[0].replace(".0","")));
+
+                if(entry.getFields().containsKey(Constants.DOWNLOAD_COUNT_SCALED))
+                    if(entry.getFields().get(Constants.DOWNLOAD_COUNT_SCALED) != null && entry.getFields().get(Constants.DOWNLOAD_COUNT_SCALED).length > 0)
+                        datasetSummary.setDownloadCountScaled(Double.valueOf(entry.getFields().get(Constants.DOWNLOAD_COUNT_SCALED)[0]));
+
                 if(entry.getFields().containsKey(Constants.CITATION_COUNT_SCALED))
                     if(entry.getFields().get(Constants.CITATION_COUNT_SCALED) != null && entry.getFields().get(Constants.CITATION_COUNT_SCALED).length > 0)
                         datasetSummary.setCitationsCountScaled(Double.valueOf(entry.getFields().get(Constants.CITATION_COUNT_SCALED)[0]));
