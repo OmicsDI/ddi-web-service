@@ -70,6 +70,26 @@ public class DatasetDetail implements Serializable{
      */
     List<String> instruments    = null;
 
+    int citationsCount ;
+
+    int connectionsCount;
+
+    int reanalysisCount;
+
+    int viewsCount;
+
+    int downloadCount;
+
+    double citationsCountScaled;
+
+    double connectionsCountScaled;
+
+    double reanalysisCountScaled;
+
+    double viewsCountScaled;
+
+    double downloadCountScaled;
+
     /**
      * Keywords related wit the type of the experiment, this keywords are
      * assigned by the DDI system
@@ -123,6 +143,13 @@ public class DatasetDetail implements Serializable{
 
     Set<String> secondary_accession = null;
 
+
+    Set<String> repositories = null;
+
+    Boolean isClaimable;
+
+    Scores scores;
+
     public Set<String> getRepositories() {
         return repositories;
     }
@@ -130,24 +157,6 @@ public class DatasetDetail implements Serializable{
     public void setRepositories(Set<String> repositories) {
         this.repositories = repositories;
     }
-
-    Set<String> repositories = null;
-
-    int citationsCount ;
-
-    int connectionsCount;
-
-    int reanalysisCount;
-
-    int viewsCount;
-
-    double citationsCountScaled;
-
-    double connectionsCountScaled;
-
-    double reanalysisCountScaled;
-
-    double viewsCountScaled;
 
     public double getCitationsCountScaled() {
         return citationsCountScaled;
@@ -215,9 +224,21 @@ public class DatasetDetail implements Serializable{
         this.viewsCount = viewsCount;
     }
 
-    Boolean isClaimable;
+    public int getDownloadCount() {
+        return downloadCount;
+    }
 
-    Scores scores;
+    public void setDownloadCount(int downloadCount) {
+        this.downloadCount = downloadCount;
+    }
+
+    public double getDownloadCountScaled() {
+        return downloadCountScaled;
+    }
+
+    public void setDownloadCountScaled(double downloadCountScaled) {
+        this.downloadCountScaled = downloadCountScaled;
+    }
 
     public Scores getScores() {
         return scores;
