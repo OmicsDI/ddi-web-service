@@ -53,14 +53,41 @@ public class DatasetSummary {
     List<String> omicsType = null;
 
     int citationsCount;
+
     int connectionsCount;
+
     int reanalysisCount;
+
     int viewsCount;
 
+    int downloadCount;
+
     double citationsCountScaled;
+
     double connectionsCountScaled;
+
     double reanalysisCountScaled;
+
     double viewsCountScaled;
+
+    double downloadCountScaled;
+
+
+    public int getDownloadCount() {
+        return downloadCount;
+    }
+
+    public void setDownloadCount(int downloadCount) {
+        this.downloadCount = downloadCount;
+    }
+
+    public double getDownloadCountScaled() {
+        return downloadCountScaled;
+    }
+
+    public void setDownloadCountScaled(double downloadCountScaled) {
+        this.downloadCountScaled = downloadCountScaled;
+    }
 
     public double getConnectionsCountScaled() {
         return connectionsCountScaled;
