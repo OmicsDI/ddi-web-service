@@ -505,6 +505,16 @@ public class DatasetController {
                 datasetDetail.setConnectionsCountScaled(Double.valueOf(searchCountScaled.iterator().next()));
             }
 
+            Set<String> downloadCountScaled = fields.get(Constants.DOWNLOAD_COUNT_SCALED);
+            if (downloadCountScaled != null && downloadCountScaled.size() > 0) {
+                datasetDetail.setDownloadCountScaled(Double.valueOf(downloadCountScaled.iterator().next()));
+            }
+
+            Set<String> downloadCount = fields.get(Constants.DOWNLOAD_COUNT);
+            if (downloadCount != null && downloadCount.size() > 0) {
+                datasetDetail.setDownloadCount(Integer.valueOf(downloadCount.iterator().next()));
+            }
+
             Map<String, Set<String>> dates = datesField;
             if (dates != null && dates.size() > 0) {
                 datasetDetail.setDates(dates);
@@ -635,6 +645,7 @@ public class DatasetController {
             }
 
         }
+
 
         if(argDataset.getScores() != null ) {
             Scores scores = argDataset.getScores();
