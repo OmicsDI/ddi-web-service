@@ -57,6 +57,7 @@ public class Constants {
     public static String SUBMITTER_FIELD                = "submitter";
 
     public static String SUBMITTER_MAIL_FIELD           = "submitter_mail";
+
     public static String SUBMITTER_EMAIL_FIELD           = "submitter_email";
     //some datasets have submitter_mail, some submitter_email. Lets display correctly, and then fix processing
     public static String SECONDARY_ACCESSION_FIELD       = "additional_accession";
@@ -83,19 +84,41 @@ public class Constants {
 
     public static String SEARCH_COUNT                   =   "search_count";
 
-    public static final String[] DATASET_SUMMARY        = {Constants.DESCRIPTION_FIELD,
+    public static String CITATION_COUNT_SCALED          =   "citation_count_scaled";
+
+    public static String VIEW_COUNT_SCALED              =   "view_count_scaled";
+
+    public static String REANALYZED_COUNT_SCALED        =   "reanalysis_count_scaled";
+
+    public static String SEARCH_COUNT_SCALED            =   "normalized_connections";
+
+    public static String DOWNLOAD_COUNT                 =    "download_count";
+
+    public static String DOWNLOAD_COUNT_SCALED          =    "download_count_scaled";
+
+
+    public static final String[] DATASET_SUMMARY        = {
+                                                           Constants.DESCRIPTION_FIELD,
                                                            Constants.NAME_FIELD,
-                                                           Constants.SUBMITTER_KEY_FIELD,Constants.CURATOR_KEY_FIELD,
+                                                           Constants.SUBMITTER_KEY_FIELD,
+                                                           Constants.CURATOR_KEY_FIELD,
                                                            Constants.PUB_DATE_FIELD,
                                                            Constants.TAXONOMY_FIELD,
                                                            Constants.OMICS_TYPE_FIELD,
                                                            Constants. ENSEMBL,
                                                            Constants.UNIPROT,
-                                                            Constants.CHEBI,
-                                                            Constants.CITATION_COUNT,
-                                                            Constants.VIEW_COUNT,
-                                                            Constants.REANALYZED_COUNT,
-                                                            Constants.SEARCH_COUNT};
+                                                           Constants.CHEBI,
+                                                           Constants.CITATION_COUNT,
+                                                           Constants.VIEW_COUNT,
+                                                           Constants.REANALYZED_COUNT,
+                                                           Constants.SEARCH_COUNT,
+                                                           Constants.VIEW_COUNT_SCALED,
+                                                           Constants.REANALYZED_COUNT_SCALED,
+                                                           Constants.CITATION_COUNT_SCALED,
+                                                           Constants.SEARCH_COUNT_SCALED,
+                                                           Constants.DOWNLOAD_COUNT,
+                                                           Constants.DOWNLOAD_COUNT_SCALED
+                                                                };
 
 
     public static final String[] DATASET_DETAIL         = {Constants.NAME_FIELD,
