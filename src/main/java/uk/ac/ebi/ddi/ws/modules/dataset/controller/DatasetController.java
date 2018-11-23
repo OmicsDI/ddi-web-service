@@ -44,6 +44,7 @@ import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.Page;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.*;
@@ -143,7 +144,7 @@ public class DatasetController {
 
         query = (query == null || query.isEmpty() || query.length() == 0)? "*:*": query;
 
-        query = query + " AND NOT (isprivate:true)";
+        query = query + " NOT (isprivate:true)";
         query = modifyIfSearchByYear(query);
 
         QueryResult queryResult = dataWsClient.getDatasets(Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
@@ -506,13 +507,15 @@ public class DatasetController {
             }
 
             Set<String> downloadCountScaled = fields.get(Constants.DOWNLOAD_COUNT_SCALED);
-            if (downloadCountScaled != null && downloadCountScaled.size() > 0) {
-                datasetDetail.setDownloadCountScaled(Double.valueOf(downloadCountScaled.iterator().next()));
+            if (downloadCountScaled != null && downloadCountScaled.size() > 0 ) {
+                String downloadValue = downloadCountScaled.iterator().next();
+                datasetDetail.setDownloadCountScaled(Double.valueOf(downloadValue.isEmpty() ? "0.0" : downloadValue));
             }
 
             Set<String> downloadCount = fields.get(Constants.DOWNLOAD_COUNT);
             if (downloadCount != null && downloadCount.size() > 0) {
-                datasetDetail.setDownloadCount(Integer.valueOf(downloadCount.iterator().next()));
+                String downloadValue = downloadCount.iterator().next();
+                datasetDetail.setDownloadCount(Integer.valueOf(downloadValue.isEmpty() ? "0.0" : downloadValue));
             }
 
             Map<String, Set<String>> dates = datesField;
@@ -735,6 +738,26 @@ public class DatasetController {
     public @ResponseBody List<UnMergeDatasets> getAllMergedDatasets(){
         return unMergeDatasetService.findAll();
     }
+
+    @ApiOperation(value = "get all datasets", notes = "get all datasets")
+    @RequestMapping(value = "/getAll", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public @ResponseBody Stream<Dataset> getAllDatasets(){
+        return datasetService.getAllData();
+    }
+
+    @ApiOperation(value = "get all datasets by pages", notes = "get all datasets bypages")
+    @RequestMapping(value = "/getDatasetPage", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public @ResponseBody Page<Dataset> getAllDatasetPage(
+            @ApiParam(value = "the starting point for the search, e.g: 0")
+            @RequestParam(value = "start", required = false, defaultValue = "0") int start,
+            @ApiParam(value = "the number of records to be retrieved, e.g: maximum 100")
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size){
+        return datasetService.getDatasetPage(start, size);
+    }
+
+
 }
 
 
