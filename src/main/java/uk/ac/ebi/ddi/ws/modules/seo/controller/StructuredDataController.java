@@ -4,6 +4,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,9 +17,7 @@ import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
 import uk.ac.ebi.ddi.ws.modules.seo.model.*;
 import uk.ac.ebi.ddi.ws.util.Constants;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by azorin on 28/07/2017.
@@ -263,6 +262,112 @@ public class StructuredDataController {
             }
 
         return data;
+    }
+
+    @ApiOperation(value = "Retrieve JSON+LD Schema for dataset page", position = 1, notes = "Retrieve data for dataset page")
+    @RequestMapping(value = "/schema/{domain}/{acc}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public @ResponseBody
+    Map<String, Object> getSchemaDataDataset(
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
+                                            @PathVariable(value = "acc") String acc,
+            @ApiParam(value = "Database accession id, e.g: pride")
+                                            @PathVariable(value = "domain") String domain) {
+        Map<String, Object> result = new HashMap<>();
+        String database = databaseDetailService.retriveAnchorName(domain);
+
+        Dataset dataset = datasetService.read(acc, database);
+
+        result.put("@context", "http://schema.org");
+        result.put("@type", "WebPage");
+
+        Map<String, Object> mainEntity = new HashMap<>();
+        mainEntity.put("@type", "Dataset");
+
+        if (StringUtils.isNotEmpty(dataset.getName())) {
+            mainEntity.put("name", dataset.getName());
+        }
+        if (StringUtils.isNotEmpty(dataset.getDescription())) {
+            mainEntity.put("description", Jsoup.parse(dataset.getDescription()).text());
+        }
+
+        try {
+            mainEntity.put("sameAs", dataset.getAdditional().get(Constants.DATASET_LINK_FIELD).iterator().next());
+        } catch(Exception ex){
+            mainEntity.put("sameAs", "unknown");
+        }
+
+        if (null != dataset.getAdditional()) {
+            if (null != dataset.getAdditional().get("submitter_keywords")) {
+                String submitterKeywords = StringUtils.join(dataset.getAdditional().get("submitter_keywords").toArray(), ",");
+                mainEntity.put("keywords", submitterKeywords);
+            }
+        }
+
+        if (null != dataset.getAdditional()) {
+            if (null != dataset.getAdditional().get("omics_type")) {
+                String omics = StringUtils.join(dataset.getAdditional().get("omics_type").toArray(), ",");
+                mainEntity.put("variableMeasured", omics);
+            }
+        }
+
+        if (null != dataset.getAdditional()) {
+            if (null != dataset.getAdditional().get("submitter")) {
+                String creator = StringUtils.join(dataset.getAdditional().get("submitter").toArray(), ",");
+
+                StructuredDataAuthor person = new StructuredDataAuthor();
+                person.setType("Person");
+                person.setName(creator);
+                StructuredDataAuthor[] creators = {person};
+
+                mainEntity.put("creator", creators);
+
+                StructuredDataAuthor publisher = new StructuredDataAuthor();
+                publisher.setType("Organization");
+                publisher.setName(domain.toUpperCase());
+
+                StructuredDataCitation citation = new StructuredDataCitation();
+                citation.setType("CreativeWork");
+                citation.setName(dataset.getName());
+                citation.setUrl("http://www.omicsdi.org/dataset/" + domain + "/" + acc);
+                citation.setAuthor(person);
+                citation.setPublisher(publisher);
+
+                mainEntity.put("citation", citation);
+
+                Map<String, Object> downloadXml = new HashMap<>();
+                downloadXml.put("@type", "DataDownload");
+                downloadXml.put("encodingFormat", "XML");
+                downloadXml.put("contentUrl", "http://www.omicsdi.org/ws/dataset/" + domain + "/" + acc + ".xml");
+                mainEntity.put("distribution", downloadXml);
+            }
+        }
+        result.put("mainEntity", mainEntity);
+        Map<String, Object> breadcrumb = new HashMap<>();
+        breadcrumb.put("@type", "BreadcrumbList");
+        List<Map<String, Object>> items = new ArrayList<>();
+        Map<String, Object> homePage = new HashMap<>();
+        homePage.put("@type", "ListItem");
+        homePage.put("position", 1);
+        homePage.put("name", "OmicsDI");
+        homePage.put("item", "https://www.omicsdi.org");
+        items.add(homePage);
+        Map<String, Object> repository = new HashMap<>();
+        repository.put("@type", "ListItem");
+        repository.put("position", 2);
+        repository.put("name", dataset.getDatabase());
+        repository.put("item", "https://www.omicsdi.org/search?q=(repository:%22" + dataset.getDatabase() + "%22)");
+        items.add(repository);
+
+        Map<String, Object> ds = new HashMap<>();
+        ds.put("@type", "ListItem");
+        ds.put("position", 3);
+        ds.put("name", dataset.getAccession());
+        ds.put("item", "http://www.omicsdi.org/dataset/" + domain + "/" + acc);
+        items.add(ds);
+        breadcrumb.put("itemListElement", items);
+        result.put("breadcrumb", breadcrumb);
+        return result;
     }
 
     /******* home ****************************************************
