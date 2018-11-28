@@ -182,8 +182,11 @@ public class StructuredDataController {
      </c:if>
      "url": "${meta_ddiURL}"
      ***************************************************************/
+    /*
+    * updated param path for . truncation in param variables
+    * */
     @ApiOperation(value = "Retrieve JSON+LD for dataset page", position = 1, notes = "Retrieve data for dataset page")
-    @RequestMapping(value = "/dataset/{domain}/{acc}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/dataset/{domain}/{acc:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     StructuredData getStructuredDataDataset(@ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
