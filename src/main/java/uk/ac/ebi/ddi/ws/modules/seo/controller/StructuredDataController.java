@@ -268,7 +268,7 @@ public class StructuredDataController {
     }
 
     @ApiOperation(value = "Retrieve JSON+LD Schema for dataset page", position = 1, notes = "Retrieve data for dataset page")
-    @RequestMapping(value = "/schema/{domain}/{acc}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/schema/{domain}/{acc:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public @ResponseBody
     Map<String, Object> getSchemaDataDataset(
