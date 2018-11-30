@@ -282,7 +282,7 @@ public class StructuredDataController {
         Dataset dataset = datasetService.read(acc, database);
 
         result.put("@context", "http://schema.org");
-        result.put("@type", "WebPage");
+        result.put("@type", "ItemPage");
 
         Map<String, Object> mainEntity = new HashMap<>();
         mainEntity.put("@type", "Dataset");
