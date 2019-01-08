@@ -45,6 +45,8 @@ public class StatisticsController {
     @Autowired
     FacetWsClient facetWsClient;
 
+    @Value("${app.version}")
+    private String version;
 
     @ApiOperation(value = "Return statistics about the number of datasets per Repository", position = 1,
             notes = "Return statistics about the number of datasets per Repository")
@@ -116,7 +118,15 @@ public class StatisticsController {
         return RepoStatsToWsStatsMapper.asFacetCount(diseases, Constants.DISEASE_FIELD);
     }
 
+    @ApiOperation(value = "Get current webservice version", position = 1, notes = "Get current webservice version")
+    @RequestMapping(value = "/version", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
+    @ResponseBody
+    public Map<String, String> getVersion() {
+        Map<String, String> res = new HashMap<>();
+        res.put("version", version);
+        return res;
+    }
 
     @ApiOperation(value = "Return General statistics about the Services", position = 1,
             notes = "Return General statistics about the Services")
