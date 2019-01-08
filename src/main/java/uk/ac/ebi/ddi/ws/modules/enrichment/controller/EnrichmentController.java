@@ -7,12 +7,9 @@ package uk.ac.ebi.ddi.ws.modules.enrichment.controller;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
@@ -37,7 +34,9 @@ import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 import java.util.*;
 
-@Api(value = "enrichment", description = "Retrieve the information about the enrichment and synonyms ", position = 0)
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
+@Api(value = "enrichment", description = "Retrieve the information about the enrichment and synonyms ")
 @Controller
 @RequestMapping(value = "/enrichment")
 
@@ -45,8 +44,6 @@ public class EnrichmentController {
 
     @Autowired
     MongoTemplate mongoTemplate;
-
-    private static final Logger logger = LoggerFactory.getLogger(EnrichmentController.class);
 
     @Autowired
     IEnrichmentInfoService enrichmentService;
@@ -63,41 +60,38 @@ public class EnrichmentController {
     @Autowired
     DatabaseDetailService databaseDetailService;
 
-    @ApiOperation(value = "get enrichment Info", position = 1, notes = "retrieve the enrichment data for a dataset")
-    @RequestMapping(value = "/getEnrichmentInfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get enrichment Info", position = 1, notes = "Retrieve the enrichment data for a dataset")
+    @RequestMapping(value = "/getEnrichmentInfo", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public
     @ResponseBody
-    DatasetEnrichmentInfo getEnrichmentInfo(
+    public DatasetEnrichmentInfo getEnrichmentInfo(
             @ApiParam(value = "Dataset accession")
             @RequestParam(value = "accession", required = true, defaultValue = "PXD002287") String accession,
             @ApiParam(value = "Database name, e.g: PRIDE")
-            @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
-    ) {
+            @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database) {
+
         database = databaseDetailService.retriveAnchorName(database);
-        DatasetEnrichmentInfo enrichmentInfo = enrichmentService.readByAccession(accession, database);
-        return enrichmentInfo;
+        return enrichmentService.readByAccession(accession, database);
     }
 
 
-    @ApiOperation(value = "get synonyms for a dataset", position = 1, notes = "retrieve all synonyms for the words in a dataset")
-    @RequestMapping(value = "/getSynonymsForDataset", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get synonyms for a dataset", position = 1,
+            notes = "Retrieve all synonyms for the words in a dataset")
+    @RequestMapping(value = "/getSynonymsForDataset", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public
     @ResponseBody
-    SynonymsForDataset getSynonymsForDataset(
+    public SynonymsForDataset getSynonymsForDataset(
             @ApiParam(value = "Dataset accession")
             @RequestParam(value = "accession", required = true, defaultValue = "PXD002287") String accession,
             @ApiParam(value = "Database name, e.g: PRIDE")
-            @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
-    ) {
+            @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database) {
+
         database = databaseDetailService.retriveAnchorName(database);
         DatasetEnrichmentInfo enrichmentInfo = enrichmentService.readByAccession(accession, database);
         if (enrichmentInfo == null) {
             return null;
         }
         List<String> words = getEnrichedWordsInDataset(enrichmentInfo);
-
         SynonymsForDataset synonymsForDataset = new SynonymsForDataset(accession, database);
 
         for (String word : words) {
@@ -120,59 +114,55 @@ public class EnrichmentController {
     private List<String> getEnrichedWordsInDataset(DatasetEnrichmentInfo enrichmentInfo) {
         Set<String> words = new HashSet<>();
         List<WordInField> wordsInField = new ArrayList<>();
-        if(enrichmentInfo.getSynonyms() != null){
-            if(enrichmentInfo.getSynonyms().containsKey(Field.NAME.getName()))
+        if (enrichmentInfo.getSynonyms() != null) {
+            if (enrichmentInfo.getSynonyms().containsKey(Field.NAME.getName())) {
                 wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.NAME.getName()));
-            if(enrichmentInfo.getSynonyms().containsKey(Field.DESCRIPTION.getName()))
+            }
+            if (enrichmentInfo.getSynonyms().containsKey(Field.DESCRIPTION.getName())) {
                 wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.DESCRIPTION.getName()));
-            if(enrichmentInfo.getSynonyms().containsKey(Field.DATA.getName()))
+            }
+            if (enrichmentInfo.getSynonyms().containsKey(Field.DATA.getName())) {
                 wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.DATA.getName()));
-            if(enrichmentInfo.getSynonyms().containsKey(Field.SAMPLE.getName()))
+            }
+            if (enrichmentInfo.getSynonyms().containsKey(Field.SAMPLE.getName())) {
                 wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.SAMPLE.getName()));
-            if(enrichmentInfo.getSynonyms().containsKey(Field.PUBMED_TITLE.getName()))
+            }
+            if (enrichmentInfo.getSynonyms().containsKey(Field.PUBMED_TITLE.getName())) {
                 wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.PUBMED_TITLE.getName()));
-            if(enrichmentInfo.getSynonyms().containsKey(Field.PUBMED_ABSTRACT.getName()))
+            }
+            if (enrichmentInfo.getSynonyms().containsKey(Field.PUBMED_ABSTRACT.getName())) {
                 wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.PUBMED_ABSTRACT.getName()));
+            }
         }
         //unique
-        for (WordInField wordInField : wordsInField)
+        for (WordInField wordInField : wordsInField) {
             words.add(wordInField.getText());
+        }
 
         return new ArrayList<>(words);
     }
 
 
-    @ApiOperation(value = "get similar datasets for a dataset", position = 1, notes = "retrieve all similar datasets for the dataset")
-    @RequestMapping(value = "/getSimilarDatasetsByBiologicalData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get similar datasets for a dataset", position = 1,
+            notes = "Retrieve all similar datasets for the dataset")
+    @RequestMapping(value = "/getSimilarDatasetsByBiologicalData", method = RequestMethod.GET,
+            produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public
     @ResponseBody
-    DataSetResult getSimilarDatasetsByBiologicalData(
+    public DataSetResult getSimilarDatasetsByBiologicalData(
             @ApiParam(value = "Dataset accession")
             @RequestParam(value = "accession", required = true, defaultValue = "PXD000002") String accession,
             @ApiParam(value = "Database name, e.g: PRIDE")
-            @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database
-    ) {
+            @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database) {
 
         String anchorDatabase = databaseDetailService.retriveAnchorName(database);
         DataSetResult result = new DataSetResult();
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, anchorDatabase);
         List<IntersectionInfo> intersectionInfos;
 
-
         if (datasetStatInfo != null) {
             intersectionInfos = datasetStatInfo.getIntersectionInfos();
-
-            Collections.sort(intersectionInfos, new Comparator<IntersectionInfo>() {
-                @Override
-                public int compare(IntersectionInfo o1, IntersectionInfo o2) {
-                    Double value1 = o1.getCosineScore();
-                    Double value2 = o2.getCosineScore();
-                    if (value1 < value2) return 1;
-                    else if (Objects.equals(value1, value2)) return 0;
-                    else return -1;
-                }
-            });
+            intersectionInfos.sort(this::compareIntersectionInfo);
             int subListLength = 30;
             if (subListLength > intersectionInfos.size()) {
                 subListLength = intersectionInfos.size();
@@ -188,31 +178,30 @@ public class EnrichmentController {
         return result;
     }
 
-    private List<DatasetSummary> getDataFromEBeyeSearch(String accession, String database, List<IntersectionInfo> intersectionInfos) {
+    private List<DatasetSummary> getDataFromEBeyeSearch(String acc, String db, List<IntersectionInfo> intersecInfos) {
 
         List<DatasetSummary> datasetSummaryList = new ArrayList<>();
         Map<String, Set<String>> currentIds = new HashMap<>();
-        for (IntersectionInfo intersectionInfo : intersectionInfos) {
+        for (IntersectionInfo intersecInfo : intersecInfos) {
+            if (intersecInfo.getRelatedDatasetAcc() != null || intersecInfo.getRelatedDatasetDatabase() != null) {
+                String tmpDbName = intersecInfo.getRelatedDatasetDatabase();
+                tmpDbName = databaseDetailService.retriveSolrName(tmpDbName);
+                Set<String> ids = currentIds.get(tmpDbName);
 
-            if (intersectionInfo.getRelatedDatasetAcc() != null || intersectionInfo.getRelatedDatasetDatabase() != null) {
-                String tempDatabaseName = intersectionInfo.getRelatedDatasetDatabase();
-
-                tempDatabaseName = databaseDetailService.retriveSolrName(tempDatabaseName);
-                Set<String> ids = currentIds.get(tempDatabaseName);
-
-                if (ids == null)
+                if (ids == null) {
                     ids = new HashSet<>();
-                if (!(intersectionInfo.getRelatedDatasetAcc().equalsIgnoreCase(accession) && tempDatabaseName.equalsIgnoreCase(database)))
-                    ids.add(intersectionInfo.getRelatedDatasetAcc());
-                currentIds.put(tempDatabaseName, ids);
+                }
+                if (!(intersecInfo.getRelatedDatasetAcc().equalsIgnoreCase(acc) && tmpDbName.equalsIgnoreCase(db))) {
+                    ids.add(intersecInfo.getRelatedDatasetAcc());
+                }
+                currentIds.put(tmpDbName, ids);
             }
-
         }
 
         for (String currentDomain : currentIds.keySet()) {
             Set<String> ids = currentIds.get(currentDomain);
 
-            if(ids.size()<99) {
+            if (ids.size() < 99) {
                 QueryResult datasetResult = dataWsClient.getDatasetsById(currentDomain, Constants.DATASET_DETAIL, ids);
                 datasetSummaryList.addAll(WsUtilities.transformDatasetSummary(datasetResult, currentDomain, null));
             }
@@ -221,121 +210,130 @@ public class EnrichmentController {
         return datasetSummaryList;
     }
 
-    private List<DatasetSummary> addScores(List<DatasetSummary> datasetSummaryList, List<IntersectionInfo> intersectionInfos) {
+    private List<DatasetSummary> addScores(List<DatasetSummary> dsSummaries, List<IntersectionInfo> intersecInfos) {
 
-        for (DatasetSummary datasetSummary : datasetSummaryList) {
-            String accession = datasetSummary.getId();
-            String database = datasetSummary.getSource();
-            database = databaseDetailService.retriveAnchorName(database);
-            Double score = 0.0;
-            for (IntersectionInfo intersectionInfo : intersectionInfos) {
-                if (intersectionInfo.getRelatedDatasetAcc().equals(accession) && intersectionInfo.getRelatedDatasetDatabase().equals(database)) {
-                    score = intersectionInfo.getCosineScore();
+        for (DatasetSummary datasetSummary : dsSummaries) {
+            String acc = datasetSummary.getId();
+            String db = datasetSummary.getSource();
+            db = databaseDetailService.retriveAnchorName(db);
+            double score = 0.0;
+            for (IntersectionInfo intersecInfo : intersecInfos) {
+                if (intersecInfo.getRelatedDatasetAcc().equals(acc)
+                        && intersecInfo.getRelatedDatasetDatabase().equals(db)) {
+                    score = intersecInfo.getCosineScore();
                     break;
                 }
             }
             datasetSummary.setScore(String.valueOf(score));
         }
 
-        Collections.sort(datasetSummaryList, new Comparator<DatasetSummary>() {
-            @Override
-            public int compare(DatasetSummary o1, DatasetSummary o2) {
-                Double value1 = Double.valueOf(o1.getScore());
-                Double value2 = Double.valueOf(o2.getScore());
-                if (value1 < value2) return 1;
-                else if (Objects.equals(value1, value2)) return 0;
-                else return -1;
+        dsSummaries.sort((o1, o2) -> {
+            Double value1 = Double.valueOf(o1.getScore());
+            Double value2 = Double.valueOf(o2.getScore());
+            if (value1 < value2) {
+                return 1;
+            } else if (Objects.equals(value1, value2)) {
+                return 0;
+            } else {
+                return -1;
             }
         });
 
-        if (datasetSummaryList.size() > 10) {
-            datasetSummaryList = datasetSummaryList.subList(0, 10);
+        if (dsSummaries.size() > 10) {
+            dsSummaries = dsSummaries.subList(0, 10);
         }
 
-        return datasetSummaryList;
+        return dsSummaries;
     }
 
-    @ApiOperation(value = "get similarity information for a dataset", position = 1, notes = "retrieve similarity info between the datasets that is similar to the given dataset, filtered by similarity threshold score ")
-    @RequestMapping(value = "/getSimilarityInfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get similarity information for a dataset", position = 1,
+            notes = "Retrieve similarity info between the datasets that is similar to the given dataset, "
+                    + "filtered by similarity threshold score ")
+    @RequestMapping(value = "/getSimilarityInfo", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public
     @ResponseBody
-    SimilarInfoResult getSimilarityInfo(
+    public SimilarInfoResult getSimilarityInfo(
             @ApiParam(value = "Dataset accession")
             @RequestParam(value = "accession", required = true, defaultValue = "PXD000002") String accession,
             @ApiParam(value = "Database name, e.g: PRIDE")
             @RequestParam(value = "database", required = true, defaultValue = "PRIDE") String database,
             @ApiParam(value = "Threshold score, e.g: 0.50")
-            @RequestParam(value = "threshold", required = true, defaultValue = "0.50") float threshold
-    ) {
+            @RequestParam(value = "threshold", required = true, defaultValue = "0.50") float threshold) {
 
         List<String> similarDatasets = new ArrayList<>();
-        Set<Triplet> Scores = new HashSet<>();
+        Set<Triplet> scores = new HashSet<>();
         String combinedName = accession + "@" + database;
-        similarDatasets.add(combinedName);//put itself in the set;
+        similarDatasets.add(combinedName); //put itself in the set;
 
-        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, databaseDetailService.retriveAnchorName(database));
+        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(
+                accession, databaseDetailService.retriveAnchorName(database));
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
-            Collections.sort(intersectionInfos, new Comparator<IntersectionInfo>() {
-                @Override
-                public int compare(IntersectionInfo o1, IntersectionInfo o2) {
-                    Double value1 = o1.getCosineScore();
-                    Double value2 = o2.getCosineScore();
-                    if (value1 < value2) return 1;
-                    else if (Objects.equals(value1, value2)) return 0;
-                    else return -1;
-                }
-            });
-            int length = intersectionInfos.size();
-            for (IntersectionInfo intersectionInfo : intersectionInfos) {
-                String combinedName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
+            intersectionInfos.sort(this::compareIntersectionInfo);
+            for (IntersectionInfo intersecInfo : intersectionInfos) {
+                String combinedName2 =
+                        intersecInfo.getRelatedDatasetAcc() + "@" + intersecInfo.getRelatedDatasetDatabase();
 
-                if (intersectionInfo.getRelatedDatasetAcc() != null && intersectionInfo.getRelatedDatasetDatabase() != null) {
+                if (intersecInfo.getRelatedDatasetAcc() != null && intersecInfo.getRelatedDatasetDatabase() != null) {
                     similarDatasets.add(combinedName2);
-                    if ((float) intersectionInfo.getCosineScore() >= threshold) {
-                        Triplet<String, String, Float> score = new Triplet<>(combinedName, combinedName2, (float) intersectionInfo.getCosineScore());
-                        Scores.add(score);
-                        findSimilarScoresFor(intersectionInfo.getRelatedDatasetAcc(), intersectionInfo.getRelatedDatasetDatabase(), similarDatasets, Scores, threshold);
+                    if ((float) intersecInfo.getCosineScore() >= threshold) {
+                        Triplet<String, String, Float> score =
+                                new Triplet<>(combinedName, combinedName2, (float) intersecInfo.getCosineScore());
+                        scores.add(score);
+                        findSimilarScoresFor(intersecInfo.getRelatedDatasetAcc(),
+                                intersecInfo.getRelatedDatasetDatabase(), similarDatasets, scores, threshold);
                     }
                 }
             }
         }
-        return new SimilarInfoResult(accession, database, new ArrayList<>(Scores));
+        return new SimilarInfoResult(accession, database, new ArrayList<>(scores));
+    }
+
+    private int compareIntersectionInfo(IntersectionInfo o1, IntersectionInfo o2) {
+        Double value1 = o1.getCosineScore();
+        Double value2 = o2.getCosineScore();
+        if (value1 < value2) {
+            return 1;
+        } else if (Objects.equals(value1, value2)) {
+            return 0;
+        } else {
+            return -1;
+        }
     }
 
     /**
-     * This function find the similar scores between this dataset(accession+database) and the other datasets inside the similarDatasets set
+     * This function find the similar scores between this dataset(accession+database)
+     * and the other datasets inside the similarDatasets set
      *
      * @param accession
      * @param database
      * @param similarDatasets
-     * @param Scores
+     * @param scores
      */
-    private void findSimilarScoresFor(String accession, String database, List<String> similarDatasets, Set<Triplet> Scores, float threshold) {
+    private void findSimilarScoresFor(String accession, String database, List<String> similarDatasets,
+                                      Set<Triplet> scores, float threshold) {
         String combinedName = accession + "@" + database;
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
         if (datasetStatInfo != null) {
             List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
-            int length = intersectionInfos.size();
-            for (IntersectionInfo intersectionInfo : intersectionInfos) {
-                String combinedName2 = intersectionInfo.getRelatedDatasetAcc() + "@" + intersectionInfo.getRelatedDatasetDatabase();
-                if (similarDatasets.contains(combinedName2) && (float) intersectionInfo.getCosineScore() >= threshold) {
-                    Triplet<String, String, Float> score = new Triplet<>(combinedName, combinedName2, (float) intersectionInfo.getCosineScore());
-                    if (!Scores.contains(score)) {
-                        Scores.add(score);
+            for (IntersectionInfo intersecInfo : intersectionInfos) {
+                String combinedName2 =
+                        intersecInfo.getRelatedDatasetAcc() + "@" + intersecInfo.getRelatedDatasetDatabase();
+                if (similarDatasets.contains(combinedName2) && (float) intersecInfo.getCosineScore() >= threshold) {
+                    Triplet<String, String, Float> score =
+                            new Triplet<>(combinedName, combinedName2, (float) intersecInfo.getCosineScore());
+                    if (!scores.contains(score)) {
+                        scores.add(score);
                     }
                 }
             }
         }
     }
 
-    @ApiOperation(value = "get reanalysis count for dataset", position = 1, notes = "retrieve reanalysis count")
-    @RequestMapping(value = "/getReanalysis", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get reanalysis count for dataset", position = 1, notes = "Retrieve reanalysis count")
+    @RequestMapping(value = "/getReanalysis", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    private void reanalysisScore(){
+    private void reanalysisScore() {
         //datasetStatInfoService.reanalysisCount();
     }
-
-
 }

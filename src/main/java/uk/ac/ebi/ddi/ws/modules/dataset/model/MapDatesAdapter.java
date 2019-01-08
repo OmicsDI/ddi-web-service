@@ -8,7 +8,7 @@ import java.util.Map;
  * Created by yperez on 10/07/2016.
  */
 
-public class MapDatesAdapter extends XmlAdapter <MyMap, Map<String, String>> {
+public class MapDatesAdapter extends XmlAdapter<MyMap, Map<String, String>> {
 
     @Override
     public Map<String, String> unmarshal(MyMap value) throws Exception {

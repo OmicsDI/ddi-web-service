@@ -31,8 +31,10 @@ public class SynonymsForWord {
         this.synonyms = synonyms;
     }
 
-    public void addSynonym(String synonym){
-        if(this.synonyms == null) this.synonyms = new ArrayList<>();
+    public void addSynonym(String synonym) {
+        if (this.synonyms == null) {
+            this.synonyms = new ArrayList<>();
+        }
         this.synonyms.add(synonym);
     }
 }

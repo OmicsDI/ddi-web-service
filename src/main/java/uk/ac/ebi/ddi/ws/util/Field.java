@@ -16,7 +16,8 @@ public enum Field {
     PUBLICATION_UPDATED("updated", FieldType.UNKNOWN, FieldCategory.DATE, "Dataset Updated Date"),
     REPOSITORY("repository", FieldType.MANDATORY, FieldCategory.ADDITIONAL, "Dataset Repository"),
     OMICS("omics_type", FieldType.MANDATORY, FieldCategory.ADDITIONAL, "Dataset Omics Type"),
-    LINK("full_dataset_link", FieldType.MANDATORY, FieldCategory.ADDITIONAL, "Full Dataset Link in the Original Database"),
+    LINK("full_dataset_link", FieldType.MANDATORY,
+            FieldCategory.ADDITIONAL, "Full Dataset Link in the Original Database"),
     SUBMITTER("submitter", FieldType.MANDATORY, FieldCategory.ADDITIONAL, "Dataset Submitter information"),
     SUBMITTER_EMAIL("submitter_email", FieldType.SUGGESTED, FieldCategory.ADDITIONAL, "Dataset Submitter email"),
     TAXONOMY("TAXONOMY", FieldType.SUGGESTED, FieldCategory.CROSSREF, "Dataset NCBI TAXONOMY"),
@@ -31,7 +32,8 @@ public enum Field {
     PUBMED_ABSTRACT("pubmed_abstract", FieldType.UNKNOWN, FieldCategory.ADDITIONAL, "PUBMED Abstract"),
     PUBMED_TITLE("pubmed_title", FieldType.UNKNOWN, FieldCategory.ADDITIONAL, "Pubmed Title Synonyms"),
     PUBMED_AUTHORS("pubmed_authors", FieldType.UNKNOWN, FieldCategory.ADDITIONAL, "Pubmed Authors"),
-    ENRICH_PUBMED_ABSTRACT("pubmed_abstract_synonyms", FieldType.UNKNOWN, FieldCategory.ADDITIONAL, "Pubmed Abstract Synonyms"),
+    ENRICH_PUBMED_ABSTRACT("pubmed_abstract_synonyms",
+            FieldType.UNKNOWN, FieldCategory.ADDITIONAL, "Pubmed Abstract Synonyms"),
     ENRICHE_PUBMED_TITLE("pubmed_title_synonyms", FieldType.UNKNOWN, FieldCategory.ADDITIONAL, "Pubmed title Synonyms"),
     GPMDB_MODEL("model", FieldType.UNKNOWN, FieldCategory.ADDITIONAL, "MODEL"),
     MEDLINE("MEDLINE", FieldType.UNKNOWN, FieldCategory.CROSSREF, "MEDLINE Reference"),
@@ -66,12 +68,13 @@ public enum Field {
      * @param type
      * @return
      */
-    public static List<Field> getValuesByType(FieldType type){
+    public static List<Field> getValuesByType(FieldType type) {
         Field[] values = Field.values();
         List<Field> vReturn = new ArrayList<>();
-        for (Field value: values){
-            if(value.getType() == type)
+        for (Field value: values) {
+            if (value.getType() == type) {
                 vReturn.add(value);
+            }
         }
         return vReturn;
     }
@@ -88,12 +91,13 @@ public enum Field {
         return category;
     }
 
-    public static List<Field> getValuesByCategory(FieldCategory category){
+    public static List<Field> getValuesByCategory(FieldCategory category) {
         Field[] values = Field.values();
         List<Field> vReturn = new ArrayList<>();
-        for (Field value: values){
-            if(value.getCategory() == category)
+        for (Field value: values) {
+            if (value.getCategory() == category) {
                 vReturn.add(value);
+            }
         }
         return vReturn;
     }
@@ -105,9 +109,10 @@ public enum Field {
     public static List<Field> getValuesByCategory(FieldCategory category, FieldType unknown) {
         Field[] values = Field.values();
         List<Field> vReturn = new ArrayList<>();
-        for (Field value: values){
-            if(value.getCategory() == category && !(value.getType() == unknown))
+        for (Field value: values) {
+            if (value.getCategory() == category && !(value.getType() == unknown)) {
                 vReturn.add(value);
+            }
         }
         return vReturn;
     }

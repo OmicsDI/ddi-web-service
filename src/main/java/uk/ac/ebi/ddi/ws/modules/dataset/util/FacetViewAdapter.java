@@ -13,25 +13,11 @@ import java.util.List;
  */
 public class FacetViewAdapter {
     FacetSettingsRepository repository;
-    public FacetViewAdapter(FacetSettingsRepository repository){
+    public FacetViewAdapter(FacetSettingsRepository repository) {
         this.repository = repository;
     }
 
-    public Facet[] process(Facet[] val){
-
-        /* creating settings for debug
-        FacetSettings settings = new FacetSettings();
-        settings.maxFacetCount = 33;
-        settings.facetProperties = new FacetProperty[2];
-        settings.facetProperties[0] = new FacetProperty();
-        settings.facetProperties[0].name="Organisms";
-        settings.facetProperties[0].caption="Species ($$$)";
-        settings.facetProperties[1] = new FacetProperty();
-        settings.facetProperties[1].name="GO";
-        settings.facetProperties[1].caption="GO Term ($$$$)";
-        settings.facetProperties[1].parentFacetName="Source";
-        settings.facetProperties[1].parentFacetValue="BioModels";
-        repository.save(settings);*/
+    public Facet[] process(Facet[] val) {
 
         FacetSettings facetSettings = repository.findAll().iterator().next();
 
@@ -40,24 +26,24 @@ public class FacetViewAdapter {
 
         for (FacetProperty facetProperty:facetSettings.facetProperties) {
             Boolean skip = false;
-            if(null!=facetProperty.parentFacetName){
+            if (null != facetProperty.parentFacetName) {
                 skip = true;
-                for(Facet f: val){
-                    if((f.getLabel().equals(facetProperty.parentFacetName))
-                            &&(f.getFacetValues().length==1)
-                            &&(f.getFacetValues()[0].getLabel().equals(facetProperty.parentFacetValue))){
+                for (Facet f: val) {
+                    if ((f.getLabel().equals(facetProperty.parentFacetName))
+                            && (f.getFacetValues().length == 1)
+                            && (f.getFacetValues()[0].getLabel().equals(facetProperty.parentFacetValue))) {
                         skip = false;
                     }
                 }
             }
-            if(skip) {
+            if (skip) {
                 excluded.add(facetProperty);
                 continue;
             }
 
-            for(Facet f: val){
-                if(f.getLabel().equals(facetProperty.name)){
-                    if(null!=facetProperty.caption){
+            for (Facet f: val) {
+                if (f.getLabel().equals(facetProperty.name)) {
+                    if (null != facetProperty.caption) {
                         f.setLabel(facetProperty.caption);
                     }
                     result.add(f);
@@ -66,27 +52,28 @@ public class FacetViewAdapter {
             }
         }
 
-        for(Facet f: val){
-            if(result.size() >= facetSettings.maxFacetCount)
+        for (Facet f: val) {
+            if (result.size() >= facetSettings.maxFacetCount) {
                 break;
+            }
 
             Boolean found = false;
-            for(Facet r: result){
-                if(r.getId().equals(f.getId())) {
+            for (Facet r: result) {
+                if (r.getId().equals(f.getId())) {
                     found = true;
                     break;
                 }
             }
-            for(FacetProperty r: excluded){
-                if(r.name.equals(f.getLabel())) {
+            for (FacetProperty r: excluded) {
+                if (r.name.equals(f.getLabel())) {
                     found = true;
                     break;
                 }
             }
-            if(!found){
+            if (!found) {
                 result.add(f);
             }
         }
-        return result.toArray(new Facet[result.size()]);
+        return result.toArray(new Facet[0]);
     }
 }

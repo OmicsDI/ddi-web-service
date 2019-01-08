@@ -13,7 +13,7 @@ public class PublicationResult {
 
     private List<PublicationDetail> publications;
 
-    public PublicationResult(){
+    public PublicationResult() {
         publications = new ArrayList<>();
     }
 

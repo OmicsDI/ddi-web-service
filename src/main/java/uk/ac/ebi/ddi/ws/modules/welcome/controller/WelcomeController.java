@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class WelcomeController {
 
     @ApiIgnore
-    @RequestMapping(method= RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     protected String gotoIndex() throws Exception {
         return "forward:/index.html";
     }

@@ -15,7 +15,8 @@ public class Additional {
 
     String value;
 
-    public Additional(){}
+    public Additional() {
+    }
 
     public Additional(String name, String value) {
         this.name = name;

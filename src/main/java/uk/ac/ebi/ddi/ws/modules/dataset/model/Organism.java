@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Yasset Perez-Riverol ypriverol
  */
 @XmlRootElement(name = "organism")
-public class Organism{
+public class Organism {
 
     /**
      * Accession of the Specie for example in the TAXONOMY database
@@ -20,7 +20,8 @@ public class Organism{
      */
     String name = null;
 
-    public Organism(){}
+    public Organism() {
+    }
 
     public Organism(String acc, String name) {
         this.acc = acc;

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseService;
 import uk.ac.ebi.ddi.service.db.model.database.DatabaseDetail;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
@@ -37,26 +36,29 @@ public class DatabaseController {
 
     @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public List<DatabaseDetail> getDatabaseList(){
-        List<DatabaseDetail> list = databaseDetailService.getDatabaseList();
-        return list;
+    public List<DatabaseDetail> getDatabaseList() {
+        return databaseDetailService.getDatabaseList();
     }
     @Autowired
     ServletContext servletContext;
 
-    @RequestMapping(value = "/{databaseName}/picture", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
-    public byte[] getDatabasePicture(@PathVariable String databaseName, final HttpServletResponse response) throws IOException {
+    @RequestMapping(value = "/{databaseName}/picture", method = RequestMethod.GET,
+            produces = MediaType.IMAGE_JPEG_VALUE)
+    public byte[] getDatabasePicture(@PathVariable String databaseName, final HttpServletResponse response)
+            throws IOException {
         response.setHeader("Cache-Control", "no-cache");
         DatabaseDetail databaseDetail = databaseDetailService.findDatabaseByName(databaseName);
-        byte[] b = databaseDetail.getImage();
-        if(null==b){
+        byte[] image = databaseDetail.getImage();
+        if (null == image) {
             InputStream in = servletContext.getResourceAsStream("no_image.jpg");
-            b = IOUtils.toByteArray(in);
+            image = IOUtils.toByteArray(in);
         }
-        return b;
+        return image;
     }
-    /********************* Function for initial load, not used *****************/
-    private void initLocalData(){
+    /**
+     * Function for initial load, not used
+     **/
+    private void initLocalData() {
 
         InputStream databasesInputStream = this.getClass().getResourceAsStream("/databases.json");
         String databaseJSONString = null;
@@ -67,14 +69,14 @@ public class DatabaseController {
             e.printStackTrace();
         }
         JSONArray databaseArray = new JSONArray(databaseJSONString);
-        for(int i = 0;i<databaseArray.length();i++){
+        for (int i = 0; i < databaseArray.length(); i++) {
             JSONObject database = databaseArray.getJSONObject(i);
             DatabaseDetail databaseDetail = new DatabaseDetail();
             databaseDetail.setDatabaseName(database.getString("databaseName"));
             databaseDetail.setTitle(database.getString("title"));
             String imageUrl = database.getString("image");
-            InputStream imgInputStream = this.getClass().getResourceAsStream("/"+imageUrl);
-            byte[] imgBytes = null ;
+            InputStream imgInputStream = this.getClass().getResourceAsStream("/" + imageUrl);
+            byte[] imgBytes = null;
             try {
                 imgBytes = IOUtils.toByteArray(imgInputStream);
             } catch (IOException e) {
@@ -89,22 +91,20 @@ public class DatabaseController {
         }
     }
 
-    @RequestMapping(value = "/db/picturebyte", method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
-    public void getStreamFromImage() throws IOException{
+    @RequestMapping(value = "/db/picturebyte", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void getStreamFromImage() throws IOException {
         DatabaseDetail databaseDetail = new DatabaseDetail();
         BufferedImage bi = ImageIO.read(new File("/home/gaur/Downloads/EGA_LOGO.png"));
         databaseDetail.setDatabaseName("Test");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(bi, "png", baos );
+        ImageIO.write(bi, "png", baos);
         baos.flush();
 
         byte[] imageInByte = baos.toByteArray();
         baos.close();
 
         InputStream is = new ByteArrayInputStream(imageInByte);
-
-        InputStream imgInputStream = this.getClass().getResourceAsStream("/home/gaur/Downloads/EGA_LOGO.png");
-        byte[] imgBytes = null ;
+        byte[] imgBytes = null;
         try {
             imgBytes = IOUtils.toByteArray(is);
         } catch (IOException e) {

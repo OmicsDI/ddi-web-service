@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @date 01/06/2015
  */
 @XmlRootElement(name = "labmember")
-public class LabMember implements Serializable{
+public class LabMember implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,7 +37,8 @@ public class LabMember implements Serializable{
      */
     String email = null;
 
-    public LabMember(){}
+    public LabMember() {
+    }
 
     public LabMember(String name, Role role, String affiliation, String email) {
         this.name = name;

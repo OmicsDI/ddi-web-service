@@ -20,7 +20,7 @@ import java.net.URL;
  */
 @Configuration
 @EnableSwagger
-@ComponentScan("uk.ac.ebi.ddi.ws.modules.controller")
+@ComponentScan("uk.ac.ebi.ddi.ws.modules")
 public class SwaggerConfig {
 
     private SpringSwaggerConfig springSwaggerConfig;
@@ -31,11 +31,11 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public SwaggerSpringMvcPlugin customImplementation(){
+    public SwaggerSpringMvcPlugin customImplementation() {
         return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
                 .apiInfo(apiInfo())
                  .apiListingReferenceOrdering(new ResourceListingPositionalOrdering())
-                .directModelSubstitute(URL.class, String.class) // don't document URL as complex object, but as simple string
+                .directModelSubstitute(URL.class, String.class)
                 .apiDescriptionOrdering(new ApiDescriptionPositionOrdering())
                 .includePatterns("/.*");
     }

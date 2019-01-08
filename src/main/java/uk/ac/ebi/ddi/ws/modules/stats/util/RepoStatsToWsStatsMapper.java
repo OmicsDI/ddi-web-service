@@ -30,8 +30,8 @@ public final class RepoStatsToWsStatsMapper {
 
         List<DomainStats> domains = new ArrayList<>();
 
-        if(domainList != null && domainList.list != null && domainList.list.length > 0){
-            for(Domain domain: domainList.list){
+        if (domainList != null && domainList.list != null && domainList.list.length > 0) {
+            for (Domain domain: domainList.list) {
                 domains.add(domainStats(domain));
             }
         }
@@ -43,24 +43,25 @@ public final class RepoStatsToWsStatsMapper {
      * @param domain
      * @return
      */
-    public static DomainStats domainStats(Domain domain){
+    public static DomainStats domainStats(Domain domain) {
         DomainStats domainStasts = null;
-        if(domain != null){
+        if (domain != null) {
             domainStasts = new DomainStats();
             StatRecord record = new StatRecord(domain.getName(), null, null);
-            if(domain.getIndexInfo() != null && domain.getIndexInfo().length > 0){
-                for(IndexInfo info: domain.getIndexInfo()){
-                    if(info != null && info.getName().equalsIgnoreCase(Constants.ENTRY_COUNT)){
+            if (domain.getIndexInfo() != null && domain.getIndexInfo().length > 0) {
+                for (IndexInfo info: domain.getIndexInfo()) {
+                    if (info != null && info.getName().equalsIgnoreCase(Constants.ENTRY_COUNT)) {
                         record.setValue(info.getValue());
                         break;
                     }
                 }
             }
             domainStasts.setdomain(record);
-            if(domain.getSubDomains() != null && domain.getSubDomains().length >0){
+            if (domain.getSubDomains() != null && domain.getSubDomains().length > 0) {
                 List<DomainStats> subdomains = new ArrayList<>();
-                for(Domain subDomain: domain.getSubDomains())
+                for (Domain subDomain: domain.getSubDomains()) {
                     subdomains.add(domainStats(subDomain));
+                }
                 domainStasts.setSubdomains(subdomains);
             }
         }
@@ -76,8 +77,9 @@ public final class RepoStatsToWsStatsMapper {
         List<StatRecord> general = new ArrayList<>();
         List<DomainStats> domainStatses = asDomainStatsList(domain);
         int count = 0;
-        for(DomainStats domainStats: domainStatses)
-        general.add(new StatRecord(Constants.REPOSITORY_TAG, String.valueOf(count), null));
+        for (DomainStats domainStats: domainStatses) {
+            general.add(new StatRecord(Constants.REPOSITORY_TAG, String.valueOf(count), null));
+        }
         return general;
 
     }
@@ -91,17 +93,19 @@ public final class RepoStatsToWsStatsMapper {
     public static List<StatRecord> asFacetCount(FacetList facets, String field) {
         List<StatRecord> records = new ArrayList<>();
 
-        if(facets != null && facets.getFacets().length != 0){
+        if (facets != null && facets.getFacets().length != 0) {
             records.add(new StatRecord("Total", facets.getHitCount(), null));
             StatRecord unknowRecord = new StatRecord(Constants.NOT_AVAILABLE, "0", null);
             int countNotAvailable = 0;
-            for(Facet facet: facets.getFacets()){
-                if(facet.getId().equalsIgnoreCase(field)){
-                    for(FacetValue facetValue: facet.getFacetValues()){
-                        if(facetValue.getLabel().equalsIgnoreCase(Constants.NOT_AVAILABLE) || facetValue.getLabel().contains(Constants.NOT_APPLICABLE)){
+            for (Facet facet: facets.getFacets()) {
+                if (facet.getId().equalsIgnoreCase(field)) {
+                    for (FacetValue facetValue: facet.getFacetValues()) {
+                        if (facetValue.getLabel().equalsIgnoreCase(Constants.NOT_AVAILABLE)
+                                || facetValue.getLabel().contains(Constants.NOT_APPLICABLE)) {
                             countNotAvailable = countNotAvailable + Integer.parseInt(facetValue.getCount());
-                        }else{
-                            records.add(new StatRecord(facetValue.getLabel(), facetValue.getCount(), facetValue.getValue()));
+                        } else {
+                            records.add(new StatRecord(
+                                    facetValue.getLabel(), facetValue.getCount(), facetValue.getValue()));
                         }
 
                     }

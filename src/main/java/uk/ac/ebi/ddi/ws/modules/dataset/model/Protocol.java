@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 
 @XmlRootElement(name = "protocol")
-public class Protocol implements Serializable{
+public class Protocol implements Serializable {
 
     private static final long serialVersionUID = 1L;
     /**
@@ -26,7 +26,8 @@ public class Protocol implements Serializable{
      */
     String description = null;
 
-    public Protocol(){}
+    public Protocol() {
+    }
 
     public Protocol(String name, String description) {
         this.name = name;

@@ -8,14 +8,15 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * This is the Detailed dataset entry for all the omics experiments. Using the current ws data model we fill the information of
+ * This is the Detailed dataset entry for all the omics experiments.
+ * Using the current ws data model we fill the information of
  * this DatasetDetail to be use by the clients.
  *
  * @author ypriverol
  */
 
 @XmlRootElement(name = "dataset")
-public class DatasetDetail implements Serializable{
+public class DatasetDetail implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -70,7 +71,7 @@ public class DatasetDetail implements Serializable{
      */
     List<String> instruments    = null;
 
-    int citationsCount ;
+    int citationsCount;
 
     int connectionsCount;
 
@@ -343,18 +344,21 @@ public class DatasetDetail implements Serializable{
         this.keywords = keywords;
     }
 
-    public void setKeywords(String[] submitterKeys, String[] curatorKeys){
+    public void setKeywords(String[] submitterKeys, String[] curatorKeys) {
         List<String> tmpkeywords = new ArrayList<>();
-        if(submitterKeys != null && submitterKeys.length > 0)
-                tmpkeywords.addAll(Arrays.asList(submitterKeys));
+        if (submitterKeys != null && submitterKeys.length > 0) {
+            tmpkeywords.addAll(Arrays.asList(submitterKeys));
+        }
 
-        if(curatorKeys != null && curatorKeys.length > 0)
-                tmpkeywords.addAll(Arrays.asList(curatorKeys));
+        if (curatorKeys != null && curatorKeys.length > 0) {
+            tmpkeywords.addAll(Arrays.asList(curatorKeys));
+        }
 
-        if(tmpkeywords.size() > 0){
+        if (tmpkeywords.size() > 0) {
             String[] arrayKeywords = new String[tmpkeywords.size()];
-            for(int i = 0; i < tmpkeywords.size(); i++)
+            for (int i = 0; i < tmpkeywords.size(); i++) {
                 arrayKeywords[i] = tmpkeywords.get(i);
+            }
             setKeywords(arrayKeywords);
         }
     }
@@ -372,12 +376,14 @@ public class DatasetDetail implements Serializable{
         this.publicationIds = publications;
     }
 
-    public void setArrayPublicationIds(String[] ids){
-        if(ids != null && ids.length> 0){
+    public void setArrayPublicationIds(String[] ids) {
+        if (ids != null && ids.length > 0) {
             publicationIds = new ArrayList<>();
-            for(String id: ids)
-                if(id != null && id.length() > 0)
+            for (String id: ids) {
+                if (id != null && id.length() > 0) {
                     publicationIds.add(id);
+                }
+            }
         }
     }
 
@@ -455,11 +461,12 @@ public class DatasetDetail implements Serializable{
      * @param protocol_descriptions the Protocol descriptions
      */
     public void addProtocols(String protocolField, String[] protocol_descriptions) {
-        if(protocols == null)
+        if (protocols == null) {
             protocols = new ArrayList<>();
-        if(protocol_descriptions != null && protocol_descriptions.length > 0 && protocolField != null){
-            for(String protocol: protocol_descriptions){
-                if(protocol != null && protocol.length() > 0){
+        }
+        if (protocol_descriptions != null && protocol_descriptions.length > 0 && protocolField != null) {
+            for (String protocol: protocol_descriptions) {
+                if (protocol != null && protocol.length() > 0) {
                     protocols.add(new Protocol(protocolField, protocol));
                 }
             }
@@ -471,11 +478,12 @@ public class DatasetDetail implements Serializable{
      * @param instruments An array of Instruments.
      */
     public void setArrayInstruments(String[] instruments) {
-         if(instruments != null && instruments.length > 0){
+         if (instruments != null && instruments.length > 0) {
              this.instruments = new ArrayList<>();
-             for(String instrument: instruments){
-                if(instrument != null && instrument.length() >0)
+             for (String instrument: instruments) {
+                if (instrument != null && instrument.length() > 0) {
                     this.instruments.add(instrument);
+                }
             }
         }
     }
@@ -485,11 +493,12 @@ public class DatasetDetail implements Serializable{
      * @param experimentTypes An array of Experiment type terms like Mass Spectrometry, etc
      */
     public void setArrayExperimentType(String[] experimentTypes) {
-        if(experimentTypes != null && experimentTypes.length > 0){
+        if (experimentTypes != null && experimentTypes.length > 0) {
             this.experimentType = new ArrayList<>();
-            for(String experimentType: experimentTypes){
-                if(experimentType != null && experimentType.length() > 0)
+            for (String experimentType: experimentTypes) {
+                if (experimentType != null && experimentType.length() > 0) {
                     this.experimentType.add(experimentType);
+                }
             }
         }
     }
@@ -500,12 +509,13 @@ public class DatasetDetail implements Serializable{
     }
 
     public void setTissues(String[] tissues) {
-        if(tissues != null && tissues.length >0){
+        if (tissues != null && tissues.length > 0) {
             this.tissues = new ArrayList<>();
-            for(String tissue: tissues)
-                if(tissue != null && tissue.length() > 0)
+            for (String tissue: tissues) {
+                if (tissue != null && tissue.length() > 0) {
                     this.tissues.add(tissue);
-
+                }
+            }
         }
     }
 
@@ -515,12 +525,13 @@ public class DatasetDetail implements Serializable{
     }
 
     public void setDiseases(String[] diseases) {
-        if(diseases != null && diseases.length >0){
+        if (diseases != null && diseases.length > 0) {
             this.diseases = new ArrayList<>();
-            for(String disease: diseases)
-                if(disease != null && disease.length() > 0)
+            for (String disease: diseases) {
+                if (disease != null && disease.length() > 0) {
                     this.diseases.add(disease);
-
+                }
+            }
         }
     }
 
@@ -533,9 +544,10 @@ public class DatasetDetail implements Serializable{
         this.similars = similars;
     }
 
-    public void addSimilar(String accession, String database, String relationType){
-        if(similars == null)
+    public void addSimilar(String accession, String database, String relationType) {
+        if (similars == null) {
             similars = new ArrayList<>();
+        }
         similars.add(new DatasetSimilar(accession, database, relationType));
     }
 
