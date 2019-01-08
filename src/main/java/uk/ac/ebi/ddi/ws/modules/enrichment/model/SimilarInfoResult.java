@@ -11,7 +11,7 @@ public class SimilarInfoResult {
 
     private String accession;
     private String database;
-    private List<Triplet> Scores ;
+    private List<Triplet> Scores;
 
     public SimilarInfoResult(String accession, String database, List<Triplet> scores) {
         this.accession = accession;

@@ -12,7 +12,7 @@ public class DomainStats {
 
     List<DomainStats> subdomains = new ArrayList<>();
 
-    public DomainStats(){
+    public DomainStats() {
 
     }
     public DomainStats(StatRecord domain, List<DomainStats> subdomains) {

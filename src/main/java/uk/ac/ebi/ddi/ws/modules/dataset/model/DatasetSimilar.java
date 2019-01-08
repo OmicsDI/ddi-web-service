@@ -8,7 +8,7 @@ import java.io.Serializable;
  */
 
 @XmlRootElement(name = "similar")
-public class DatasetSimilar implements Serializable{
+public class DatasetSimilar implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -20,7 +20,8 @@ public class DatasetSimilar implements Serializable{
 
     String relationType;
 
-    public DatasetSimilar(){}
+    public DatasetSimilar() {
+    }
 
     public DatasetSimilar(String accession, String database, String relationType) {
         this.accession = accession;

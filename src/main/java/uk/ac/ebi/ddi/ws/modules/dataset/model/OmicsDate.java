@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Created by yperez on 10/07/2016.
  */
-@XmlRootElement(name ="date")
+@XmlRootElement(name = "date")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class OmicsDate {
 
@@ -15,7 +15,8 @@ public class OmicsDate {
 
     String value;
 
-    public OmicsDate(){}
+    public OmicsDate() {
+    }
 
     public OmicsDate(String key, String value) {
         this.type = key;

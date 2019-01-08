@@ -7,6 +7,6 @@ import java.util.List;
  * Created by yperez on 10/07/2016.
  */
 public class MyMap {
-    @XmlElement(name="entry")
+    @XmlElement(name = "entry")
     public List<MyEntry> entries;
 }

@@ -12,7 +12,7 @@
     <groupId>uk.ac.ebi.ddi</groupId>
     <artifactId>ddi-web-service</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <name>ddi-web-service</name>
 
     <!--
@@ -32,6 +32,8 @@
         <ddi.mongo.machine.three>abcd</ddi.mongo.machine.three>
         <ddi.mongo.authenticationDatabase>admin</ddi.mongo.authenticationDatabase>
         <database.environment>mongoDB</database.environment>
+        <maven.checkstyle.version>2.17</maven.checkstyle.version>
+        <checkstyle.config.location>checkstyle.xml</checkstyle.config.location>
     </properties>
 
 
@@ -74,6 +76,25 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.version}</version>
+                <executions>
+                    <execution>
+                        <id>checkstyle</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <failOnViolation>true</failOnViolation>
+                            <consoleOutput>true</consoleOutput>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
 
     </build>
@@ -103,6 +124,7 @@
             <version>3.2.14.RELEASE</version>
             <scope>test</scope>
         </dependency>
+
         <!-- Servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -137,7 +159,7 @@
         <dependency>
             <groupId>uk.ac.ebi.ddi</groupId>
             <artifactId>ddi-service-db</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.1.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>

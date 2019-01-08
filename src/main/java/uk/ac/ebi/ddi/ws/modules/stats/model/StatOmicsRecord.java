@@ -15,7 +15,8 @@ public class StatOmicsRecord {
     private String proteomics;
     private String transcriptomics;
 
-    public StatOmicsRecord(String year, String genomicsNo, String metabolomicsNo, String proteomicsNo, String transcriptomicsNo) {
+    public StatOmicsRecord(String year, String genomicsNo, String metabolomicsNo, String proteomicsNo,
+                           String transcriptomicsNo) {
         this.year = year;
         this.genomics = genomicsNo;
         this.metabolomics = metabolomicsNo;

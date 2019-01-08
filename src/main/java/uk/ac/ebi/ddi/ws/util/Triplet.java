@@ -9,12 +9,12 @@ import java.io.Serializable;
  *
  * @author mbai
  */
-public class Triplet<K1,K2,V> implements Serializable {
+public class Triplet<K1, K2, V> implements Serializable {
     private K1 key1;
     private K2 key2;
     private V value;
 
-    public Triplet(K1 key1,K2 key2, V value) {
+    public Triplet(K1 key1, K2 key2, V value) {
         this.key1 = key1;
         this.key2 = key2;
         this.value = value;
@@ -44,14 +44,14 @@ public class Triplet<K1,K2,V> implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Triplet)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Triplet)) {
+            return false;
+        }
 
         Triplet triplet = (Triplet) o;
-
-//        return !(key1 != null ? !key1.equals(tuple.key1) : tuple.key1 != null) && !(key2 != null ? !key2.equals(tuple.key2) : tuple.key2 != null) && !(value != null ? !value.equals(tuple.value) : tuple.value != null);
-
-        //the order of key1 and key2 has no difference
         return (this.hashCode() == triplet.hashCode());
 
     }

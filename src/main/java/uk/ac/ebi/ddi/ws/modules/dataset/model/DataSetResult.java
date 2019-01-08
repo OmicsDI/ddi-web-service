@@ -28,8 +28,7 @@ public class DataSetResult {
     /**
      * Default constructor without paramters
      */
-    public DataSetResult(){
-
+    public DataSetResult() {
     }
 
     /**

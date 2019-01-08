@@ -33,10 +33,11 @@ public class OmicsDataset implements Serializable {
 
     private boolean isClaimable;
 
-    public OmicsDataset(){}
+    public OmicsDataset() {
+    }
 
     public OmicsDataset(Dataset dataset) {
-        if(dataset != null) {
+        if (dataset != null) {
             this.accession = dataset.getAccession();
             this.name = dataset.getName();
             this.database = dataset.getDatabase();
@@ -52,30 +53,33 @@ public class OmicsDataset implements Serializable {
 
     private ArrayList<Ref> convertRef(Map<String, Set<String>> crossReferences) {
         ArrayList<Ref> value = new ArrayList<>();
-        for(Map.Entry entry: crossReferences.entrySet()){
+        for (Map.Entry entry: crossReferences.entrySet()) {
             String key = (String) entry.getKey();
-            for(String values: (Set<String>) entry.getValue())
+            for (String values: (Set<String>) entry.getValue()) {
                 value.add(new Ref(key, values));
+            }
         }
         return value;
     }
 
     private ArrayList<Additional> convertAdditional(Map<String, Set<String>> crossReferences) {
             ArrayList<Additional> value = new ArrayList<>();
-            for(Map.Entry entry: crossReferences.entrySet()){
+            for (Map.Entry entry: crossReferences.entrySet()) {
                 String key = (String) entry.getKey();
-                for(String values: (Set<String>) entry.getValue())
+                for (String values: (Set<String>) entry.getValue()) {
                     value.add(new Additional(key, values));
+                }
             }
         return value;
         }
 
     private ArrayList<OmicsDate> convert(Map<String, Set<String>> oldValues) {
         ArrayList<OmicsDate> value = new ArrayList<>();
-        for(Map.Entry entry: oldValues.entrySet()){
+        for (Map.Entry entry: oldValues.entrySet()) {
             String key = (String) entry.getKey();
-            for(String values: (Set<String>) entry.getValue())
+            for (String values: (Set<String>) entry.getValue()) {
                 value.add(new OmicsDate(key, values));
+            }
         }
         return  value;
     }

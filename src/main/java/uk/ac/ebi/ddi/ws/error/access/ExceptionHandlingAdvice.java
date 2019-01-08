@@ -20,14 +20,12 @@ import java.security.Principal;
  *
  */
 @ControllerAdvice
-
 public class ExceptionHandlingAdvice {
 
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AccessDeniedException.class)
-    private
     @ResponseBody
-    RestError handleAccessDeniedException(AccessDeniedException ex, Principal principal) {
+    private RestError handleAccessDeniedException(AccessDeniedException ex, Principal principal) {
         // distinguish two cases:
         //      request for private data, but no user credentials present
         //      user credentials present, but access forbidden for user
@@ -48,9 +46,8 @@ public class ExceptionHandlingAdvice {
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     @ExceptionHandler(ResourceNotFoundException.class)
-    public
     @ResponseBody
-    RestError handleResourceNotFoundException(ResourceNotFoundException ex) {
+    public RestError handleResourceNotFoundException(ResourceNotFoundException ex) {
         return new RestError(HttpStatus.NOT_FOUND,
                 HttpStatus.NOT_FOUND.value(),
                 "Not found: " + ex.getMessage(),
@@ -61,9 +58,8 @@ public class ExceptionHandlingAdvice {
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    private
     @ResponseBody
-    RestError handleAnyOtherException(Exception ex) {
+    private RestError handleAnyOtherException(Exception ex) {
         return new RestError(HttpStatus.INTERNAL_SERVER_ERROR,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error: " + ex.getMessage(),
@@ -76,16 +72,11 @@ public class ExceptionHandlingAdvice {
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(InvalidDataException.class)
-    private
     @ResponseBody
-    RestError handleIllegalArgumentException(InvalidDataException ex) {
+    private RestError handleIllegalArgumentException(InvalidDataException ex) {
         return new RestError(HttpStatus.UNPROCESSABLE_ENTITY,
                 HttpStatus.UNPROCESSABLE_ENTITY.value(),
                 "Invalid data." + ex.getMessage(),
                 null);
     }
-
-
-
-
 }
