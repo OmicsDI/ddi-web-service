@@ -430,7 +430,7 @@ public class StructuredDataController {
                 "genomics and metabolomics and Multi-Omics");
         organization.setLogo("http://www.omicsdi.org/static/images/logo/OmicsDI-icon-3.png");
         organization.setEmail("omicsdi-support@ebi.ac.uk");
-        organization.setSameAs("https://github.com/BD2K-DDI,https://twitter.com/OmicsDI," +
+        organization.setSameAs("https://github.com/OmicsDI,https://twitter.com/OmicsDI," +
                 "https://plus.google.com/u/0/113645049761549550219");
 
         graph.setGraph(new StructuredData[]{webSite, organization});
