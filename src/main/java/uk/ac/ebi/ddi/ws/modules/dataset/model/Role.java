@@ -8,6 +8,6 @@ public enum Role {
 
     SUBMITTER,
     LABHEAD,
-    COLABORATOR
-
+    COLABORATOR,
+    ADMIN
 }
