@@ -9,6 +9,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -31,12 +32,10 @@ import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
 import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
 import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.OmicsDataset;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.*;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
+import uk.ac.ebi.ddi.ws.modules.security.UserPermissionService;
 import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
@@ -96,13 +95,17 @@ public class DatasetController {
     UnMergeDatasetService unMergeDatasetService;
 
     @Autowired
+    UserPermissionService userPermissionService;
+
+    @Autowired
     public DatasetController(CitationService citationService,
                              EBIPubmedSearchService ebiPubmedSearchService,
                              ReanalysisDataService reanalysisDataService,
                              IMostAccessedDatasetService mostAccessedDatasetService,
                              IDatasetService datasetService,
                              EnrichmentInfoService enrichmentService,
-                             UnMergeDatasetService unMergeDatasetService) {
+                             UnMergeDatasetService unMergeDatasetService,
+                             UserPermissionService userPermissionService) {
         RepoDatasetMapper.ebiPubmedSearchService = ebiPubmedSearchService;
         RepoDatasetMapper.mostAccessedDatasetService = mostAccessedDatasetService;
         RepoDatasetMapper.citationService = citationService;
@@ -110,6 +113,7 @@ public class DatasetController {
         RepoDatasetMapper.datasetService = datasetService;
 
 
+        this.userPermissionService = userPermissionService;
         this.mostAccessedDatasetService = mostAccessedDatasetService;
         this.citationService = citationService;
         this.ebiPubmedSearchService = ebiPubmedSearchService;
@@ -634,36 +638,42 @@ public class DatasetController {
             @ApiParam(value = "The starting point for the search, e.g: 0")
             @RequestParam(value = "start", required = false, defaultValue = "0") int start,
             @ApiParam(value = "The number of records to be retrieved, e.g: maximum 100")
-            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
-            return datasetService.getMergeCandidates(start, size);
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size,
+            @RequestHeader HttpHeaders headers) {
+        userPermissionService.hasRole(Role.ADMIN, headers);
+        return datasetService.getMergeCandidates(start, size);
     }
 
     @ApiOperation(value = "Merge datasets", notes = "Merge datasets")
     @RequestMapping(value = "/merge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void mergeDatasets(@RequestBody MergeCandidate mergeCandidate) {
+    public void mergeDatasets(@RequestBody MergeCandidate mergeCandidate, @RequestHeader HttpHeaders headers) {
+        userPermissionService.hasRole(Role.ADMIN, headers);
         datasetService.mergeDatasets(mergeCandidate);
     }
 
     @ApiOperation(value = "Skipping merge datasets", notes = "Skip merge datasets")
     @RequestMapping(value = "/skipMerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void skipDatasets(@RequestBody MergeCandidate mergeCandidate) {
+    public void skipDatasets(@RequestBody MergeCandidate mergeCandidate, @RequestHeader HttpHeaders headers) {
+        userPermissionService.hasRole(Role.ADMIN, headers);
         datasetService.skipMerge(mergeCandidate);
     }
 
     @ApiOperation(value = "Multiomics merging datasets", notes = "Multiomics merging datasets")
     @RequestMapping(value = "/multiomicsMerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void multiomicsMergeDatasets(@RequestBody MergeCandidate mergeCandidate) {
-        datasetService.addMultiomics(mergeCandidate);
+    public void multiomicsMergeDatasets(@RequestBody MergeCandidate candidate, @RequestHeader HttpHeaders headers) {
+        userPermissionService.hasRole(Role.ADMIN, headers);
+        datasetService.addMultiomics(candidate);
     }
 
     @ApiOperation(value = "Retrieve merge candidate counts", notes = "Retrieve merge candidate counts")
     @RequestMapping(value = "/getMergeCandidateCount", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
-    public Integer getMergeCandidateCount() {
+    public Integer getMergeCandidateCount(@RequestHeader HttpHeaders headers) {
+        userPermissionService.hasRole(Role.ADMIN, headers);
         return datasetService.getMergeCandidateCount();
     }
 
@@ -681,7 +691,8 @@ public class DatasetController {
     @ApiOperation(value = "Unmerge datasets", notes = "Un-merge datasets")
     @RequestMapping(value = "/unmerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void unMergeDatasets(@RequestBody List<UnMergeDatasets> mergeCandidate) {
+    public void unMergeDatasets(@RequestBody List<UnMergeDatasets> mergeCandidate, @RequestHeader HttpHeaders headers) {
+        userPermissionService.hasRole(Role.ADMIN, headers);
         unMergeDatasetService.unmergeDataset(mergeCandidate);
     }
 
@@ -689,7 +700,8 @@ public class DatasetController {
     @RequestMapping(value = "/getAllmerged", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
-    public List<UnMergeDatasets> getAllMergedDatasets() {
+    public List<UnMergeDatasets> getAllMergedDatasets(@RequestHeader HttpHeaders headers) {
+        userPermissionService.hasRole(Role.ADMIN, headers);
         return unMergeDatasetService.findAll();
     }
 
