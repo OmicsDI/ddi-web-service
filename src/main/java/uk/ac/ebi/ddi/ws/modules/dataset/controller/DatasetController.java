@@ -228,6 +228,41 @@ public class DatasetController {
 
     }
 
+    @ApiOperation(value = "Retrieve a batch of datasets", position = 1, notes = "Retrieve an specific dataset")
+    @RequestMapping(value = "/batch", method = RequestMethod.GET, produces = {APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.OK) // 200
+    @ResponseBody
+    public Map<String, Object> getMultipleDatasets(
+            @ApiParam(value = "List of accessions, matching database by index")
+            @RequestParam(value = "acc") String[] accessions,
+            @ApiParam(value = "List of databases, matching accession by index")
+            @RequestParam(value = "database") String[] databases) {
+        if (accessions.length != databases.length) {
+            throw new IllegalArgumentException("The amounts of accessions and databases are not match");
+        }
+
+        Map<String, Object> result = new HashMap<>();
+
+        List<DatasetDetail> datasets = new ArrayList<>();
+        List<String> failure = new ArrayList<>();
+        for (int i = 0; i < accessions.length; i++) {
+            String acc = accessions[i];
+            String domain = databases[i];
+            try {
+                DatasetDetail datasetDetail = new DatasetDetail();
+                Dataset dsResult = datasetService.read(acc, databaseDetailService.retriveAnchorName(domain));
+
+                datasetDetail = getBasicDatasetInfo(datasetDetail, dsResult);
+                datasets.add(datasetDetail);
+            } catch (Exception e) {
+                failure.add(acc);
+            }
+        }
+        result.put("datasets", datasets);
+        result.put("failure", failure);
+        return result;
+    }
+
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
     @RequestMapping(value = "/get", method = RequestMethod.GET, produces = {APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
@@ -243,6 +278,7 @@ public class DatasetController {
         DatasetDetail datasetDetail = new DatasetDetail();
         Dataset dsResult = datasetService.read(acc, databaseDetailService.retriveAnchorName(domain));
 
+        datasetDetail = getBasicDatasetInfo(datasetDetail, dsResult);
         datasetDetail = getDatasetInfo(datasetDetail, dsResult);
 
         // Trace the access to the dataset
@@ -400,11 +436,11 @@ public class DatasetController {
         return datasetService.findByFullDatasetLink(url);
     }
 
-    public DatasetDetail getDatasetInfo(DatasetDetail datasetDetail, Dataset argDataset) {
+
+    private DatasetDetail getBasicDatasetInfo(DatasetDetail datasetDetail, Dataset argDataset) {
         if (argDataset == null) {
             return datasetDetail;
         }
-
         Map<String, Set<String>> datesField = argDataset.getDates();
         Map<String, Set<String>> fields = argDataset.getAdditional();
         Map<String, Set<String>> crossFields = argDataset.getCrossReferences();
@@ -516,6 +552,30 @@ public class DatasetController {
             datasetDetail.setSubmitter(submitter);
         }
 
+        Set<String> repositories = fields.get(Constants.REPOSITORY_FIELD);
+
+        if (repositories != null && repositories.size() > 0) {
+            datasetDetail.setRepositories(repositories);
+        }
+
+        if (argDataset.getScores() != null) {
+            Scores scores = argDataset.getScores();
+            datasetDetail.setViewsCount(scores.getViewCount());
+            datasetDetail.setCitationsCount(scores.getCitationCount());
+            datasetDetail.setReanalysisCount(scores.getReanalysisCount());
+            datasetDetail.setConnectionsCount(scores.getSearchCount());
+        }
+
+        return datasetDetail;
+    }
+
+    public DatasetDetail getDatasetInfo(DatasetDetail datasetDetail, Dataset argDataset) {
+        if (argDataset == null) {
+            return datasetDetail;
+        }
+
+        Map<String, Set<String>> fields = argDataset.getAdditional();
+
         Set<String> submitterMail = fields.get(Constants.SUBMITTER_MAIL_FIELD);
         if ((submitterMail != null) && (submitterMail.size() > 0)) {
             datasetDetail.setSubmitterMail(submitterMail);
@@ -596,20 +656,6 @@ public class DatasetController {
                 datasetDetail.setSecondary_accession(new HashSet<>());
             }
             datasetDetail.getSecondary_accession().add(acc);
-        }
-
-        Set<String> repositories = fields.get(Constants.REPOSITORY_FIELD);
-
-        if (repositories != null && repositories.size() > 0) {
-            datasetDetail.setRepositories(repositories);
-        }
-
-        if (argDataset.getScores() != null) {
-            Scores scores = argDataset.getScores();
-            datasetDetail.setViewsCount(scores.getViewCount());
-            datasetDetail.setCitationsCount(scores.getCitationCount());
-            datasetDetail.setReanalysisCount(scores.getReanalysisCount());
-            datasetDetail.setConnectionsCount(scores.getSearchCount());
         }
 
         return datasetDetail;
