@@ -225,7 +225,6 @@ public class DatasetController {
 
         Dataset dataset = datasetService.read(acc, database);
         return new OmicsDataset(dataset);
-
     }
 
     @ApiOperation(value = "Retrieve a batch of datasets", position = 1, notes = "Retrieve an specific dataset")
@@ -243,22 +242,32 @@ public class DatasetController {
 
         Map<String, Object> result = new HashMap<>();
 
-        List<DatasetDetail> datasets = new ArrayList<>();
-        List<String> failure = new ArrayList<>();
+        List<DatasetDetail> datasetDetails = new ArrayList<>();
+        List<DatasetShort> failure = new ArrayList<>();
+        Map<DatasetShort, Boolean> datasetShorts = new HashMap<>();
+
         for (int i = 0; i < accessions.length; i++) {
-            String acc = accessions[i];
-            String domain = databases[i];
+            String domain = databaseDetailService.retriveAnchorName(databases[i]);
+            datasetShorts.put(new DatasetShort(domain, accessions[i]), false);
+        }
+        List<Dataset> datasets = datasetService.findMultipleDatasets(datasetShorts.keySet());
+        for (Dataset dataset : datasets) {
             try {
                 DatasetDetail datasetDetail = new DatasetDetail();
-                Dataset dsResult = datasetService.read(acc, databaseDetailService.retriveAnchorName(domain));
-
-                datasetDetail = getBasicDatasetInfo(datasetDetail, dsResult);
-                datasets.add(datasetDetail);
+                datasetDetail = getBasicDatasetInfo(datasetDetail, dataset);
+                datasetDetails.add(datasetDetail);
+                datasetShorts.put(new DatasetShort(dataset.getDatabase(), dataset.getAccession()), true);
             } catch (Exception e) {
-                failure.add(acc);
+                failure.add(new DatasetShort(dataset.getDatabase(), dataset.getAccession()));
             }
         }
-        result.put("datasets", datasets);
+
+        for (DatasetShort datasetShort : datasetShorts.keySet()) {
+            if (!datasetShorts.get(datasetShort)) {
+                failure.add(datasetShort);
+            }
+        }
+        result.put("datasets", datasetDetails);
         result.put("failure", failure);
         return result;
     }
@@ -459,16 +468,6 @@ public class DatasetController {
             datasetDetail.setPublicationDate(publicationDates.iterator().next());
         }
 
-        Set<String> dataProtocols = fields.get(Constants.DATA_PROTOCOL_FIELD);
-        if (dataProtocols != null && dataProtocols.size() > 0) {
-            datasetDetail.addProtocols(Constants.DATA_PROTOCOL_FIELD, dataProtocols.toArray(new String[0]));
-        }
-
-        Set<String> sampleProtocols = fields.get(Constants.SAMPLE_PROTOCOL_FIELD);
-        if (sampleProtocols != null && sampleProtocols.size() > 0) {
-            datasetDetail.addProtocols(Constants.SAMPLE_PROTOCOL_FIELD, sampleProtocols.toArray(new String[0]));
-        }
-
         Set<String> fullDatasetLinks = fields.get(Constants.DATASET_LINK_FIELD);
         if (fullDatasetLinks != null && fullDatasetLinks.size() > 0) {
             datasetDetail.setFull_dataset_link(fullDatasetLinks.iterator().next());
@@ -575,6 +574,17 @@ public class DatasetController {
         }
 
         Map<String, Set<String>> fields = argDataset.getAdditional();
+
+
+        Set<String> dataProtocols = fields.get(Constants.DATA_PROTOCOL_FIELD);
+        if (dataProtocols != null && dataProtocols.size() > 0) {
+            datasetDetail.addProtocols(Constants.DATA_PROTOCOL_FIELD, dataProtocols.toArray(new String[0]));
+        }
+
+        Set<String> sampleProtocols = fields.get(Constants.SAMPLE_PROTOCOL_FIELD);
+        if (sampleProtocols != null && sampleProtocols.size() > 0) {
+            datasetDetail.addProtocols(Constants.SAMPLE_PROTOCOL_FIELD, sampleProtocols.toArray(new String[0]));
+        }
 
         Set<String> submitterMail = fields.get(Constants.SUBMITTER_MAIL_FIELD);
         if ((submitterMail != null) && (submitterMail.size() > 0)) {
