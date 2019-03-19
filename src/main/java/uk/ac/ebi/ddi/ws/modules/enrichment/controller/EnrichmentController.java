@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
+import uk.ac.ebi.ddi.service.db.model.dataset.DatasetShort;
 import uk.ac.ebi.ddi.service.db.model.enrichment.DatasetEnrichmentInfo;
 import uk.ac.ebi.ddi.service.db.model.enrichment.WordInField;
 import uk.ac.ebi.ddi.service.db.model.similarity.DatasetStatInfo;
@@ -260,29 +261,38 @@ public class EnrichmentController {
             @ApiParam(value = "Threshold score, e.g: 0.50")
             @RequestParam(value = "threshold", required = true, defaultValue = "0.50") float threshold) {
 
-        List<String> similarDatasets = new ArrayList<>();
+        Set<String> similarDatasets = new HashSet<>();
         Set<Triplet> scores = new HashSet<>();
-        String combinedName = accession + "@" + database;
-        similarDatasets.add(combinedName); //put itself in the set;
+        String source = accession + "@" + database;
+        similarDatasets.add(source); //put itself in the set;
 
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(
                 accession, databaseDetailService.retriveAnchorName(database));
-        if (datasetStatInfo != null) {
-            List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
-            intersectionInfos.sort(this::compareIntersectionInfo);
-            for (IntersectionInfo intersecInfo : intersectionInfos) {
-                String combinedName2 =
-                        intersecInfo.getRelatedDatasetAcc() + "@" + intersecInfo.getRelatedDatasetDatabase();
+        if (datasetStatInfo == null) {
+            return new SimilarInfoResult(accession, database, new ArrayList<>(scores));
+        }
+        List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
+        intersectionInfos.sort(this::compareIntersectionInfo);
+        List<DatasetShort> toFetch = new ArrayList<>();
+        for (IntersectionInfo intersect : intersectionInfos) {
+            String dest = intersect.getRelatedDatasetAcc() + "@" + intersect.getRelatedDatasetDatabase();
 
-                if (intersecInfo.getRelatedDatasetAcc() != null && intersecInfo.getRelatedDatasetDatabase() != null) {
-                    similarDatasets.add(combinedName2);
-                    if ((float) intersecInfo.getCosineScore() >= threshold) {
-                        Triplet<String, String, Float> score =
-                                new Triplet<>(combinedName, combinedName2, (float) intersecInfo.getCosineScore());
-                        scores.add(score);
-                        findSimilarScoresFor(intersecInfo.getRelatedDatasetAcc(),
-                                intersecInfo.getRelatedDatasetDatabase(), similarDatasets, scores, threshold);
-                    }
+            if (intersect.getRelatedDatasetAcc() == null || intersect.getRelatedDatasetDatabase() == null) {
+                continue;
+            }
+            similarDatasets.add(dest);
+            if (intersect.getCosineScore() >= threshold) {
+                scores.add(new Triplet<>(source, dest, intersect.getCosineScore()));
+                toFetch.add(new DatasetShort(intersect.getRelatedDatasetDatabase(), intersect.getRelatedDatasetAcc()));
+            }
+        }
+        List<DatasetStatInfo> datasetStatInfos = datasetStatInfoService.findMultiple(toFetch);
+        for (DatasetStatInfo child : datasetStatInfos) {
+            String childSource = child.getAccession() + "@" + child.getDatabase();
+            for (IntersectionInfo intersect : child.getIntersectionInfos()) {
+                String childDest = intersect.getRelatedDatasetAcc() + "@" + intersect.getRelatedDatasetDatabase();
+                if (similarDatasets.contains(childDest) && intersect.getCosineScore() >= threshold) {
+                    scores.add(new Triplet<>(childSource, childDest, intersect.getCosineScore()));
                 }
             }
         }
@@ -298,35 +308,6 @@ public class EnrichmentController {
             return 0;
         } else {
             return -1;
-        }
-    }
-
-    /**
-     * This function find the similar scores between this dataset(accession+database)
-     * and the other datasets inside the similarDatasets set
-     *
-     * @param accession
-     * @param database
-     * @param similarDatasets
-     * @param scores
-     */
-    private void findSimilarScoresFor(String accession, String database, List<String> similarDatasets,
-                                      Set<Triplet> scores, float threshold) {
-        String combinedName = accession + "@" + database;
-        DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(accession, database);
-        if (datasetStatInfo != null) {
-            List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
-            for (IntersectionInfo intersecInfo : intersectionInfos) {
-                String combinedName2 =
-                        intersecInfo.getRelatedDatasetAcc() + "@" + intersecInfo.getRelatedDatasetDatabase();
-                if (similarDatasets.contains(combinedName2) && (float) intersecInfo.getCosineScore() >= threshold) {
-                    Triplet<String, String, Float> score =
-                            new Triplet<>(combinedName, combinedName2, (float) intersecInfo.getCosineScore());
-                    if (!scores.contains(score)) {
-                        scores.add(score);
-                    }
-                }
-            }
         }
     }
 
