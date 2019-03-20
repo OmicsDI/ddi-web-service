@@ -60,7 +60,6 @@ public class Triplet<K1, K2, V> implements Serializable {
     public int hashCode() {
         int result = key1 != null ? key1.hashCode() : 0;
         result = result + (key2 != null ? key2.hashCode() : 0);  //the order of key1 and key2 has no difference
-        result = 31 * result + (value != null ? value.hashCode() : 0);
         return result;
     }
 }

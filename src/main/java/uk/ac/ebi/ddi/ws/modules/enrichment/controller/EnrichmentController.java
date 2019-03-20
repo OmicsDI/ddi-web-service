@@ -262,18 +262,17 @@ public class EnrichmentController {
             @RequestParam(value = "threshold", required = true, defaultValue = "0.50") float threshold) {
 
         Set<String> similarDatasets = new HashSet<>();
-        Set<Triplet> scores = new HashSet<>();
+        Map<Triplet, Triplet<String, String, Double>> scores = new HashMap<>();
         String source = accession + "@" + database;
         similarDatasets.add(source); //put itself in the set;
 
         DatasetStatInfo datasetStatInfo = datasetStatInfoService.readByAccession(
                 accession, databaseDetailService.retriveAnchorName(database));
         if (datasetStatInfo == null) {
-            return new SimilarInfoResult(accession, database, new ArrayList<>(scores));
+            return new SimilarInfoResult(accession, database, Collections.emptyList());
         }
         List<IntersectionInfo> intersectionInfos = datasetStatInfo.getIntersectionInfos();
-        intersectionInfos.sort(this::compareIntersectionInfo);
-        List<DatasetShort> toFetch = new ArrayList<>();
+        Set<DatasetShort> toFetch = new HashSet<>();
         for (IntersectionInfo intersect : intersectionInfos) {
             String dest = intersect.getRelatedDatasetAcc() + "@" + intersect.getRelatedDatasetDatabase();
 
@@ -282,21 +281,24 @@ public class EnrichmentController {
             }
             similarDatasets.add(dest);
             if (intersect.getCosineScore() >= threshold) {
-                scores.add(new Triplet<>(source, dest, intersect.getCosineScore()));
+                Triplet<String, String, Double> score = new Triplet<>(source, dest, intersect.getCosineScore());
+                scores.put(score, score);
                 toFetch.add(new DatasetShort(intersect.getRelatedDatasetDatabase(), intersect.getRelatedDatasetAcc()));
             }
         }
         List<DatasetStatInfo> datasetStatInfos = datasetStatInfoService.findMultiple(toFetch);
-        for (DatasetStatInfo child : datasetStatInfos) {
-            String childSource = child.getAccession() + "@" + child.getDatabase();
-            for (IntersectionInfo intersect : child.getIntersectionInfos()) {
-                String childDest = intersect.getRelatedDatasetAcc() + "@" + intersect.getRelatedDatasetDatabase();
-                if (similarDatasets.contains(childDest) && intersect.getCosineScore() >= threshold) {
-                    scores.add(new Triplet<>(childSource, childDest, intersect.getCosineScore()));
+
+        datasetStatInfos.forEach(childDs -> childDs.getIntersectionInfos().forEach(grantChild -> {
+            String childSource = childDs.getAccession() + "@" + childDs.getDatabase();
+            String childDest = grantChild.getRelatedDatasetAcc() + "@" + grantChild.getRelatedDatasetDatabase();
+            Triplet<String, String, Double> score = new Triplet<>(childSource, childDest, grantChild.getCosineScore());
+            if (similarDatasets.contains(childDest) && grantChild.getCosineScore() >= threshold) {
+                if (!scores.containsKey(score) || scores.get(score).getValue() < score.getValue()) {
+                    scores.put(score, score);
                 }
             }
-        }
-        return new SimilarInfoResult(accession, database, new ArrayList<>(scores));
+        }));
+        return new SimilarInfoResult(accession, database, new ArrayList<>(scores.values()));
     }
 
     private int compareIntersectionInfo(IntersectionInfo o1, IntersectionInfo o2) {
