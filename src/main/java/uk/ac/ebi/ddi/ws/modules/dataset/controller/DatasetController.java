@@ -4,6 +4,8 @@ package uk.ac.ebi.ddi.ws.modules.dataset.controller;
  * @author Yasset Perez-Riverol ypriverol
  */
 
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+import com.maxmind.geoip2.record.Location;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -32,22 +34,35 @@ import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
 import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
 import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.*;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.Role;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.security.UserPermissionService;
+import uk.ac.ebi.ddi.ws.services.LocationService;
 import uk.ac.ebi.ddi.ws.util.Constants;
+import uk.ac.ebi.ddi.ws.util.FileUtils;
+import uk.ac.ebi.ddi.ws.util.MapUtils;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
+import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.lang.reflect.Array;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.ac.ebi.ddi.service.db.utils.Constants.SECONDARY_ACCESSION;
+import static uk.ac.ebi.ddi.service.db.utils.Constants.SECONDARY_ACCESSION_ADDITIONAL;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.tranformServletResquestToEvent;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.transformSimilarDatasetSummary;
 
@@ -85,6 +100,9 @@ public class DatasetController {
 
     @Autowired
     DatabaseDetailService databaseDetailService;
+
+    @Autowired
+    private LocationService locationService;
 
     //autowired by ctor param
     IMostAccessedDatasetService mostAccessedDatasetService;
@@ -216,15 +234,70 @@ public class DatasetController {
             produces = {APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
-    public OmicsDataset getDataset(
+    public Map<String, Object> getDataset(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
             @PathVariable(value = "acc") String acc,
             @ApiParam(value = "Database accession id, e.g: pride")
-            @PathVariable(value = "domain") String domain) {
+            @PathVariable(value = "domain") String domain,
+            @ApiParam(value = "IP Address of user, use to detect the best provider, not required")
+            @RequestHeader(value = "ip", required = false) String ipAddress) {
         String database = databaseDetailService.retriveAnchorName(domain);
-
         Dataset dataset = datasetService.read(acc, database);
-        return new OmicsDataset(dataset);
+        Map<String, Set<String>> additional = dataset.getAdditional();
+        additional.remove(Field.DATASET_FILE.getName());
+        additional.put(SECONDARY_ACCESSION_ADDITIONAL, dataset.getAllSecondaryAccessions());
+        additional.remove(SECONDARY_ACCESSION);
+        Map<String, Object> result = new HashMap<>();
+        result.put("accession", dataset.getAccession());
+        result.put("name", dataset.getName());
+        result.put("database", dataset.getDatabase());
+        result.put("description", dataset.getDescription());
+        result.put("dates", MapUtils.eliminateSet(dataset.getDates()));
+        result.put("additional", additional);
+        result.put("cross_references", dataset.getCrossReferences());
+        result.put("is_claimable", dataset.isClaimable());
+        result.put("scores", dataset.getScores());
+        String primaryAccession = ipAddress == null ? acc : getPreferableAccession(
+                dataset.getFiles(), ipAddress, dataset.getAccession());
+        List<Object> files = dataset.getFiles().keySet().stream().map(x -> {
+            Map<String, Object> provider = new HashMap<>();
+            Map<String, List<String>> fileGroup = new HashMap<>();
+            dataset.getFiles().get(x).forEach(f -> {
+                String extension = FileUtils.getFileExtension(f).orElse("--");
+                List<String> urls = new ArrayList<>(Collections.singleton(f));
+                if (fileGroup.containsKey(extension)) {
+                    urls.addAll(fileGroup.get(extension));
+                }
+                fileGroup.put(extension, urls);
+            });
+            provider.put("files", fileGroup);
+            provider.put("type", x.equals(primaryAccession) ? "primary" : "mirror");
+            return provider;
+        }).collect(Collectors.toList());
+        result.put("files", files);
+        return result;
+    }
+
+    private String getPreferableAccession(Map<String, Set<String>> files, String ipAddress, String defaultAccession) {
+        if (files.size() == 1) {
+            return files.keySet().iterator().next();
+        }
+        if (files.size() == 0) {
+            return defaultAccession;
+        }
+        try {
+            Map<String, Double> distances = new HashMap<>();
+            Location userLocation = locationService.getLocation(ipAddress);
+            for (String accession : files.keySet()) {
+                URI uri = new URI(files.get(accession).iterator().next());
+                Location serverLocation = locationService.getLocation(uri.getHost());
+                distances.put(accession, LocationService.distance(userLocation, serverLocation));
+            }
+            distances = MapUtils.sortByValue(distances);
+            return distances.keySet().iterator().next();
+        } catch (GeoIp2Exception | IOException | URISyntaxException e) {
+            return defaultAccession;
+        }
     }
 
     @ApiOperation(value = "Retrieve a batch of datasets", position = 1, notes = "Retrieve an specific dataset")

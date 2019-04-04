@@ -18,6 +18,7 @@
     <mvc:annotation-driven/>
 
     <context:component-scan base-package="uk.ac.ebi.ddi.ws.modules"/>
+    <context:component-scan base-package="uk.ac.ebi.ddi.ws.services"/>
 
 
     <bean id="ebeyeWsConfigDev" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigDev" />
