@@ -2,10 +2,7 @@ package uk.ac.ebi.ddi.ws.modules.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -22,9 +19,12 @@ public class UserPermissionService {
 
     private RestTemplate restTemplate = new RestTemplate();
 
-    public void hasRole(Role requiredRole, HttpHeaders headers) {
+    public void hasRole(Role requiredRole, String accessToken) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(profileServiceEndpoint)
                 .path("/api/user/current");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("x-auth-token", accessToken);
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
         URI uri = builder.build().toUri();
         ResponseEntity<JsonNode> response = restTemplate.exchange(uri, HttpMethod.GET, entity, JsonNode.class);
