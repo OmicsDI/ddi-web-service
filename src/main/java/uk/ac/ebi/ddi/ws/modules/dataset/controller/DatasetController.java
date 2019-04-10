@@ -238,10 +238,10 @@ public class DatasetController {
             @PathVariable(value = "acc") String acc,
             @ApiParam(value = "Database accession id, e.g: pride")
             @PathVariable(value = "domain") String domain,
-            @ApiParam(value = "IP Address of user, use to detect the best provider, not required")
-            @RequestHeader(value = "ip", required = false) String ipAddress) {
+            HttpServletRequest request) {
         String database = databaseDetailService.retriveAnchorName(domain);
         Dataset dataset = datasetService.read(acc, database);
+        String ipAddress = request.getRemoteAddr();
         Map<String, Set<String>> additional = dataset.getAdditional();
         additional.remove(Field.DATASET_FILE.getName());
         additional.put(SECONDARY_ACCESSION_ADDITIONAL, dataset.getAllSecondaryAccessions());
@@ -256,22 +256,21 @@ public class DatasetController {
         result.put("cross_references", dataset.getCrossReferences());
         result.put("is_claimable", dataset.isClaimable());
         result.put("scores", dataset.getScores());
-        String primaryAccession = ipAddress == null ? acc : getPreferableAccession(
-                dataset.getFiles(), ipAddress, dataset.getAccession());
+        String primaryAccession = getPreferableAccession(dataset.getFiles(), ipAddress, dataset.getAccession());
         List<Object> files = dataset.getFiles().keySet().stream().map(x -> {
-            Map<String, Object> provider = new HashMap<>();
-            Map<String, List<String>> fileGroup = new HashMap<>();
+            Map<String, Object> providers = new HashMap<>();
+            Map<String, List<String>> fileGroups = new HashMap<>();
             dataset.getFiles().get(x).forEach(f -> {
                 String extension = FileUtils.getFileExtension(f).orElse("--");
                 List<String> urls = new ArrayList<>(Collections.singleton(f));
-                if (fileGroup.containsKey(extension)) {
-                    urls.addAll(fileGroup.get(extension));
+                if (fileGroups.containsKey(extension)) {
+                    urls.addAll(fileGroups.get(extension));
                 }
-                fileGroup.put(extension, urls);
+                fileGroups.put(extension, urls);
             });
-            provider.put("files", fileGroup);
-            provider.put("type", x.equals(primaryAccession) ? "primary" : "mirror");
-            return provider;
+            providers.put("files", fileGroups);
+            providers.put("type", x.equals(primaryAccession) ? "primary" : "mirror");
+            return providers;
         }).collect(Collectors.toList());
         result.put("files", files);
         return result;
