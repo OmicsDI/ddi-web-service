@@ -20,11 +20,11 @@ public class SimpleCORSFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        if (((request.getHeader("Access-Control-Request-Method") != null
+        if (request.getHeader("Access-Control-Request-Method") != null
                 || ("GET".equals(request.getMethod()))
-                || ("POST".equals(request.getMethod())))
-                && !("OPTIONS".equals(request.getMethod()))
-                && !("PUT".equals(request.getMethod())))) {
+                || ("POST".equals(request.getMethod()))
+                || ("OPTION".equals(request.getMethod()))
+                || ("PUT".equals(request.getMethod()))) {
             // CORS "pre-flight" request
             //response.addHeader("Access-Control-Allow-Origin","http://ves-hx-43.ebi.ac.uk:8080");
             //response.addHeader("Access-Control-Allow-Origin", "http://www.omicsdi.org");
@@ -33,7 +33,7 @@ public class SimpleCORSFilter extends OncePerRequestFilter {
             response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE,OPTIONS");
             //response.addHeader("Access-Control-Allow-Headers", "X-Requested-With,Origin,Content-Type, Accept");
             response.addHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With,accept,Origin,"
-                    + "Access-Control-Request-Method,Access-Control-Request-Headers");
+                    + "Access-Control-Request-Method,Access-Control-Request-Headers,x-auth-token");
             response.addHeader("cors.support.credentials", "true");
             response.addHeader("cors.exposed.headers", "Access-Control-Allow-Origin,"
                     + "Access-Control-Allow-Credentials");
