@@ -9,9 +9,9 @@ import com.maxmind.geoip2.record.Location;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -43,7 +43,6 @@ import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.security.UserPermissionService;
 import uk.ac.ebi.ddi.ws.services.LocationService;
 import uk.ac.ebi.ddi.ws.util.Constants;
-import uk.ac.ebi.ddi.ws.util.FileUtils;
 import uk.ac.ebi.ddi.ws.util.MapUtils;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 import uk.ac.ebi.ddi.xml.validator.utils.Field;
@@ -103,6 +102,9 @@ public class DatasetController {
 
     @Autowired
     private LocationService locationService;
+
+    @Autowired
+    private FileGroupService fileGroupService;
 
     //autowired by ctor param
     IMostAccessedDatasetService mostAccessedDatasetService;
@@ -239,10 +241,10 @@ public class DatasetController {
             @PathVariable(value = "acc") String acc,
             @ApiParam(value = "Database accession id, e.g: pride")
             @PathVariable(value = "domain") String domain,
-            @ApiParam(value = "IP Address of user, use to detect the best provider, not required")
-            @RequestHeader(value = "ip", required = false) String ipAddress) {
+            HttpServletRequest request) {
         String database = databaseDetailService.retriveAnchorName(domain);
         Dataset dataset = datasetService.read(acc, database);
+        String ipAddress = request.getRemoteAddr();
         Map<String, Set<String>> additional = dataset.getAdditional();
         additional.remove(Field.DATASET_FILE.getName());
         additional.put(SECONDARY_ACCESSION_ADDITIONAL, dataset.getAllSecondaryAccessions());
@@ -257,24 +259,31 @@ public class DatasetController {
         result.put("cross_references", dataset.getCrossReferences());
         result.put("is_claimable", dataset.isClaimable());
         result.put("scores", dataset.getScores());
-        String primaryAccession = ipAddress == null ? acc : getPreferableAccession(
-                dataset.getFiles(), ipAddress, dataset.getAccession());
+        String primaryAccession = getPreferableAccession(dataset.getFiles(), ipAddress, dataset.getAccession());
+        Map<String, String> groups = getAvailableGroups();
         List<Object> files = dataset.getFiles().keySet().stream().map(x -> {
-            Map<String, Object> provider = new HashMap<>();
-            Map<String, List<String>> fileGroup = new HashMap<>();
+            Map<String, Object> providers = new HashMap<>();
+            Map<String, List<String>> fileGroups = new HashMap<>();
             dataset.getFiles().get(x).forEach(f -> {
-                String extension = FileUtils.getFileExtension(f).orElse("--");
+                String baseName = FilenameUtils.getBaseName(f);
                 List<String> urls = new ArrayList<>(Collections.singleton(f));
-                if (fileGroup.containsKey(extension)) {
-                    urls.addAll(fileGroup.get(extension));
+                String extension = "Other";
+                for (String g : groups.keySet()) {
+                    if (baseName.toLowerCase().contains(g.toLowerCase())) {
+                        extension = groups.get(g);
+                        break;
+                    }
                 }
-                fileGroup.put(extension, urls);
+                if (fileGroups.containsKey(extension)) {
+                    urls.addAll(fileGroups.get(extension));
+                }
+                fileGroups.put(extension, urls);
             });
-            provider.put("files", fileGroup);
-            provider.put("type", x.equals(primaryAccession) ? "primary" : "mirror");
-            return provider;
+            providers.put("files", fileGroups);
+            providers.put("type", x.equals(primaryAccession) ? "primary" : "mirror");
+            return providers;
         }).collect(Collectors.toList());
-        result.put("files", files);
+        result.put("file_versions", files);
         return result;
     }
 
@@ -298,6 +307,17 @@ public class DatasetController {
         } catch (GeoIp2Exception | IOException | URISyntaxException e) {
             return defaultAccession;
         }
+    }
+
+    private Map<String, String> getAvailableGroups() {
+        List<FileGroup> fileGroups = fileGroupService.findAll();
+        Map<String, String> result = new HashMap<>();
+        for (FileGroup fileGroup : fileGroups) {
+            for (String extension: fileGroup.getExtensions()) {
+                result.put(extension, fileGroup.getGroup());
+            }
+        }
+        return result;
     }
 
     @ApiOperation(value = "Retrieve a batch of datasets", position = 1, notes = "Retrieve an specific dataset")
@@ -768,32 +788,35 @@ public class DatasetController {
             @RequestParam(value = "start", required = false, defaultValue = "0") int start,
             @ApiParam(value = "The number of records to be retrieved, e.g: maximum 100")
             @RequestParam(value = "size", required = false, defaultValue = "20") int size,
-            @RequestHeader HttpHeaders headers) {
-        userPermissionService.hasRole(Role.ADMIN, headers);
+            @RequestHeader("x-auth-token") String accessToken) {
+        userPermissionService.hasRole(Role.ADMIN, accessToken);
         return datasetService.getMergeCandidates(start, size);
     }
 
     @ApiOperation(value = "Merge datasets", notes = "Merge datasets")
     @RequestMapping(value = "/merge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void mergeDatasets(@RequestBody MergeCandidate mergeCandidate, @RequestHeader HttpHeaders headers) {
-        userPermissionService.hasRole(Role.ADMIN, headers);
+    public void mergeDatasets(@RequestBody MergeCandidate mergeCandidate,
+                              @RequestHeader("x-auth-token") String accessToken) {
+        userPermissionService.hasRole(Role.ADMIN, accessToken);
         datasetService.mergeDatasets(mergeCandidate);
     }
 
     @ApiOperation(value = "Skipping merge datasets", notes = "Skip merge datasets")
     @RequestMapping(value = "/skipMerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void skipDatasets(@RequestBody MergeCandidate mergeCandidate, @RequestHeader HttpHeaders headers) {
-        userPermissionService.hasRole(Role.ADMIN, headers);
+    public void skipDatasets(@RequestBody MergeCandidate mergeCandidate,
+                             @RequestHeader("x-auth-token") String accessToken) {
+        userPermissionService.hasRole(Role.ADMIN, accessToken);
         datasetService.skipMerge(mergeCandidate);
     }
 
     @ApiOperation(value = "Multiomics merging datasets", notes = "Multiomics merging datasets")
     @RequestMapping(value = "/multiomicsMerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void multiomicsMergeDatasets(@RequestBody MergeCandidate candidate, @RequestHeader HttpHeaders headers) {
-        userPermissionService.hasRole(Role.ADMIN, headers);
+    public void multiomicsMergeDatasets(@RequestBody MergeCandidate candidate,
+                                        @RequestHeader("x-auth-token") String accessToken) {
+        userPermissionService.hasRole(Role.ADMIN, accessToken);
         datasetService.addMultiomics(candidate);
     }
 
@@ -801,8 +824,8 @@ public class DatasetController {
     @RequestMapping(value = "/getMergeCandidateCount", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
-    public Integer getMergeCandidateCount(@RequestHeader HttpHeaders headers) {
-        userPermissionService.hasRole(Role.ADMIN, headers);
+    public Integer getMergeCandidateCount(@RequestHeader("x-auth-token") String accessToken) {
+        userPermissionService.hasRole(Role.ADMIN, accessToken);
         return datasetService.getMergeCandidateCount();
     }
 
@@ -820,8 +843,9 @@ public class DatasetController {
     @ApiOperation(value = "Unmerge datasets", notes = "Un-merge datasets")
     @RequestMapping(value = "/unmerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void unMergeDatasets(@RequestBody List<UnMergeDatasets> mergeCandidate, @RequestHeader HttpHeaders headers) {
-        userPermissionService.hasRole(Role.ADMIN, headers);
+    public void unMergeDatasets(@RequestBody List<UnMergeDatasets> mergeCandidate,
+                                @RequestHeader("x-auth-token") String accessToken) {
+        userPermissionService.hasRole(Role.ADMIN, accessToken);
         unMergeDatasetService.unmergeDataset(mergeCandidate);
     }
 
@@ -829,8 +853,8 @@ public class DatasetController {
     @RequestMapping(value = "/getAllmerged", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
-    public List<UnMergeDatasets> getAllMergedDatasets(@RequestHeader HttpHeaders headers) {
-        userPermissionService.hasRole(Role.ADMIN, headers);
+    public List<UnMergeDatasets> getAllMergedDatasets(@RequestHeader("x-auth-token") String accessToken) {
+        userPermissionService.hasRole(Role.ADMIN, accessToken);
         return unMergeDatasetService.findAll();
     }
 
