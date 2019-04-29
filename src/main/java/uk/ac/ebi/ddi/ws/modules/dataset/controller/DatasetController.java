@@ -265,7 +265,7 @@ public class DatasetController {
             Map<String, Object> providers = new HashMap<>();
             Map<String, List<String>> fileGroups = new HashMap<>();
             dataset.getFiles().get(x).forEach(f -> {
-                String baseName = FilenameUtils.getBaseName(f);
+                String baseName = FilenameUtils.getName(f);
                 List<String> urls = new ArrayList<>(Collections.singleton(f));
                 String extension = "Other";
                 for (String g : groups.keySet()) {
