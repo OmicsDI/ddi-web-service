@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.ws.util;
 
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
+
 /**
  * @author Yasset Perez-Riverol ypriverol
  */
@@ -8,148 +10,90 @@ public class Constants {
     private Constants() {
     }
 
-    public static final String ENTRY_COUNT              = "Number of entries";
-    public static final String TAXONOMY_FIELD           = "TAXONOMY";
-    public static final String MAIN_DOMAIN              = "omics";
-    public static final String REPOSITORY_TAG           = "Repositories";
-    public static final String TISSUE_FIELD             = "tissue";
-    public static final String OMICS_TYPE_FIELD         = "omics_type";
-    public static final String DISEASE_FIELD            = "disease";
-    public static final String DESCRIPTION_FIELD        = "description";
-    public static final String NAME_FIELD               = "name";
-    public static final String SUBMITTER_KEY_FIELD      = "submitter_keywords";
-    public static final String CURATOR_KEY_FIELD        = "curator_keywords";
-    public static final String PUB_DATE_FIELD           = "publication_date";
-    public static final String PUB_DATE_FIELD_OPTIONAL  = "publication";
-    public static final String[] PUB_DATES = new String[]{PUB_DATE_FIELD, PUB_DATE_FIELD_OPTIONAL};
-    public static final String EGA_UPDATED_FIELD        = "updated";
+    public static final String ENTRY_COUNT = "Number of entries";
+    public static final String MAIN_DOMAIN = "omics";
+    public static final String REPOSITORY_TAG = "Repositories";
+    public static final String PUB_DATE_FIELD = "publication_date";
+    public static final String[] PUB_DATES = new String[] {PUB_DATE_FIELD, DSField.Date.PUBLICATION.key()};
 
-    public static final String DATA_PROTOCOL_FIELD      = "data_protocol";
+    public static final String LAB_HEAD_FIELD = "labhead";
 
-    public static final String SAMPLE_PROTOCOL_FIELD    = "sample_protocol";
+    public static final String LAB_HEAD_MAIL_FIELD = "labhead_mail";
 
-    public static final String PUBMED_FIELD             = "pubmed";
+    public static final String ENSEMBL = "ENSEMBL";
 
-    public static final String DATASET_LINK_FIELD       = "full_dataset_link";
+    public static final String UNIPROT = "UNIPROT";
 
-    public static final String INSTRUMENT_FIELD         = "instrument_platform";
+    public static final String CHEBI = "CHEBI";
 
-    public static final String EXPERIMENT_TYPE_FIELD    = "technology_type";
-
-    public static final String ORGANIZATION_FIELD       = "submitter_affiliation";
-
-    public static final String DATES_FIELD              = "dates";
-
-    public static final String SUBMITTER_FIELD                = "submitter";
-
-    public static final String SUBMITTER_MAIL_FIELD           = "submitter_mail";
-
-    public static final String SUBMITTER_EMAIL_FIELD           = "submitter_email";
-    //some datasets have submitter_mail, some submitter_email. Lets display correctly, and then fix processing
-    public static final String SECONDARY_ACCESSION_FIELD       = "additional_accession";
-
-    public static final String ADDITIONAL_ACCESSION_FIELD = "secondary_accession";
-
-    public static final String REPOSITORY_FIELD       = "repository";
-
-    public static final String LAB_HEAD_FIELD                 =  "labhead";
-
-    public static final String LAB_HEAD_MAIL_FIELD            =  "labhead_mail";
-
-    public static final String ENSEMBL                        =   "ENSEMBL";
-
-    public static final String UNIPROT                        =   "UNIPROT";
-
-    public static final String CHEBI                          =   "CHEBI";
-
-    public static final String CITATION_COUNT                 =   "citation_count";
-
-    public static final String VIEW_COUNT                     =   "view_count";
-
-    public static final String REANALYZED_COUNT               =   "reanalysis_count";
-
-    public static final String SEARCH_COUNT                   =   "search_count";
-
-    public static final String CITATION_COUNT_SCALED          =   "citation_count_scaled";
-
-    public static final String VIEW_COUNT_SCALED              =   "view_count_scaled";
-
-    public static final String REANALYZED_COUNT_SCALED        =   "reanalysis_count_scaled";
-
-    public static final String SEARCH_COUNT_SCALED            =   "normalized_connections";
-
-    public static final String DOWNLOAD_COUNT                 =    "download_count";
-
-    public static final String DOWNLOAD_COUNT_SCALED          =    "download_count_scaled";
-
-
-    public static final String[] DATASET_SUMMARY        = {
-                                                           Constants.DESCRIPTION_FIELD,
-                                                           Constants.NAME_FIELD,
-                                                           Constants.SUBMITTER_KEY_FIELD,
-                                                           Constants.CURATOR_KEY_FIELD,
-                                                           Constants.PUB_DATE_FIELD,
-                                                           Constants.TAXONOMY_FIELD,
-                                                           Constants.OMICS_TYPE_FIELD,
-                                                           Constants.ENSEMBL,
-                                                           Constants.UNIPROT,
-                                                           Constants.CHEBI,
-                                                           Constants.CITATION_COUNT,
-                                                           Constants.VIEW_COUNT,
-                                                           Constants.REANALYZED_COUNT,
-                                                           Constants.SEARCH_COUNT,
-                                                           Constants.VIEW_COUNT_SCALED,
-                                                           Constants.REANALYZED_COUNT_SCALED,
-                                                           Constants.CITATION_COUNT_SCALED,
-                                                           Constants.SEARCH_COUNT_SCALED,
-                                                           Constants.DOWNLOAD_COUNT,
-                                                           Constants.DOWNLOAD_COUNT_SCALED
-                                                                };
-
-
-    public static final String[] DATASET_DETAIL         = {Constants.NAME_FIELD,
-                                                           Constants.DESCRIPTION_FIELD,
-                                                           Constants.PUB_DATE_FIELD,
-                                                           Constants.DATASET_LINK_FIELD,
-                                                           Constants.DATA_PROTOCOL_FIELD,
-                                                           Constants.SAMPLE_PROTOCOL_FIELD,
-                                                           Constants.INSTRUMENT_FIELD,
-                                                           Constants.EXPERIMENT_TYPE_FIELD,
-                                                           Constants.PUBMED_FIELD,
-                                                           Constants.SUBMITTER_KEY_FIELD,
-                                                           Constants.CURATOR_KEY_FIELD,
-                                                           Constants.TAXONOMY_FIELD,
-                                                           Constants.DISEASE_FIELD,
-                                                           Constants.OMICS_TYPE_FIELD,
-                                                           Constants.TISSUE_FIELD,
-                                                           Constants.ORGANIZATION_FIELD,
-                                                           Constants.DATES_FIELD,
-                                                           Constants.SUBMITTER_FIELD,
-                                                           Constants.SUBMITTER_MAIL_FIELD,
-                                                           Constants.LAB_HEAD_FIELD,
-                                                           Constants.LAB_HEAD_MAIL_FIELD };
-
-    public static final String[] MORELIKE_FIELDS        =  {Constants.NAME_FIELD,
-                                                            Constants.DESCRIPTION_FIELD,
-                                                            Constants.DATA_PROTOCOL_FIELD,
-                                                            Constants.SAMPLE_PROTOCOL_FIELD,
-                                                            Constants.OMICS_TYPE_FIELD
+    public static final String[] DATASET_SUMMARY = {
+            DSField.DESCRIPTION.key(),
+            DSField.NAME.key(),
+            DSField.Additional.SUBMITTER_KEYWORDS.key(),
+            DSField.Additional.CURATOR_KEYWORDS.key(),
+            Constants.PUB_DATE_FIELD,
+            DSField.CrossRef.TAXONOMY.key(),
+            DSField.Additional.OMICS.key(),
+            Constants.ENSEMBL,
+            Constants.UNIPROT,
+            Constants.CHEBI,
+            DSField.Additional.CITATION_COUNT.key(),
+            DSField.Additional.VIEW_COUNT.key(),
+            DSField.Additional.REANALYSIS_COUNT.key(),
+            DSField.Additional.SEARCH_COUNT.key(),
+            DSField.Additional.VIEW_COUNT_SCALED.key(),
+            DSField.Additional.REANALYSIS_COUNT_SCALED.key(),
+            DSField.Additional.CITATION_COUNT_SCALED.key(),
+            DSField.Additional.SEARCH_COUNT_SCALED.key(),
+            DSField.Additional.DOWNLOAD_COUNT.key(),
+            DSField.Additional.DOWNLOAD_COUNT_SCALED.key()
     };
 
 
+    public static final String[] DATASET_DETAIL = {
+            DSField.NAME.key(),
+            DSField.DESCRIPTION.key(),
+            Constants.PUB_DATE_FIELD,
+            DSField.Additional.LINK.key(),
+            DSField.Additional.DATA.key(),
+            DSField.Additional.SAMPLE.key(),
+            DSField.Additional.INSTRUMENT.key(),
+            DSField.Additional.TECHNOLOGY_TYPE.key(),
+            DSField.CrossRef.PUBMED.key(),
+            DSField.Additional.SUBMITTER_KEYWORDS.key(),
+            DSField.Additional.CURATOR_KEYWORDS.key(),
+            DSField.CrossRef.TAXONOMY.key(),
+            DSField.Additional.DISEASE_FIELD.key(),
+            DSField.Additional.OMICS.key(),
+            DSField.Additional.TISSUE_FIELD.key(),
+            DSField.Additional.SUBMITTER_AFFILIATION.key(),
+            DSField.DATES.key(),
+            DSField.Additional.SUBMITTER.key(),
+            DSField.Additional.SUBMITTER_MAIL.key(),
+            Constants.LAB_HEAD_FIELD,
+            Constants.LAB_HEAD_MAIL_FIELD};
 
-    public static final String  NOT_AVAILABLE           = "Not available";
+    public static final String[] MORELIKE_FIELDS = {
+            DSField.NAME.key(),
+            DSField.DESCRIPTION.key(),
+            DSField.Additional.DATA.key(),
+            DSField.Additional.SAMPLE.key(),
+            DSField.Additional.OMICS.key()
+    };
 
-    public static final String  NOT_APPLICABLE          = "not applicable";
 
-    public static final String DATASET_FILE             = "dataset_file";
+    public static final String NOT_AVAILABLE = "Not available";
+
+    public static final String NOT_APPLICABLE = "not applicable";
+
+    public static final String DATASET_FILE = "dataset_file";
 
 
-    public static final String TAXONOMY_NAME                  = "name";
+    public static final String TAXONOMY_NAME = "name";
 
-    public static final String[] TAXONOMY_FIELDS              = {Constants.TAXONOMY_NAME};
+    public static final String[] TAXONOMY_FIELDS = {Constants.TAXONOMY_NAME};
 
-    public static final String[] EXCLUSION_WORDS              = {
+    public static final String[] EXCLUSION_WORDS = {
             "ega", "study", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "a", "b", "c", "d", "e", "f", "g", "h",
             "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
             "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it",
@@ -165,7 +109,7 @@ public class Constants {
             "yet", "you", "your", "protein", "proteomics", "proteomic", "proteome", "proteomes", "mass", "proteins",
             "lc", "ms", "based", "from", "using", "during", "LC-MS", "LC-MS/MS", "reveals", "as", "non", "data"};
 
-    public static final String[] SHORT_EXCLUSION_WORDS              = {"ega", "study", "data",
+    public static final String[] SHORT_EXCLUSION_WORDS = {"ega", "study", "data",
             "using", "10", "available", "da", "two", "protein", "proteins",
             "peptide", "peptides", "20", "80", "24", "30", "50", "0", "100",
             "15", "24", "rna", "cell", "between", "mouse", "used", "human", "each",
@@ -190,115 +134,52 @@ public class Constants {
 
     };
 
-    public static final String TAXONOMY_DOMAIN               = "taxonomy";
+    public static final String TAXONOMY_DOMAIN = "taxonomy";
 
-    public static final int HIGH_QUERY_THRESHOLD             = 100;
+    public static final int HIGH_QUERY_THRESHOLD = 100;
 
-    public static final String PRIDE_DOMAIN                  = "pride";
+    public static final String PRIDE_DOMAIN = "pride";
 
-    public static final String ORDER_ASCENDING               = "ascending";
+    public static final String ORDER_ASCENDING = "ascending";
 
-    public static final String ORDER_DESCENDING              = "descending";
+    public static final String ORDER_DESCENDING = "descending";
 
-    public static final String PUBMED_AUTHOR_FIELD           = "author";
+    public static final String PUBMED_AUTHOR_FIELD = "author";
 
-    public static final String PUBMED_ABSTRACT_FIELD         = "description";
+    public static final String PUBMED_ABSTRACT_FIELD = "description";
 
-    public static final String PUBMED_ID_FIELD               = "id";
+    public static final String PUBMED_ID_FIELD = "id";
 
-    public static final String PUBMED_ISSUE_FIELD            = "issue";
+    public static final String PUBMED_ISSUE_FIELD = "issue";
 
-    public static final String PUBMED_JOURNAL_FIELD          = "journal";
+    public static final String PUBMED_JOURNAL_FIELD = "journal";
 
-    public static final String PUBMED_KEYS_FIELD             = "keywords";
+    public static final String PUBMED_KEYS_FIELD = "keywords";
 
-    public static final String PUBMED_NAME_FIELD             = "name";
+    public static final String PUBMED_NAME_FIELD = "name";
 
-    public static final String PUBMED_PAG_FIELD              = "pagination";
+    public static final String PUBMED_PAG_FIELD = "pagination";
 
-    public static final String PUBMED_VOL_FIELD              = "volume";
+    public static final String PUBMED_VOL_FIELD = "volume";
 
-    public static final String PUBMED_DATE_FIELD             = "publication_date";
+    public static final String PUBMED_DATE_FIELD = "publication_date";
 
-    public static final String PUBMED_AFFILATION_FIELD       = "affiliation";
+    public static final String PUBMED_AFFILATION_FIELD = "affiliation";
 
 
-    public static final String[] PUBLICATION_SUMMARY         = {Constants.PUBMED_ABSTRACT_FIELD,
-                                                           Constants.PUBMED_AUTHOR_FIELD,
-                                                           Constants.PUBMED_DATE_FIELD,
-                                                           Constants.PUBMED_ID_FIELD,
-                                                           Constants.PUBMED_JOURNAL_FIELD,
-                                                           Constants.PUBMED_ISSUE_FIELD,
-                                                           Constants.PUBMED_KEYS_FIELD,
-                                                           Constants.PUBMED_NAME_FIELD,
-                                                           Constants.PUBMED_PAG_FIELD,
-                                                           Constants.PUBMED_VOL_FIELD,
-                                                           Constants.PUBMED_AFFILATION_FIELD};
+    public static final String[] PUBLICATION_SUMMARY = {Constants.PUBMED_ABSTRACT_FIELD,
+            Constants.PUBMED_AUTHOR_FIELD,
+            Constants.PUBMED_DATE_FIELD,
+            Constants.PUBMED_ID_FIELD,
+            Constants.PUBMED_JOURNAL_FIELD,
+            Constants.PUBMED_ISSUE_FIELD,
+            Constants.PUBMED_KEYS_FIELD,
+            Constants.PUBMED_NAME_FIELD,
+            Constants.PUBMED_PAG_FIELD,
+            Constants.PUBMED_VOL_FIELD,
+            Constants.PUBMED_AFFILATION_FIELD};
 
     //Todo: We need to do this dynamic
 
-    public static final String[] INITIAL_DOMAINS            = {"omics"
-
-
-    };
-
-    /***********
-    public enum Database{
-        PRIDE("Pride", "pride"),
-        PEPTIDEATLAS("PeptideAtlas", "peptide_atlas"),
-        MASSIVE("Massive", "massive"),
-        METABOLIGHTS("MetaboLights", "metabolights_dataset"),
-        EGA("EGA", "ega"),
-        GPMDB("GPMDB",  "gpmdb"),
-        GNPS("GNPS", "gnps"),
-        ARRAY_EXPRESS("ArrayExpress", "arrayexpress-repository"),
-        METABOLOMEEXPRESS("MetabolomeExpress", "metabolome_express"),
-        EXPRESSION_ATLAS("ExpressionAtlas", "atlas-experiments"),
-        METABOLOMICSWORKBENCH("MetabolomicsWorkbench", "metabolomics_workbench"),
-        BIOMODELS("BioModels Database","biomodels"),
-        LINCS("LINCS","lincs"),
-        PAXDB("PAXDB","paxdb"),
-        JPOST("JPOST Repository","jpost"),
-        EVA("EVA","eva");
-
-        String databaseName;
-        String solarName;
-
-        Database(String databaseName, String solrName) {
-            this.databaseName = databaseName;
-            this.solarName = solrName;
-        }
-
-        public String getDatabaseName() {
-            return databaseName;
-        }
-
-        public void setDatabaseName(String databaseName) {
-            this.databaseName = databaseName;
-        }
-
-        public String getSolarName() {
-            return solarName;
-        }
-
-        public void setSolarName(String solarName) {
-            this.solarName = solarName;
-        }
-
-        public static String retriveAnchorName(String name){
-            for(Database database: values())
-                if(database.solarName.equalsIgnoreCase(name))
-                       return database.getDatabaseName();
-            return name;
-        }
-
-        public static String retriveSorlName(String name) {
-            for(Database database: values())
-                if(database.getDatabaseName().equalsIgnoreCase(name))
-                    return database.getSolarName();
-            return name;
-        }
-    }
-     ***********/
-
+    public static final String[] INITIAL_DOMAINS = {"omics"};
 }

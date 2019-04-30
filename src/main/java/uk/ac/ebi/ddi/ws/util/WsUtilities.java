@@ -1,5 +1,6 @@
 package uk.ac.ebi.ddi.ws.util;
 
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Facet;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.FacetValue;
@@ -75,10 +76,10 @@ public class WsUtilities {
             for (Entry entry: queryResult.getEntries()) {
                 DatasetSummary datasetSummary = new DatasetSummary();
                 Map<String, String[]> fields = entry.getFields();
-                String[] names = fields.get(Constants.NAME_FIELD);
-                String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
+                String[] names = fields.get(DSField.NAME.key());
+                String[] descriptions = fields.get(DSField.DESCRIPTION.key());
                 String[] publicationDates = fields.get(Constants.PUB_DATE_FIELD);
-                String[] omicsType = fields.get(Constants.OMICS_TYPE_FIELD);
+                String[] omicsType = fields.get(DSField.Additional.OMICS.key());
 
                 datasetSummary.setId(entry.getId());
                 if (names != null && names.length > 0) {
@@ -116,10 +117,10 @@ public class WsUtilities {
             for (Entry entry: queryResult.getEntries()) {
                 DatasetSummary datasetSummary = new DatasetSummary();
                 Map<String, String[]> fields = entry.getFields();
-                String[] names = fields.get(Constants.NAME_FIELD);
-                String[] descriptions = fields.get(Constants.DESCRIPTION_FIELD);
+                String[] names = fields.get(DSField.NAME.key());
+                String[] descriptions = fields.get(DSField.DESCRIPTION.key());
                 String[] publicationDates = fields.get(Constants.PUB_DATE_FIELD);
-                String[] omicsType = fields.get(Constants.OMICS_TYPE_FIELD);
+                String[] omicsType = fields.get(DSField.Additional.OMICS.key());
 
                 datasetSummary.setId(entry.getId());
                 if (names != null && names.length > 0) {

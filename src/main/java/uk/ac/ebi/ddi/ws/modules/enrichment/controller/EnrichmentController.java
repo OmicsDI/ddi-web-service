@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.service.db.model.dataset.DatasetShort;
@@ -29,7 +30,6 @@ import uk.ac.ebi.ddi.ws.modules.enrichment.model.SimilarInfoResult;
 import uk.ac.ebi.ddi.ws.modules.enrichment.model.SynonymsForDataset;
 import uk.ac.ebi.ddi.ws.modules.enrichment.model.SynonymsForWord;
 import uk.ac.ebi.ddi.ws.util.Constants;
-import uk.ac.ebi.ddi.ws.util.Field;
 import uk.ac.ebi.ddi.ws.util.Triplet;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
@@ -116,23 +116,23 @@ public class EnrichmentController {
         Set<String> words = new HashSet<>();
         List<WordInField> wordsInField = new ArrayList<>();
         if (enrichmentInfo.getSynonyms() != null) {
-            if (enrichmentInfo.getSynonyms().containsKey(Field.NAME.getName())) {
-                wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.NAME.getName()));
+            if (enrichmentInfo.getSynonyms().containsKey(DSField.NAME.getName())) {
+                wordsInField.addAll(enrichmentInfo.getSynonyms().get(DSField.NAME.getName()));
             }
-            if (enrichmentInfo.getSynonyms().containsKey(Field.DESCRIPTION.getName())) {
-                wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.DESCRIPTION.getName()));
+            if (enrichmentInfo.getSynonyms().containsKey(DSField.DESCRIPTION.getName())) {
+                wordsInField.addAll(enrichmentInfo.getSynonyms().get(DSField.DESCRIPTION.getName()));
             }
-            if (enrichmentInfo.getSynonyms().containsKey(Field.DATA.getName())) {
-                wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.DATA.getName()));
+            if (enrichmentInfo.getSynonyms().containsKey(DSField.Additional.DATA.getName())) {
+                wordsInField.addAll(enrichmentInfo.getSynonyms().get(DSField.Additional.DATA.getName()));
             }
-            if (enrichmentInfo.getSynonyms().containsKey(Field.SAMPLE.getName())) {
-                wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.SAMPLE.getName()));
+            if (enrichmentInfo.getSynonyms().containsKey(DSField.Additional.SAMPLE.getName())) {
+                wordsInField.addAll(enrichmentInfo.getSynonyms().get(DSField.Additional.SAMPLE.getName()));
             }
-            if (enrichmentInfo.getSynonyms().containsKey(Field.PUBMED_TITLE.getName())) {
-                wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.PUBMED_TITLE.getName()));
+            if (enrichmentInfo.getSynonyms().containsKey(DSField.Additional.PUBMED_TITLE.getName())) {
+                wordsInField.addAll(enrichmentInfo.getSynonyms().get(DSField.Additional.PUBMED_TITLE.getName()));
             }
-            if (enrichmentInfo.getSynonyms().containsKey(Field.PUBMED_ABSTRACT.getName())) {
-                wordsInField.addAll(enrichmentInfo.getSynonyms().get(Field.PUBMED_ABSTRACT.getName()));
+            if (enrichmentInfo.getSynonyms().containsKey(DSField.Additional.PUBMED_ABSTRACT.getName())) {
+                wordsInField.addAll(enrichmentInfo.getSynonyms().get(DSField.Additional.PUBMED_ABSTRACT.getName()));
             }
         }
         //unique
