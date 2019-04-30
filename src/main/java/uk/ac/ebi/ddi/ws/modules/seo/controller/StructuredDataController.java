@@ -10,13 +10,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
 import uk.ac.ebi.ddi.ws.modules.seo.model.*;
-import uk.ac.ebi.ddi.ws.util.Constants;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by azorin on 28/07/2017.
@@ -208,7 +211,7 @@ public class StructuredDataController {
         }
 
         try {
-            data.setSameAs(dataset.getAdditional().get(Constants.DATASET_LINK_FIELD).iterator().next());
+            data.setSameAs(dataset.getAdditional().get(DSField.Additional.LINK.key()).iterator().next());
         } catch (Exception ex) {
             data.setSameAs("unknown");
         }
@@ -283,7 +286,7 @@ public class StructuredDataController {
         }
 
         try {
-            mainEntity.put("sameAs", dataset.getAdditional().get(Constants.DATASET_LINK_FIELD).iterator().next());
+            mainEntity.put("sameAs", dataset.getAdditional().get(DSField.Additional.LINK.key()).iterator().next());
         } catch (Exception ex) {
             mainEntity.put("sameAs", "unknown");
         }

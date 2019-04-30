@@ -1,5 +1,6 @@
 package uk.ac.ebi.ddi.ws.modules.dataset.util;
 
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
@@ -85,6 +86,13 @@ public class RepoDatasetMapper {
         return taxonomyMap;
     }
 
+    private static boolean hasValue(Map<String, String[]> fields, String key) {
+        if (fields.get(key) != null && fields.get(key).length > 0) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Transform a web-service entry to a DatasetSummary
      * @param entry the original entry from the dataset
@@ -107,74 +115,77 @@ public class RepoDatasetMapper {
 
         Map<String, String[]> fields = entry.getFields();
 
-        if (fields.get(Constants.NAME_FIELD) != null  && fields.get(Constants.NAME_FIELD).length > 0) {
-            datasetSummary.setTitle(fields.get(Constants.NAME_FIELD)[0]);
+        if (hasValue(fields, DSField.NAME.key())) {
+            datasetSummary.setTitle(fields.get(DSField.NAME.key())[0]);
         }
 
-        if (fields.get(Constants.DESCRIPTION_FIELD) != null && fields.get(Constants.DESCRIPTION_FIELD).length > 0) {
-            datasetSummary.setDescription(fields.get(Constants.DESCRIPTION_FIELD)[0]);
+        if (hasValue(fields, DSField.DESCRIPTION.key())) {
+            datasetSummary.setDescription(fields.get(DSField.DESCRIPTION.key())[0]);
         }
 
-        if (fields.get(Constants.PUB_DATE_FIELD) != null && fields.get(Constants.PUB_DATE_FIELD).length > 0) {
+        if (hasValue(fields, Constants.PUB_DATE_FIELD)) {
             datasetSummary.setPublicationDate(fields.get(Constants.PUB_DATE_FIELD)[0]);
         }
 
         List<String> keywords = new ArrayList<>();
 
-        if (fields.get(Constants.CURATOR_KEY_FIELD) != null && fields.get(Constants.CURATOR_KEY_FIELD).length > 0) {
-            keywords.addAll(formatKeywords(Arrays.asList(fields.get(Constants.CURATOR_KEY_FIELD))));
+        if (hasValue(fields, DSField.Additional.CURATOR_KEYWORDS.key())) {
+            keywords.addAll(formatKeywords(Arrays.asList(fields.get(DSField.Additional.CURATOR_KEYWORDS.key()))));
         }
 
-        if (fields.get(Constants.OMICS_TYPE_FIELD) != null && fields.get(Constants.OMICS_TYPE_FIELD).length > 0) {
-            datasetSummary.setOmicsType(Arrays.asList(fields.get(Constants.OMICS_TYPE_FIELD)));
+        if (hasValue(fields, DSField.Additional.OMICS.key())) {
+            datasetSummary.setOmicsType(Arrays.asList(fields.get(DSField.Additional.OMICS.key())));
         }
 
-        if (fields.get(Constants.SUBMITTER_KEY_FIELD) != null && fields.get(Constants.SUBMITTER_KEY_FIELD).length > 0) {
-            keywords.addAll(formatKeywords(Arrays.asList(fields.get(Constants.SUBMITTER_KEY_FIELD))));
+        if (hasValue(fields, DSField.Additional.SUBMITTER_KEYWORDS.key())) {
+            keywords.addAll(formatKeywords(Arrays.asList(fields.get(DSField.Additional.SUBMITTER_KEYWORDS.key()))));
         }
 
-        if (fields.get(Constants.CITATION_COUNT) != null && fields.get(Constants.CITATION_COUNT).length > 0) {
-            datasetSummary.setCitationsCount(Integer.valueOf(fields.get(Constants.CITATION_COUNT)[0]));
+        if (hasValue(fields, DSField.Additional.CITATION_COUNT.key())) {
+            datasetSummary.setCitationsCount(Integer.valueOf(fields.get(DSField.Additional.CITATION_COUNT.key())[0]));
         }
 
-        if (fields.get(Constants.SEARCH_COUNT) != null && fields.get(Constants.SEARCH_COUNT).length > 0) {
-            datasetSummary.setConnectionsCount(Integer.valueOf(fields.get(Constants.SEARCH_COUNT)[0]));
+        if (hasValue(fields, DSField.Additional.SEARCH_COUNT.key())) {
+            datasetSummary.setConnectionsCount(Integer.valueOf(fields.get(DSField.Additional.SEARCH_COUNT.key())[0]));
         }
 
-        if (fields.get(Constants.VIEW_COUNT) != null && fields.get(Constants.VIEW_COUNT).length > 0) {
-            datasetSummary.setViewsCount(Integer.valueOf(fields.get(Constants.VIEW_COUNT)[0]));
+        if (hasValue(fields, DSField.Additional.VIEW_COUNT.key())) {
+            datasetSummary.setViewsCount(Integer.valueOf(fields.get(DSField.Additional.VIEW_COUNT.key())[0]));
         }
 
-        if (fields.get(Constants.REANALYZED_COUNT) != null && fields.get(Constants.REANALYZED_COUNT).length > 0) {
-            datasetSummary.setReanalysisCount(Integer.valueOf(fields.get(Constants.REANALYZED_COUNT)[0]));
+        if (hasValue(fields, DSField.Additional.REANALYSIS_COUNT.key())) {
+            datasetSummary.setReanalysisCount(
+                    Integer.valueOf(fields.get(DSField.Additional.REANALYSIS_COUNT.key())[0]));
         }
 
-        if (fields.get(Constants.DOWNLOAD_COUNT) != null && fields.get(Constants.DOWNLOAD_COUNT).length > 0) {
-            datasetSummary.setDownloadCount(Integer.valueOf(fields.get(Constants.DOWNLOAD_COUNT)[0]
+        if (hasValue(fields, DSField.Additional.DOWNLOAD_COUNT.key())) {
+            datasetSummary.setDownloadCount(Integer.valueOf(fields.get(DSField.Additional.DOWNLOAD_COUNT.key())[0]
                     .replace(".0", "")));
         }
 
-        if (fields.get(Constants.DOWNLOAD_COUNT_SCALED) != null
-                && fields.get(Constants.DOWNLOAD_COUNT_SCALED).length > 0) {
-            datasetSummary.setDownloadCountScaled(Double.valueOf(fields.get(Constants.DOWNLOAD_COUNT_SCALED)[0]));
+        if (hasValue(fields, DSField.Additional.DOWNLOAD_COUNT_SCALED.key())) {
+            datasetSummary.setDownloadCountScaled(
+                    Double.valueOf(fields.get(DSField.Additional.DOWNLOAD_COUNT_SCALED.key())[0]));
         }
 
-        if (fields.get(Constants.CITATION_COUNT_SCALED) != null
-                && fields.get(Constants.CITATION_COUNT_SCALED).length > 0) {
-            datasetSummary.setCitationsCountScaled(Double.valueOf(fields.get(Constants.CITATION_COUNT_SCALED)[0]));
+        if (hasValue(fields, DSField.Additional.CITATION_COUNT_SCALED.key())) {
+            datasetSummary.setCitationsCountScaled(
+                    Double.valueOf(fields.get(DSField.Additional.CITATION_COUNT_SCALED.key())[0]));
         }
 
-        if (fields.get(Constants.SEARCH_COUNT_SCALED) != null && fields.get(Constants.SEARCH_COUNT_SCALED).length > 0) {
-            datasetSummary.setConnectionsCountScaled(Double.valueOf(fields.get(Constants.SEARCH_COUNT_SCALED)[0]));
+        if (hasValue(fields, DSField.Additional.SEARCH_COUNT_SCALED.key())) {
+            datasetSummary.setConnectionsCountScaled(
+                    Double.valueOf(fields.get(DSField.Additional.SEARCH_COUNT_SCALED.key())[0]));
         }
 
-        if (fields.get(Constants.VIEW_COUNT_SCALED) != null && fields.get(Constants.VIEW_COUNT_SCALED).length > 0) {
-            datasetSummary.setViewsCountScaled(Double.valueOf(fields.get(Constants.VIEW_COUNT_SCALED)[0]));
+        if (hasValue(fields, DSField.Additional.VIEW_COUNT_SCALED.key())) {
+            datasetSummary.setViewsCountScaled(
+                    Double.valueOf(fields.get(DSField.Additional.VIEW_COUNT_SCALED.key())[0]));
         }
 
-        if (fields.get(Constants.REANALYZED_COUNT_SCALED) != null
-                && fields.get(Constants.REANALYZED_COUNT_SCALED).length > 0) {
-            datasetSummary.setReanalysisCountScaled(Double.valueOf(fields.get(Constants.REANALYZED_COUNT_SCALED)[0]));
+        if (hasValue(fields, DSField.Additional.REANALYSIS_COUNT_SCALED.key())) {
+            datasetSummary.setReanalysisCountScaled(
+                    Double.valueOf(fields.get(DSField.Additional.REANALYSIS_COUNT_SCALED.key())[0]));
         }
 
         if (keywords.size() > 0) {
@@ -187,11 +198,9 @@ public class RepoDatasetMapper {
 
         List<Organism> organisms = new ArrayList<>();
 
-        if (fields.containsKey(Constants.TAXONOMY_FIELD)) {
-            if (fields.get(Constants.TAXONOMY_FIELD) != null && fields.get(Constants.TAXONOMY_FIELD).length > 0) {
-                for (String taxonomyId: fields.get(Constants.TAXONOMY_FIELD)) {
-                    organisms.add(new Organism(taxonomyId, taxonomyMap.get(taxonomyId)));
-                }
+        if (hasValue(fields, DSField.CrossRef.TAXONOMY.key())) {
+            for (String taxonomyId: fields.get(DSField.CrossRef.TAXONOMY.key())) {
+                organisms.add(new Organism(taxonomyId, taxonomyMap.get(taxonomyId)));
             }
         }
         datasetSummary.setOrganisms(organisms);
@@ -245,8 +254,8 @@ public class RepoDatasetMapper {
         Set<String> ids = new HashSet<>();
         if (queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0) {
             for (Entry entry: queryResult.getEntries()) {
-               if (entry.getFields() != null && entry.getFields().containsKey(Constants.TAXONOMY_FIELD)) {
-                   Collections.addAll(ids, entry.getFields().get(Constants.TAXONOMY_FIELD));
+               if (entry.getFields() != null && entry.getFields().containsKey(DSField.CrossRef.TAXONOMY.key())) {
+                   Collections.addAll(ids, entry.getFields().get(DSField.CrossRef.TAXONOMY.key()));
                }
             }
         }

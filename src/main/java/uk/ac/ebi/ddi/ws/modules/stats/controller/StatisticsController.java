@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.facet.FacetWsClient;
@@ -69,8 +70,8 @@ public class StatisticsController {
         DomainList domain = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
         String[] dubdomains  = WsUtilities.getSubdomainList(domain);
         FacetList taxonomies = facetWsClient.getFacetEntriesByDomains(
-                Constants.MAIN_DOMAIN, dubdomains, Constants.TAXONOMY_FIELD, 100);
-        return RepoStatsToWsStatsMapper.asFacetCount(taxonomies, Constants.TAXONOMY_FIELD);
+                Constants.MAIN_DOMAIN, dubdomains, DSField.CrossRef.TAXONOMY.key(), 100);
+        return RepoStatsToWsStatsMapper.asFacetCount(taxonomies, DSField.CrossRef.TAXONOMY.key());
     }
 
     @ApiOperation(value = "Return statistics about the number of datasets per Tissue", position = 1,
@@ -84,9 +85,9 @@ public class StatisticsController {
 
         DomainList domain    = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
         String[] dubdomains  = WsUtilities.getSubdomainList(domain);
-        FacetList tissues =
-                facetWsClient.getFacetEntriesByDomains(Constants.MAIN_DOMAIN, dubdomains, Constants.TISSUE_FIELD, size);
-        return RepoStatsToWsStatsMapper.asFacetCount(tissues, Constants.TISSUE_FIELD);
+        FacetList tissues = facetWsClient.getFacetEntriesByDomains(
+                Constants.MAIN_DOMAIN, dubdomains, DSField.Additional.TISSUE_FIELD.key(), size);
+        return RepoStatsToWsStatsMapper.asFacetCount(tissues, DSField.Additional.TISSUE_FIELD.key());
     }
 
     @ApiOperation(value = "Return statistics about the number of datasets per Omics Type", position = 1,
@@ -99,8 +100,8 @@ public class StatisticsController {
         DomainList domain = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
         String[] dubdomains  = WsUtilities.getSubdomainList(domain);
         FacetList omics = facetWsClient.getFacetEntriesByDomains(
-                Constants.MAIN_DOMAIN, dubdomains, Constants.OMICS_TYPE_FIELD, 100);
-        return RepoStatsToWsStatsMapper.asFacetCount(omics, Constants.OMICS_TYPE_FIELD);
+                Constants.MAIN_DOMAIN, dubdomains, DSField.Additional.OMICS.key(), 100);
+        return RepoStatsToWsStatsMapper.asFacetCount(omics, DSField.Additional.OMICS.key());
     }
 
     @ApiOperation(value = "Return statistics about the number of datasets per dieases", position = 1,
@@ -114,8 +115,8 @@ public class StatisticsController {
         String[] subdomains  = WsUtilities.getSubdomainList(domain);
         FacetList diseases =
                 facetWsClient.getFacetEntriesByDomains(
-                        Constants.MAIN_DOMAIN, subdomains, Constants.DISEASE_FIELD, size);
-        return RepoStatsToWsStatsMapper.asFacetCount(diseases, Constants.DISEASE_FIELD);
+                        Constants.MAIN_DOMAIN, subdomains, DSField.Additional.DISEASE_FIELD.key(), size);
+        return RepoStatsToWsStatsMapper.asFacetCount(diseases, DSField.Additional.DISEASE_FIELD.key());
     }
 
     @ApiOperation(value = "Get current webservice version", position = 1, notes = "Get current webservice version")
@@ -143,7 +144,7 @@ public class StatisticsController {
         Integer numberOfDatasets = WsUtilities.getNumberofEntries(domain);
         resultStat.add(new StatRecord("Different Datasets", String.valueOf(numberOfDatasets), null));
         FacetList facet = facetWsClient.getFacetEntriesByDomains(
-                Constants.MAIN_DOMAIN, subdomains, Constants.DISEASE_FIELD, 100);
+                Constants.MAIN_DOMAIN, subdomains, DSField.Additional.DISEASE_FIELD.key(), 100);
 
         if (facet.getFacets() != null && facet.getFacets()[0] != null
                 && facet.getFacets()[0].getFacetValues() != null) {
@@ -152,7 +153,7 @@ public class StatisticsController {
         }
 
         facet = facetWsClient.getFacetEntriesByDomains(
-                Constants.MAIN_DOMAIN, subdomains, Constants.TISSUE_FIELD, 100);
+                Constants.MAIN_DOMAIN, subdomains, DSField.Additional.TISSUE_FIELD.key(), 100);
 
         if (facet.getFacets() != null && facet.getFacets()[0] != null
                 && facet.getFacets()[0].getFacetValues() != null) {
@@ -161,7 +162,7 @@ public class StatisticsController {
         }
 
         facet = facetWsClient.getFacetEntriesByDomains(
-                Constants.MAIN_DOMAIN, subdomains, Constants.TAXONOMY_FIELD, 100);
+                Constants.MAIN_DOMAIN, subdomains, DSField.CrossRef.TAXONOMY.key(), 100);
 
         if (facet.getFacets() != null && facet.getFacets()[0] != null
                 && facet.getFacets()[0].getFacetValues() != null) {

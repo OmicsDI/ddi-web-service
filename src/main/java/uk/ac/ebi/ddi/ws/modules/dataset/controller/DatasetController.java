@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
@@ -45,7 +46,6 @@ import uk.ac.ebi.ddi.ws.services.LocationService;
 import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.MapUtils;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
-import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,8 +60,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.ac.ebi.ddi.service.db.utils.Constants.SECONDARY_ACCESSION;
-import static uk.ac.ebi.ddi.service.db.utils.Constants.SECONDARY_ACCESSION_ADDITIONAL;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.tranformServletResquestToEvent;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.transformSimilarDatasetSummary;
 
@@ -246,9 +244,9 @@ public class DatasetController {
         Dataset dataset = datasetService.read(acc, database);
         String ipAddress = request.getRemoteAddr();
         Map<String, Set<String>> additional = dataset.getAdditional();
-        additional.remove(Field.DATASET_FILE.getName());
-        additional.put(SECONDARY_ACCESSION_ADDITIONAL, dataset.getAllSecondaryAccessions());
-        additional.remove(SECONDARY_ACCESSION);
+        additional.remove(DSField.Additional.DATASET_FILE.getName());
+        additional.put(DSField.Additional.ADDITIONAL_ACCESSION.key(), dataset.getAllSecondaryAccessions());
+        additional.remove(DSField.Additional.SECONDARY_ACCESSION.key());
         Map<String, Object> result = new HashMap<>();
         result.put("accession", dataset.getAccession());
         result.put("name", dataset.getName());
@@ -417,9 +415,9 @@ public class DatasetController {
                     datasetSummary.setViewsCount(dataset.getTotal());
                     datasetSummary.setSource(databaseDetailService.retriveSolrName(dataset.getDatabase()));
                     datasetSummary.setId(dataset.getAccession());
-                    if (dataset.getAdditional().containsKey(Constants.OMICS_TYPE_FIELD)) {
+                    if (dataset.getAdditional().containsKey(DSField.Additional.OMICS.key())) {
                         List<String> omicsType = Collections.list(
-                                Collections.enumeration(dataset.getAdditional().get(Constants.OMICS_TYPE_FIELD)));
+                                Collections.enumeration(dataset.getAdditional().get(DSField.Additional.OMICS.key())));
                         datasetSummary.setOmicsType(omicsType);
                     }
                     datasetSummaryList.add(datasetSummary);
@@ -546,7 +544,7 @@ public class DatasetController {
         Map<String, Set<String>> datesField = argDataset.getDates();
         Map<String, Set<String>> fields = argDataset.getAdditional();
         Map<String, Set<String>> crossFields = argDataset.getCrossReferences();
-        Set<String> omicsType = argDataset.getAdditional().get(Constants.OMICS_TYPE_FIELD);
+        Set<String> omicsType = argDataset.getAdditional().get(DSField.Additional.OMICS.key());
         Set<String> publicationDates = argDataset.getDates().get("publication");
 
         datasetDetail.setId(argDataset.getAccession());
@@ -561,42 +559,42 @@ public class DatasetController {
             datasetDetail.setPublicationDate(publicationDates.iterator().next());
         }
 
-        Set<String> fullDatasetLinks = fields.get(Constants.DATASET_LINK_FIELD);
+        Set<String> fullDatasetLinks = fields.get(DSField.Additional.LINK.key());
         if (fullDatasetLinks != null && fullDatasetLinks.size() > 0) {
             datasetDetail.setFull_dataset_link(fullDatasetLinks.iterator().next());
         }
 
-        Set<String> diseases = fields.get(Constants.DISEASE_FIELD);
+        Set<String> diseases = fields.get(DSField.Additional.DISEASE_FIELD.key());
         if (diseases != null && diseases.size() > 0) {
             datasetDetail.setDiseases(diseases.toArray(new String[0]));
         }
-        Set<String> viewCountScaled = fields.get(Constants.VIEW_COUNT_SCALED);
+        Set<String> viewCountScaled = fields.get(DSField.Additional.VIEW_COUNT_SCALED.key());
         if (viewCountScaled != null && viewCountScaled.size() > 0) {
             datasetDetail.setViewsCountScaled(Double.valueOf(viewCountScaled.iterator().next()));
         }
 
-        Set<String> citationCountScaled = fields.get(Constants.CITATION_COUNT_SCALED);
+        Set<String> citationCountScaled = fields.get(DSField.Additional.CITATION_COUNT_SCALED.key());
         if (citationCountScaled != null && citationCountScaled.size() > 0) {
             datasetDetail.setCitationsCountScaled(Double.valueOf(citationCountScaled.iterator().next()));
         }
 
-        Set<String> reanalysisCountScaled = fields.get(Constants.REANALYZED_COUNT_SCALED);
+        Set<String> reanalysisCountScaled = fields.get(DSField.Additional.REANALYSIS_COUNT_SCALED.key());
         if (reanalysisCountScaled != null && reanalysisCountScaled.size() > 0) {
             datasetDetail.setReanalysisCountScaled(Double.valueOf(reanalysisCountScaled.iterator().next()));
         }
 
-        Set<String> searchCountScaled = fields.get(Constants.SEARCH_COUNT_SCALED);
+        Set<String> searchCountScaled = fields.get(DSField.Additional.SEARCH_COUNT_SCALED.key());
         if (searchCountScaled != null && searchCountScaled.size() > 0) {
             datasetDetail.setConnectionsCountScaled(Double.valueOf(searchCountScaled.iterator().next()));
         }
 
-        Set<String> downloadCountScaled = fields.get(Constants.DOWNLOAD_COUNT_SCALED);
+        Set<String> downloadCountScaled = fields.get(DSField.Additional.DOWNLOAD_COUNT_SCALED.key());
         if (downloadCountScaled != null && downloadCountScaled.size() > 0) {
             String downloadValue = downloadCountScaled.iterator().next();
             datasetDetail.setDownloadCountScaled(Double.valueOf(downloadValue.isEmpty() ? "0.0" : downloadValue));
         }
 
-        Set<String> downloadCount = fields.get(Constants.DOWNLOAD_COUNT);
+        Set<String> downloadCount = fields.get(DSField.Additional.DOWNLOAD_COUNT.key());
         if (downloadCount != null && downloadCount.size() > 0) {
             String downloadValue = downloadCount.iterator().next();
             datasetDetail.setDownloadCount(Integer.valueOf(downloadValue.isEmpty() ? "0.0" : downloadValue));
@@ -606,45 +604,45 @@ public class DatasetController {
             datasetDetail.setDates(datesField);
         }
 
-        Set<String> tissues = fields.get(Constants.TISSUE_FIELD);
+        Set<String> tissues = fields.get(DSField.Additional.TISSUE_FIELD.key());
         if (tissues != null && tissues.size() > 0) {
             datasetDetail.setTissues(setToArray(tissues, String.class));
         }
 
-        Set<String> instruments = fields.get(Constants.INSTRUMENT_FIELD);
+        Set<String> instruments = fields.get(DSField.Additional.INSTRUMENT.key());
 
         if (instruments != null && instruments.size() > 0) {
             datasetDetail.setArrayInstruments(setToArray(instruments, String.class));
         }
 
-        Set<String> experimentType = fields.get(Constants.EXPERIMENT_TYPE_FIELD);
+        Set<String> experimentType = fields.get(DSField.Additional.TECHNOLOGY_TYPE.key());
         if (experimentType != null && experimentType.size() > 0) {
             datasetDetail.setArrayExperimentType(setToArray(experimentType, String.class));
         }
 
-        Set<String> pubmedids = crossFields.get(Constants.PUBMED_FIELD);
+        Set<String> pubmedids = crossFields.get(DSField.CrossRef.PUBMED.key());
         if ((pubmedids != null) && (pubmedids.size() > 0)) {
             datasetDetail.setArrayPublicationIds(setToArray(pubmedids, String.class));
         }
 
-        Set<String> submitterKeys = fields.get(Constants.SUBMITTER_KEY_FIELD);
-        Set<String> curatorKeys = fields.get(Constants.CURATOR_KEY_FIELD);
+        Set<String> submitterKeys = fields.get(DSField.Additional.SUBMITTER_KEYWORDS.key());
+        Set<String> curatorKeys = fields.get(DSField.Additional.CURATOR_KEYWORDS.key());
 
         if (submitterKeys != null && curatorKeys != null && submitterKeys.size() > 0 && curatorKeys.size() > 0) {
             datasetDetail.setKeywords(setToArray(submitterKeys, String.class), setToArray(curatorKeys, String.class));
         }
 
-        Set<String> organization = fields.get(Constants.ORGANIZATION_FIELD);
+        Set<String> organization = fields.get(DSField.Additional.SUBMITTER_AFFILIATION.key());
         if ((organization != null) && (organization.size() > 0)) {
             datasetDetail.setOrganization(new ArrayList<>(organization));
         }
 
-        Set<String> submitter = fields.get(Constants.SUBMITTER_FIELD);
+        Set<String> submitter = fields.get(DSField.Additional.SUBMITTER.key());
         if ((submitter != null) && (submitter.size() > 0)) {
             datasetDetail.setSubmitter(submitter);
         }
 
-        Set<String> repositories = fields.get(Constants.REPOSITORY_FIELD);
+        Set<String> repositories = fields.get(DSField.Additional.REPOSITORY.key());
 
         if (repositories != null && repositories.size() > 0) {
             datasetDetail.setRepositories(repositories);
@@ -669,22 +667,22 @@ public class DatasetController {
         Map<String, Set<String>> fields = argDataset.getAdditional();
 
 
-        Set<String> dataProtocols = fields.get(Constants.DATA_PROTOCOL_FIELD);
+        Set<String> dataProtocols = fields.get(DSField.Additional.DATA.key());
         if (dataProtocols != null && dataProtocols.size() > 0) {
-            datasetDetail.addProtocols(Constants.DATA_PROTOCOL_FIELD, dataProtocols.toArray(new String[0]));
+            datasetDetail.addProtocols(DSField.Additional.DATA.key(), dataProtocols.toArray(new String[0]));
         }
 
-        Set<String> sampleProtocols = fields.get(Constants.SAMPLE_PROTOCOL_FIELD);
+        Set<String> sampleProtocols = fields.get(DSField.Additional.SAMPLE.key());
         if (sampleProtocols != null && sampleProtocols.size() > 0) {
-            datasetDetail.addProtocols(Constants.SAMPLE_PROTOCOL_FIELD, sampleProtocols.toArray(new String[0]));
+            datasetDetail.addProtocols(DSField.Additional.SAMPLE.key(), sampleProtocols.toArray(new String[0]));
         }
 
-        Set<String> submitterMail = fields.get(Constants.SUBMITTER_MAIL_FIELD);
+        Set<String> submitterMail = fields.get(DSField.Additional.SUBMITTER_MAIL.key());
         if ((submitterMail != null) && (submitterMail.size() > 0)) {
             datasetDetail.setSubmitterMail(submitterMail);
         }
 
-        Set<String> submitterEmail = fields.get(Constants.SUBMITTER_EMAIL_FIELD);
+        Set<String> submitterEmail = fields.get(DSField.Additional.SUBMITTER_EMAIL.key());
         if ((submitterEmail != null) && (submitterEmail.size() > 0)) {
             datasetDetail.setSubmitterMail(submitterEmail);
         }
@@ -699,7 +697,7 @@ public class DatasetController {
             datasetDetail.setLabHeadMail(labHeadMail);
         }
 
-        Set<String> taxonomyIds = argDataset.getCrossReferences().get(Constants.TAXONOMY_FIELD);
+        Set<String> taxonomyIds = argDataset.getCrossReferences().get(DSField.CrossRef.TAXONOMY.key());
         if (taxonomyIds != null && taxonomyIds.size() > 0) {
             ArrayList<String> ids = new ArrayList<>(taxonomyIds);
             QueryResult taxonomies = new QueryResult();
@@ -733,8 +731,8 @@ public class DatasetController {
         if (null != secondaryAccession1) {
             secondaryAccessionsPlus.addAll(secondaryAccession1);
         }
-        Set<String> secondaryAccession = fields.get(Constants.SECONDARY_ACCESSION_FIELD);
-        Set<String> additionalAccession = fields.get(Constants.ADDITIONAL_ACCESSION_FIELD);
+        Set<String> secondaryAccession = fields.get(DSField.Additional.SECONDARY_ACCESSION.key());
+        Set<String> additionalAccession = fields.get(DSField.Additional.ADDITIONAL_ACCESSION.key());
 
         if (additionalAccession != null && additionalAccession.size() > 0) {
             for (String acc : additionalAccession) {
