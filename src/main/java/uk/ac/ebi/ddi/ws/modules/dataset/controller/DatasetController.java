@@ -205,6 +205,7 @@ public class DatasetController {
         return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
     }
 
+
     private String modifyIfSearchByYear(String query) {
         Pattern pattern = Pattern.compile("publication_date:\"\\s*(\\d{4})\"");
         Matcher matcher = pattern.matcher(query);
@@ -214,6 +215,29 @@ public class DatasetController {
             return query.replaceAll("publication_date:\"\\s*(\\d{4})\"", "publication_date:" + searchByYear);
         }
         return query;
+    }
+
+
+    @ApiOperation(value = "Retrieve the list of dataset's file using positions", position = 1)
+    @RequestMapping(value = "/{domain}/{acc}/files", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    @ResponseBody
+    public List<String> getFilesAt(
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
+            @PathVariable(value = "acc") String acc,
+            @ApiParam(value = "Database accession id, e.g: pride")
+            @PathVariable(value = "domain") String domain,
+            @RequestParam(value = "position") List<Integer> positions) {
+        String database = databaseDetailService.retriveAnchorName(domain);
+        Dataset dataset = datasetService.read(acc, database);
+        List<String> files = new ArrayList<>();
+        dataset.getFiles().keySet().forEach(x -> files.addAll(dataset.getFiles().get(x)));
+        files.sort(Comparator.comparing(String::toString));
+        List<String> result = new ArrayList<>();
+        for (int pos : positions) {
+            result.add(files.get(pos));
+        }
+        return result;
     }
 
     @ApiOperation(value = "Retrieve the latest datasets in the repository", position = 1,
