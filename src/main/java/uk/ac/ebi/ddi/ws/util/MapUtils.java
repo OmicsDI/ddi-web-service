@@ -23,4 +23,11 @@ public class MapUtils {
         }
         return result;
     }
+
+    public static String getFirst(Map<String, Set<String>> input, String key) {
+        if (input.containsKey(key)) {
+            return input.get(key).iterator().next();
+        }
+        return null;
+    }
 }

@@ -296,6 +296,16 @@ public class DatasetController {
                         break;
                     }
                 }
+                if (extension.equals("Raw Data")) {
+                    String omicsType = MapUtils.getFirst(dataset.getAdditional(), DSField.Additional.OMICS.key());
+                    if (omicsType != null) {
+                        if (omicsType.equals("Proteomics")) {
+                            extension = "Mass Spectra";
+                        } else if (omicsType.equals("Transcriptomics")) {
+                            extension = "Micro Arrays";
+                        }
+                    }
+                }
                 if (fileGroups.containsKey(extension)) {
                     urls.addAll(fileGroups.get(extension));
                 }
