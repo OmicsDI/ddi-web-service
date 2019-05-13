@@ -12,6 +12,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -263,10 +264,14 @@ public class DatasetController {
             @PathVariable(value = "acc") String acc,
             @ApiParam(value = "Database accession id, e.g: pride")
             @PathVariable(value = "domain") String domain,
+            @RequestParam(value = "debug", defaultValue = "false", required = false) boolean debug,
+            @RequestHeader HttpHeaders httpHeaders,
             HttpServletRequest request) {
         String database = databaseDetailService.retriveAnchorName(domain);
         Dataset dataset = datasetService.read(acc, database);
-        String ipAddress = request.getRemoteAddr();
+        String ipAddress = request.getHeader("X-FORWARDED-FOR");
+        ipAddress = ipAddress != null ? ipAddress : request.getHeader("X-Cluster-Client-IP");
+        ipAddress = ipAddress != null ? ipAddress : request.getRemoteAddr();
         Map<String, Set<String>> additional = dataset.getAdditional();
         additional.remove(DSField.Additional.DATASET_FILE.getName());
         additional.put(DSField.Additional.ADDITIONAL_ACCESSION.key(), dataset.getAllSecondaryAccessions());
@@ -316,6 +321,10 @@ public class DatasetController {
             return providers;
         }).collect(Collectors.toList());
         result.put("file_versions", files);
+        if (debug) {
+            result.put("ip_address", ipAddress);
+            result.put("headers", httpHeaders.toSingleValueMap());
+        }
         return result;
     }
 
