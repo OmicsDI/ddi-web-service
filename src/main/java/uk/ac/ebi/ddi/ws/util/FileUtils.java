@@ -1,9 +1,15 @@
 package uk.ac.ebi.ddi.ws.util;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FileUtils {
+
+    private static Pattern fileNamePattern = Pattern.compile("filename=([^&]*)");
 
     public static Optional<String> getFileExtension(final String url) {
 
@@ -25,5 +31,13 @@ public class FileUtils {
         }
 
         return Optional.empty();
+    }
+
+    public static String getFilenameFromUrl(final String url) {
+        Matcher matcher = fileNamePattern.matcher(url);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return FilenameUtils.getName(url);
     }
 }

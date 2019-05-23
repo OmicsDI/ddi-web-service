@@ -9,7 +9,6 @@ import com.maxmind.geoip2.record.Location;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -45,6 +44,7 @@ import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.security.UserPermissionService;
 import uk.ac.ebi.ddi.ws.services.LocationService;
 import uk.ac.ebi.ddi.ws.util.Constants;
+import uk.ac.ebi.ddi.ws.util.FileUtils;
 import uk.ac.ebi.ddi.ws.util.MapUtils;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
@@ -223,7 +223,7 @@ public class DatasetController {
     @RequestMapping(value = "/{domain}/{acc}/files", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
-    public List<String> getFilesAt(
+    public List<Map<String, String>> getFilesAt(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
             @PathVariable(value = "acc") String acc,
             @ApiParam(value = "Database accession id, e.g: pride")
@@ -234,9 +234,22 @@ public class DatasetController {
         List<String> files = new ArrayList<>();
         dataset.getFiles().keySet().forEach(x -> files.addAll(dataset.getFiles().get(x)));
         files.sort(Comparator.comparing(String::toString));
-        List<String> result = new ArrayList<>();
+        List<GalaxyFileExtension> galaxyFileExtensions = fileGroupService.findAllGalaxyExtensions();
+        galaxyFileExtensions.sort((x1, x2) -> x2.getExtension().length() - x1.getExtension().length());
+        List<Map<String, String>> result = new ArrayList<>();
         for (int pos : positions) {
-            result.add(files.get(pos));
+            Map<String, String> element = new HashMap<>();
+            element.put("url", files.get(pos));
+            String baseName = FileUtils.getFilenameFromUrl(files.get(pos));
+            String type = "other";
+            for (GalaxyFileExtension extension : galaxyFileExtensions) {
+                if (baseName.toLowerCase().contains(extension.getExtension())) {
+                    type = extension.getType();
+                    break;
+                }
+            }
+            element.put("type", type);
+            result.add(element);
         }
         return result;
     }
@@ -287,34 +300,25 @@ public class DatasetController {
         result.put("is_claimable", dataset.isClaimable());
         result.put("scores", dataset.getScores());
         String primaryAccession = getPreferableAccession(dataset.getFiles(), ipAddress, dataset.getAccession());
-        Map<String, String> groups = getAvailableGroups();
+        List<GalaxyFileExtension> galaxyFileExtensions = fileGroupService.findAllGalaxyExtensions();
+        galaxyFileExtensions.sort((x1, x2) -> x2.getExtension().length() - x1.getExtension().length());
         List<Object> files = dataset.getFiles().keySet().stream().map(x -> {
             Map<String, Object> providers = new HashMap<>();
             Map<String, List<String>> fileGroups = new HashMap<>();
             dataset.getFiles().get(x).forEach(f -> {
-                String baseName = FilenameUtils.getName(f);
+                String baseName = FileUtils.getFilenameFromUrl(f);
                 List<String> urls = new ArrayList<>(Collections.singleton(f));
-                String extension = "Other";
-                for (String g : groups.keySet()) {
-                    if (baseName.toLowerCase().contains(g.toLowerCase())) {
-                        extension = groups.get(g);
+                String type = "Other";
+                for (GalaxyFileExtension extension : galaxyFileExtensions) {
+                    if (baseName.toLowerCase().contains(extension.getExtension())) {
+                        type = extension.getType().substring(0, 1).toUpperCase() + extension.getType().substring(1);
                         break;
                     }
                 }
-                if (extension.equals("Raw Data")) {
-                    String omicsType = MapUtils.getFirst(dataset.getAdditional(), DSField.Additional.OMICS.key());
-                    if (omicsType != null) {
-                        if (omicsType.equals("Proteomics")) {
-                            extension = "Mass Spectra";
-                        } else if (omicsType.equals("Transcriptomics")) {
-                            extension = "Micro Arrays";
-                        }
-                    }
+                if (fileGroups.containsKey(type)) {
+                    urls.addAll(fileGroups.get(type));
                 }
-                if (fileGroups.containsKey(extension)) {
-                    urls.addAll(fileGroups.get(extension));
-                }
-                fileGroups.put(extension, urls);
+                fileGroups.put(type, urls);
             });
             providers.put("files", fileGroups);
             providers.put("type", x.equals(primaryAccession) ? "primary" : "mirror");
@@ -571,12 +575,15 @@ public class DatasetController {
     @RequestMapping(value = "/getDatasetByUrl", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
-    public Dataset getDatasetByUrl(
+    public DatasetDetail getDatasetByUrl(
             @ApiParam(value = "Url of the Dataset in the resource, "
                     + "e.g : https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-5789")
             @RequestBody() String url) {
+        DatasetDetail datasetDetail = new DatasetDetail();
+        Dataset dsResult = datasetService.findByFullDatasetLink(url);
 
-        return datasetService.findByFullDatasetLink(url);
+        datasetDetail = getBasicDatasetInfo(datasetDetail, dsResult);
+        return getDatasetInfo(datasetDetail, dsResult);
     }
 
 
