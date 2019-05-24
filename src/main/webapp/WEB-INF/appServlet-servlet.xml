@@ -15,7 +15,17 @@
 
 
     <!-- Enables the Spring MVC @Controller programming model -->
-    <mvc:annotation-driven/>
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+            <bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+                <property name="marshaller" ref="xstreamMarshaller" />
+                <property name="unmarshaller" ref="xstreamMarshaller" />
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <bean id="xstreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller" />
 
     <context:component-scan base-package="uk.ac.ebi.ddi.ws.modules"/>
     <context:component-scan base-package="uk.ac.ebi.ddi.ws.services"/>
