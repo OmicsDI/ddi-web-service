@@ -4,6 +4,8 @@ import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.Location;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,11 +18,14 @@ import java.net.InetAddress;
 public class LocationService {
 
     private DatabaseReader databaseReader;
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocationService.class);
 
     @Autowired
     public LocationService(@Value("${ddi.maxmind.db.path}") String maxmindDbFile) throws IOException {
+        LOGGER.info("Initialising LocationService...");
         File database = new File(maxmindDbFile);
         databaseReader = new DatabaseReader.Builder(database).build();
+        LOGGER.info("LocationService initialised");
     }
 
     public Location getLocation(String ip) throws IOException, GeoIp2Exception {
