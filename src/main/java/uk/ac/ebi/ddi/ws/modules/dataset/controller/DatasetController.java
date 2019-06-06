@@ -9,6 +9,8 @@ import com.maxmind.geoip2.record.Location;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -116,6 +118,8 @@ public class DatasetController {
     @Autowired
     UserPermissionService userPermissionService;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatasetController.class);
+
     @Autowired
     public DatasetController(CitationService citationService,
                              EBIPubmedSearchService ebiPubmedSearchService,
@@ -125,6 +129,8 @@ public class DatasetController {
                              EnrichmentInfoService enrichmentService,
                              UnMergeDatasetService unMergeDatasetService,
                              UserPermissionService userPermissionService) {
+
+        LOGGER.info("Initialising DatasetController...");
         RepoDatasetMapper.ebiPubmedSearchService = ebiPubmedSearchService;
         RepoDatasetMapper.mostAccessedDatasetService = mostAccessedDatasetService;
         RepoDatasetMapper.citationService = citationService;
@@ -140,6 +146,8 @@ public class DatasetController {
         this.datasetService = datasetService;
         this.enrichmentService = enrichmentService;
         this.unMergeDatasetService = unMergeDatasetService;
+
+        LOGGER.info("DatasetController initialised");
     }
 
     //@CrossOrigin
