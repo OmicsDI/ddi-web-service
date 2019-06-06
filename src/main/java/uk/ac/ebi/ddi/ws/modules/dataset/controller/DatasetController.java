@@ -73,33 +73,33 @@ import static uk.ac.ebi.ddi.ws.util.WsUtilities.transformSimilarDatasetSummary;
 public class DatasetController {
 
     @Autowired
-    DatasetWsClient dataWsClient;
+    private DatasetWsClient dataWsClient;
 
     @Autowired
-    DomainWsClient domainWsClient;
+    private DomainWsClient domainWsClient;
 
     @Autowired
     private DatasetResourceService resourceService;
 
     @Autowired
-    HttpEventService eventService;
+    private HttpEventService eventService;
 
     @Autowired
     private DictionaryClient dictionaryClient;
 
     @Autowired
-    IDatasetSimilarsService datasetSimilarsService;
+    private IDatasetSimilarsService datasetSimilarsService;
 
-    IDatasetService datasetService;
-
-    @Autowired
-    IUnMergeDatasetService iUnMergeDatasetService;
+    private IDatasetService datasetService;
 
     @Autowired
-    FacetSettingsRepository facetSettingsRepository;
+    private IUnMergeDatasetService iUnMergeDatasetService;
 
     @Autowired
-    DatabaseDetailService databaseDetailService;
+    private FacetSettingsRepository facetSettingsRepository;
+
+    @Autowired
+    private DatabaseDetailService databaseDetailService;
 
     @Autowired
     private LocationService locationService;
@@ -107,13 +107,9 @@ public class DatasetController {
     @Autowired
     private FileGroupService fileGroupService;
 
-    //autowired by ctor param
-    IMostAccessedDatasetService mostAccessedDatasetService;
-    CitationService citationService;
-    EBIPubmedSearchService ebiPubmedSearchService;
-    ReanalysisDataService reanalysisDataService;
-    EnrichmentInfoService enrichmentService;
-    UnMergeDatasetService unMergeDatasetService;
+    private IMostAccessedDatasetService mostAccessedDatasetService;
+    private EnrichmentInfoService enrichmentService;
+    private UnMergeDatasetService unMergeDatasetService;
 
     @Autowired
     UserPermissionService userPermissionService;
@@ -140,9 +136,6 @@ public class DatasetController {
 
         this.userPermissionService = userPermissionService;
         this.mostAccessedDatasetService = mostAccessedDatasetService;
-        this.citationService = citationService;
-        this.ebiPubmedSearchService = ebiPubmedSearchService;
-        this.reanalysisDataService = reanalysisDataService;
         this.datasetService = datasetService;
         this.enrichmentService = enrichmentService;
         this.unMergeDatasetService = unMergeDatasetService;
