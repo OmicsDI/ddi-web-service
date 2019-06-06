@@ -53,7 +53,6 @@ import uk.ac.ebi.ddi.ws.util.WsUtilities;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -63,6 +62,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.ac.ebi.ddi.ws.util.ArrayUtils.setToArray;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.tranformServletResquestToEvent;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.transformSimilarDatasetSummary;
 
@@ -819,10 +819,6 @@ public class DatasetController {
         }
 
         return datasetDetail;
-    }
-
-    public <T> T[] setToArray(Set<T> argSet, Class<T> type) {
-        return argSet.toArray((T[]) Array.newInstance(type, argSet.size()));
     }
 
     @ApiOperation(value = "Retrieve all similar dataset based on pubmed id",
