@@ -10,7 +10,7 @@ spec:
   template:
     metadata:
       labels:
-        app: omicsdi-ddi-webservice
+        app: omicsdi-ddi-webservice-pod
     spec:
       containers:
         - name: omicsdi-ddi-webservice
