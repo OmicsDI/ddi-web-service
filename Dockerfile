@@ -37,7 +37,7 @@ RUN apk del curl && \
 RUN rm -rf $CATALINA_HOME/webapps/ROOT
 
 # Fetch jar created into the previous step
-COPY --from=builder /root/target/*.war $CATALINA_HOME/webapps/ROOT.war
+COPY --from=builder /root/target/*.war $CATALINA_HOME/webapps/ws.war
 COPY --from=builder /root/GeoLite2-City.mmdb /opt/
 
 ENV DDI_MAXMIND_FILE /opt/GeoLite2-City.mmdb
