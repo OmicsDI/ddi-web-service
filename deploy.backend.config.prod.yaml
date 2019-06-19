@@ -1,0 +1,22 @@
+--
+name: prod
+credential:
+  user: tvu
+server:
+  deploy_dir: /nfs/public/rw/webadmin/tomcat/bases/pride/tc-pst-prider-ws/deploy
+  user: tc_pst02
+  deploy_user: pst_prd
+  deploy_prefix: ddi-web-service
+  symlink_default_war: /nfs/public/rw/webadmin/tomcat/bases/pride/tc-pst-prider-ws/deploy/ddi-webservice.war
+  hosts:
+    - ves-pg-42
+    - ves-pg-43
+    - ves-oy-42
+    - ves-oy-43
+java:
+  start: /nfs/public/rw/webadmin/tomcat/bases/pride/tc-pst-prider-ws/bin/start
+  clean_dir: /nfs/public/rw/webadmin/tomcat/bases/pride/tc-pst-prider-ws/bin/clean_dirs
+  stop: /nfs/public/rw/webadmin/tomcat/bases/pride/tc-pst-prider-ws/bin/stop
+middware:
+  host: ebi-cli
+  tmp_dir: /tmp/omicsdi/ddi-web-service
