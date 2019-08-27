@@ -6,7 +6,7 @@
     <parent>
         <groupId>uk.ac.ebi.ddi.maven</groupId>
         <artifactId>ddi-base-master</artifactId>
-        <version>1.5</version>
+        <version>1.7</version>
     </parent>
 
     <groupId>uk.ac.ebi.ddi</groupId>
@@ -34,6 +34,7 @@
         <database.environment>mongoDB</database.environment>
         <maven.checkstyle.version>2.17</maven.checkstyle.version>
         <checkstyle.config.location>checkstyle.xml</checkstyle.config.location>
+        <spring.version>5.1.9.RELEASE</spring.version>
     </properties>
 
 
@@ -92,7 +93,18 @@
     </build>
 
     <dependencies>
-        <!-- ##### 3rd party dependencies ##### ##### ##### ##### ##### -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.9.9</version>
+        </dependency>
+
         <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -128,20 +140,22 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>3.2.14.RELEASE</version>
+            <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
 
         <!-- Servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>${servlet.version}</version>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.servlet.jsp/javax.servlet.jsp-api -->
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>${jsp.version}</version>
+            <artifactId>javax.servlet.jsp-api</artifactId>
+            <version>2.3.3</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- REST documentation (Swagger) -->
@@ -161,7 +175,7 @@
         <dependency>
             <groupId>uk.ac.ebi.ddi</groupId>
             <artifactId>ddi-validator</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
         </dependency>
 
         <dependency>
@@ -194,13 +208,7 @@
             <artifactId>gson</artifactId>
             <version>${gson.version}</version>
         </dependency>
-        <!--        <dependency>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                    <version>4.11</version>
-                    <scope>test</scope>
-                </dependency>-->
-        <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
+
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
@@ -235,13 +243,6 @@
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
             <version>1.4.9</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.5.2</version>
         </dependency>
 
         <dependency>
