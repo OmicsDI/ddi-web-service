@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: omicsdi-ddi-webservice-deployment
-  namespace: dev
+  namespace: local
 spec:
   selector:
     matchLabels:
@@ -39,18 +39,18 @@ spec:
                   name: omicsdi
                   key: MONGO_PORT
             - name: DDI_MONGO_MACHINE_ONE
-              value: "mongod-0.mongodb-service.dev.svc.cluster.local"
+              value: "mongod-0.mongodb-service.local.svc.cluster.local"
             - name: DDI_MONGO_MACHINE_TWO
-              value: "mongod-0.mongodb-service.dev.svc.cluster.local"
+              value: "mongod-0.mongodb-service.local.svc.cluster.local"
             - name: DDI_MONGO_MACHINE_THREE
-              value: "mongod-0.mongodb-service.dev.svc.cluster.local"
+              value: "mongod-0.mongodb-service.local.svc.cluster.local"
             - name: DDI_MONGO_AUTH_DB
               valueFrom:
                 secretKeyRef:
                   name: omicsdi
                   key: MONGO_AUTH_DB
             - name: DDI_PROFILE_ENDPOINT
-              value: "https://www.omicsdi.org/profilews"
+              value: "http://127.0.0.1:30090/profilews"
           ports:
             - containerPort: 8080
 ---
@@ -58,12 +58,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: omicsdi-ddi-webservice
-  namespace: dev
+  namespace: local
   labels:
     app: omicsdi-ddi-webservice
 spec:
+  type: NodePort
   ports:
     - port: 8080
+      nodePort: 30080
       targetPort: 8080
   selector:
     app: omicsdi-ddi-webservice-pod
