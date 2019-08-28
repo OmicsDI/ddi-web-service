@@ -2,17 +2,20 @@ package uk.ac.ebi.ddi.ws.swagger;
 
 import com.google.common.collect.Ordering;
 import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
+import com.mangofactory.swagger.models.dto.ApiDescription;
+import com.mangofactory.swagger.models.dto.ApiInfo;
 import com.mangofactory.swagger.ordering.ResourceListingPositionalOrdering;
 import com.mangofactory.swagger.plugin.EnableSwagger;
 import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
-import com.wordnik.swagger.model.ApiDescription;
-import com.wordnik.swagger.model.ApiInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import java.net.URL;
+
+//import com.wordnik.swagger.model.ApiDescription;
+//import com.wordnik.swagger.model.ApiInfo;
 
 /**
  * @author Yasset Perez-Riverol ypriverol@gmail.com
@@ -54,8 +57,8 @@ public class SwaggerConfig {
     private class ApiDescriptionPositionOrdering extends Ordering<ApiDescription> {
         @Override
         public int compare(ApiDescription apiDescription, ApiDescription other) {
-            int pos1 = apiDescription.operations().iterator().next().position();
-            int pos2 = other.operations().iterator().next().position();
+            int pos1 = apiDescription.getOperations().iterator().next().getPosition();
+            int pos2 = other.getOperations().iterator().next().getPosition();
             return Integer.compare(pos1, pos2);
         }
     }

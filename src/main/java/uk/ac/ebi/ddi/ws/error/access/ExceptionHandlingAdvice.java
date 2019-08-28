@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.ws.error.access;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,6 +23,8 @@ import java.security.Principal;
  */
 @ControllerAdvice
 public class ExceptionHandlingAdvice {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionHandlingAdvice.class);
 
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AccessDeniedException.class)
@@ -60,6 +64,7 @@ public class ExceptionHandlingAdvice {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     private RestError handleAnyOtherException(Exception ex) {
+        LOGGER.error("Unknown exception occurred", ex);
         return new RestError(HttpStatus.INTERNAL_SERVER_ERROR,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error: " + ex.getMessage(),

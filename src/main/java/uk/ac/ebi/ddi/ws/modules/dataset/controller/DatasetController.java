@@ -355,7 +355,7 @@ public class DatasetController {
             distances = MapUtils.sortByValue(distances);
             return distances.keySet().iterator().next();
         } catch (GeoIp2Exception | IOException | URISyntaxException e) {
-            LOGGER.error("Couldn't determine location of ip {}, ", ipAddress, e);
+            LOGGER.error("Couldn't determine location of ip {}, ", ipAddress);
             return defaultAccession;
         }
     }
