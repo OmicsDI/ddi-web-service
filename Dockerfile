@@ -9,7 +9,7 @@ RUN tar -xvf GeoLite2-City.tar.gz --strip 1
 # Compilation
 RUN mvn package
 
-FROM openjdk:8-jdk-alpine
+FROM openjdk:8-jre-alpine
 
 COPY --from=builder /root/target/*.jar /
 
