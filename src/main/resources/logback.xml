@@ -8,6 +8,7 @@
     <logger name="org.springframework" level="error"/>
     <logger name="org.springframework.beans" level="error"/>
     <logger name="com.mangofactory.swagger" level="info"/>
+    <logger name="org.mongodb.driver" level="error" />
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
