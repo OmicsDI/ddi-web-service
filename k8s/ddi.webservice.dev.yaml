@@ -50,7 +50,7 @@ spec:
                   name: omicsdi
                   key: MONGO_AUTH_DB
             - name: DDI_PROFILE_ENDPOINT
-              value: "https://www.omicsdi.org/profilews"
+              value: "http://dev.omicsdi.org/profilews"
           ports:
             - containerPort: 8080
 ---
