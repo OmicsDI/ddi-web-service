@@ -14,3 +14,4 @@ spec:
             backend:
               serviceName: omicsdi-ddi-webservice
               servicePort: 8080
+---
