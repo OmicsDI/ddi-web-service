@@ -846,7 +846,10 @@ public class DatasetController {
     @ApiOperation(value = "Merge datasets", notes = "Merge datasets")
     @RequestMapping(value = "/merge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void mergeDatasets(@RequestBody MergeCandidate mergeCandidate,
+    public void mergeDatasets(
+            @ApiParam(value = "The datasets need to be merged should be passed here, e.g:'E-MTAB-3060'")
+            @RequestBody MergeCandidate mergeCandidate,
+                              @ApiParam(value = "Authentication token need to be passed to check if user as access to perform operation.")
                               @RequestHeader("x-auth-token") String accessToken) {
         userPermissionService.hasRole(Role.ADMIN, accessToken);
         datasetService.mergeDatasets(mergeCandidate);
@@ -855,7 +858,10 @@ public class DatasetController {
     @ApiOperation(value = "Skipping merge datasets", notes = "Skip merge datasets")
     @RequestMapping(value = "/skipMerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void skipDatasets(@RequestBody MergeCandidate mergeCandidate,
+    public void skipDatasets(
+            @ApiParam(value = "The datasets need to be merged should be passed here, e.g:'E-MTAB-3060'")
+            @RequestBody MergeCandidate mergeCandidate,
+            @ApiParam(value = "Authentication token need to be passed to check if user as access to perform operation.")
                              @RequestHeader("x-auth-token") String accessToken) {
         userPermissionService.hasRole(Role.ADMIN, accessToken);
         datasetService.skipMerge(mergeCandidate);
@@ -864,7 +870,10 @@ public class DatasetController {
     @ApiOperation(value = "Multiomics merging datasets", notes = "Multiomics merging datasets")
     @RequestMapping(value = "/multiomicsMerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void multiomicsMergeDatasets(@RequestBody MergeCandidate candidate,
+    public void multiomicsMergeDatasets(
+            @ApiParam(value = "The datasets need to be merged should be passed here, e.g:'E-MTAB-3060'")
+            @RequestBody MergeCandidate candidate,
+                                        @ApiParam(value = "Authentication token need to be passed to check if user as access to perform operation.")
                                         @RequestHeader("x-auth-token") String accessToken) {
         userPermissionService.hasRole(Role.ADMIN, accessToken);
         datasetService.addMultiomics(candidate);
@@ -874,7 +883,9 @@ public class DatasetController {
     @RequestMapping(value = "/getMergeCandidateCount", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
-    public Integer getMergeCandidateCount(@RequestHeader("x-auth-token") String accessToken) {
+    public Integer getMergeCandidateCount(
+            @ApiParam(value = "The datasets need to be merged should be passed here, e.g: ['E-MTAB-3060','E-MTAB-2040']")
+            @RequestHeader("x-auth-token") String accessToken) {
         userPermissionService.hasRole(Role.ADMIN, accessToken);
         return datasetService.getMergeCandidateCount();
     }
@@ -893,7 +904,10 @@ public class DatasetController {
     @ApiOperation(value = "Unmerge datasets", notes = "Un-merge datasets")
     @RequestMapping(value = "/unmerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
-    public void unMergeDatasets(@RequestBody List<UnMergeDatasets> mergeCandidate,
+    public void unMergeDatasets(
+            @ApiParam(value = "The datasets need to be merged should be passed here, e.g: ['E-MTAB-3060','E-MTAB-2040']")
+            @RequestBody List<UnMergeDatasets> mergeCandidate,
+            @ApiParam(value = "Authentication token need to be passed to check if user as access to perform operation.")
                                 @RequestHeader("x-auth-token") String accessToken) {
         userPermissionService.hasRole(Role.ADMIN, accessToken);
         unMergeDatasetService.unmergeDataset(mergeCandidate);
@@ -903,7 +917,9 @@ public class DatasetController {
     @RequestMapping(value = "/getAllmerged", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
-    public List<UnMergeDatasets> getAllMergedDatasets(@RequestHeader("x-auth-token") String accessToken) {
+    public List<UnMergeDatasets> getAllMergedDatasets(
+            @ApiParam(value = "Authentication token need to be passed to check if user as access to perform operation.")
+            @RequestHeader("x-auth-token") String accessToken) {
         userPermissionService.hasRole(Role.ADMIN, accessToken);
         return unMergeDatasetService.findAll();
     }
@@ -926,5 +942,19 @@ public class DatasetController {
             @ApiParam(value = "The number of records to be retrieved, e.g: maximum 100")
             @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
         return datasetService.getDatasetPage(start, size);
+    }
+
+    @ApiOperation(value = "Get all datasets by database", notes = "Get all datasets by database")
+    @RequestMapping(value = "/getDatasetByDB", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public Page<Dataset> getAllDatasetsByDB(@ApiParam(value = "The name of database of which datasets need to be retrieved")
+                                            @RequestParam(value = "database", required = true) String database,
+                                        @ApiParam(value = "The starting point for the search, e.g: 0")
+                                        @RequestParam(value = "start", required = false, defaultValue = "0") int start,
+                                        @ApiParam(value = "The number of records to be retrieved, e.g: maximum 100")
+                                            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+        Page<Dataset> data = datasetService.readDatasetsByDatabase(database, start, size);
+        return data;
     }
 }
