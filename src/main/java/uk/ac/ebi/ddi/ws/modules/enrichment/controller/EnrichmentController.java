@@ -4,6 +4,7 @@ package uk.ac.ebi.ddi.ws.modules.enrichment.controller;
  * Created by mingze on 27/10/15.
  */
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -37,6 +38,7 @@ import java.util.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+@ApiIgnore
 @Api(value = "enrichment", description = "Retrieve the information about the enrichment and synonyms ")
 @Controller
 @RequestMapping(value = "/enrichment")
