@@ -1,5 +1,6 @@
 package uk.ac.ebi.ddi.ws.modules.dblucene;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -18,6 +19,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 /**
  * Created by gaur on 29/3/17.
  */
+@ApiIgnore
 @Api(value = "dblucenemapping", description = "get feedback about search results", position = 0)
 @Controller
 @RequestMapping(value = "/dblucene")
