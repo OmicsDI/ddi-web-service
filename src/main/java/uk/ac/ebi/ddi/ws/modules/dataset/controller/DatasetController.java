@@ -924,15 +924,16 @@ public class DatasetController {
         return unMergeDatasetService.findAll();
     }
 
-    @ApiOperation(value = "Get all datasets", notes = "Get all datasets")
+    @ApiOperation(value = "Get all datasets", notes = "Get all datasets in form of streams")
     @RequestMapping(value = "/getAll", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Stream<Dataset> getAllDatasets() {
-        return datasetService.getAllData();
+        Stream<Dataset> datasetStream = datasetService.getAllData();
+        return datasetStream;
     }
 
-    @ApiOperation(value = "Get all datasets by pages", notes = "Get all datasets by pages")
+    @ApiOperation(value = "Get all datasets by pages.", notes = "Get all datasets by pages.")
     @RequestMapping(value = "/getDatasetPage", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
