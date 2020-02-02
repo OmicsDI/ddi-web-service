@@ -949,11 +949,11 @@ public class DatasetController {
     @RequestMapping(value = "/getDatasetByDB", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Page<Dataset> getAllDatasetsByDB(@ApiParam(value = "The name of database of which datasets need to be retrieved")
+    public Page<Dataset> getAllDatasetsByDB(@ApiParam(value = "The name of database of which datasets need to be retrieved.")
                                             @RequestParam(value = "database", required = true) String database,
                                         @ApiParam(value = "The starting point for the search, e.g: 0")
                                         @RequestParam(value = "start", required = false, defaultValue = "0") int start,
-                                        @ApiParam(value = "The number of records to be retrieved, e.g: maximum 100")
+                                        @ApiParam(value = "The number of records to be retrieved, e.g: maximum 100.")
                                             @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
         Page<Dataset> data = datasetService.readDatasetsByDatabase(database, start, size);
         return data;
