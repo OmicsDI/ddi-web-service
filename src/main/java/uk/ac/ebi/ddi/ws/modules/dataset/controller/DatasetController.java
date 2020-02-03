@@ -874,9 +874,8 @@ public class DatasetController {
     public void multiomicsMergeDatasets(
             @ApiParam(value = "The datasets need to be merged should be passed here, e.g:'E-MTAB-3060'")
             @RequestBody MergeCandidate candidate,
-                                        @ApiParam(value = "Authentication token need to be passed to check if user as " +
-                                                "access to perform operation.")
-                                        @RequestHeader("x-auth-token") String accessToken) {
+            @ApiParam(value = "Authentication token need to be passed to check if user can perform operation")
+            @RequestHeader("x-auth-token") String accessToken) {
         userPermissionService.hasRole(Role.ADMIN, accessToken);
         datasetService.addMultiomics(candidate);
     }
