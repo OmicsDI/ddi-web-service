@@ -4,6 +4,7 @@ package uk.ac.ebi.ddi.ws.modules.dataset.controller;
  * @author Yasset Perez-Riverol ypriverol
  */
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.record.Location;
 import com.wordnik.swagger.annotations.Api;
@@ -224,16 +225,16 @@ public class DatasetController {
 
 
     @ApiOperation(value = "Retrieve the list of dataset's file using positions", position = 1)
-    @RequestMapping(value = "/{domain}/{acc}/files", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{database}/{acc}/files", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<Map<String, String>> getFilesAt(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
             @PathVariable(value = "acc") String acc,
             @ApiParam(value = "Database accession id, e.g: pride")
-            @PathVariable(value = "domain") String domain,
+            @PathVariable(value = "database") String database,
             @RequestParam(value = "position") List<Integer> positions) {
-        String database = databaseDetailService.retriveAnchorName(domain);
+        database = databaseDetailService.retriveAnchorName(database);
         Dataset dataset = datasetService.read(acc, database);
         List<String> files = new ArrayList<>();
         dataset.getFiles().keySet().forEach(x -> files.addAll(dataset.getFiles().get(x)));
@@ -272,7 +273,7 @@ public class DatasetController {
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/{domain}/{acc}", method = RequestMethod.GET,
+    @RequestMapping(value = "/{database}/{acc}", method = RequestMethod.GET,
             produces = {APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
@@ -280,11 +281,11 @@ public class DatasetController {
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
             @PathVariable(value = "acc") String acc,
             @ApiParam(value = "Database accession id, e.g: pride")
-            @PathVariable(value = "domain") String domain,
+            @PathVariable(value = "database") String database,
             @RequestParam(value = "debug", defaultValue = "false", required = false) boolean debug,
             @RequestHeader HttpHeaders httpHeaders,
             HttpServletRequest request) {
-        String database = databaseDetailService.retriveAnchorName(domain);
+        database = databaseDetailService.retriveAnchorName(database);
         Dataset dataset = datasetService.read(acc, database);
         String ipAddress = request.getHeader("X-FORWARDED-FOR");
         ipAddress = ipAddress != null ? ipAddress : request.getHeader("X-Cluster-Client-IP");
@@ -577,6 +578,7 @@ public class DatasetController {
         return files;
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Get dataset by Url", notes = "Retrieve dataset by source url")
     @RequestMapping(value = "/getDatasetByUrl", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -856,6 +858,7 @@ public class DatasetController {
         datasetService.mergeDatasets(mergeCandidate);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Skipping merge datasets", notes = "Skip merge datasets")
     @RequestMapping(value = "/skipMerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -868,6 +871,7 @@ public class DatasetController {
         datasetService.skipMerge(mergeCandidate);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Multiomics merging datasets", notes = "Multiomics merging datasets")
     @RequestMapping(value = "/multiomicsMerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -880,6 +884,7 @@ public class DatasetController {
         datasetService.addMultiomics(candidate);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Retrieve merge candidate counts", notes = "Retrieve merge candidate counts")
     @RequestMapping(value = "/getMergeCandidateCount", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -892,6 +897,7 @@ public class DatasetController {
         return datasetService.getMergeCandidateCount();
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Retrieve all dataset counts by database", position = 1,
             notes = "Retrieve all datasets count by database")
     @RequestMapping(value = "/getDbDatasetCount", method = RequestMethod.GET,
@@ -902,7 +908,7 @@ public class DatasetController {
         return datasetService.getDbDatasetsCount();
     }
 
-
+    @ApiIgnore
     @ApiOperation(value = "Unmerge datasets", notes = "Un-merge datasets")
     @RequestMapping(value = "/unmerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -917,6 +923,7 @@ public class DatasetController {
         unMergeDatasetService.unmergeDataset(mergeCandidate);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Get all merged datasets", notes = "Get all merged datasets")
     @RequestMapping(value = "/getAllmerged", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -928,6 +935,7 @@ public class DatasetController {
         return unMergeDatasetService.findAll();
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Get all datasets", notes = "Get all datasets in form of streams")
     @RequestMapping(value = "/getAll", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -937,6 +945,7 @@ public class DatasetController {
         return datasetStream;
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Get all datasets by pages.", notes = "Get all datasets by pages.")
     @RequestMapping(value = "/getDatasetPage", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -949,6 +958,7 @@ public class DatasetController {
         return datasetService.getDatasetPage(start, size);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Get all datasets by database", notes = "Get all datasets by database")
     @RequestMapping(value = "/getDatasetByDB", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)

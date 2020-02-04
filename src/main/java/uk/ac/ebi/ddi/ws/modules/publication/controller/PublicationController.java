@@ -4,6 +4,7 @@ package uk.ac.ebi.ddi.ws.modules.publication.controller;
  * @author Yasset Perez-Riverol ypriverol
  */
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 
+@ApiIgnore
 @Api(value = "publication",
         description = "Retrieve the information about the publication including search functionalities")
 @Controller
