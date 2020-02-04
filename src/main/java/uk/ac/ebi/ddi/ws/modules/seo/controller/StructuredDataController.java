@@ -1,5 +1,6 @@
 package uk.ac.ebi.ddi.ws.modules.seo.controller;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -256,6 +257,7 @@ public class StructuredDataController {
         return data;
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Retrieve JSON+LD Schema for dataset page", position = 1,
             notes = "Retrieve data for dataset page")
     @RequestMapping(value = "/schema/{domain}/{acc:.+}", method = RequestMethod.GET,
