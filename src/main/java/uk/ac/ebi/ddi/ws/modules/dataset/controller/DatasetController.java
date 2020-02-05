@@ -417,6 +417,7 @@ public class DatasetController {
         return result;
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
     @RequestMapping(value = "/get", method = RequestMethod.GET, produces = {APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
