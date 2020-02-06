@@ -225,17 +225,17 @@ public class DatasetController {
 
 
     @ApiOperation(value = "Retrieve the list of dataset's file using positions", position = 1)
-    @RequestMapping(value = "/{database}/{acc}/files", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{database}/{accession}/files", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<Map<String, String>> getFilesAt(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @PathVariable(value = "acc") String acc,
+            @PathVariable(value = "accession") String accession,
             @ApiParam(value = "Database accession id, e.g: pride")
             @PathVariable(value = "database") String database,
             @RequestParam(value = "position") List<Integer> positions) {
         database = databaseDetailService.retriveAnchorName(database);
-        Dataset dataset = datasetService.read(acc, database);
+        Dataset dataset = datasetService.read(accession, database);
         List<String> files = new ArrayList<>();
         dataset.getFiles().keySet().forEach(x -> files.addAll(dataset.getFiles().get(x)));
         files.sort(Comparator.comparing(String::toString));
@@ -273,20 +273,20 @@ public class DatasetController {
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/{database}/{acc}", method = RequestMethod.GET,
+    @RequestMapping(value = "/{database}/{accession}", method = RequestMethod.GET,
             produces = {APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public Map<String, Object> getDataset(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @PathVariable(value = "acc") String acc,
+            @PathVariable(value = "accession") String accession,
             @ApiParam(value = "Database accession id, e.g: pride")
             @PathVariable(value = "database") String database,
             @RequestParam(value = "debug", defaultValue = "false", required = false) boolean debug,
             @RequestHeader HttpHeaders httpHeaders,
             HttpServletRequest request) {
         database = databaseDetailService.retriveAnchorName(database);
-        Dataset dataset = datasetService.read(acc, database);
+        Dataset dataset = datasetService.read(accession, database);
         String ipAddress = request.getHeader("X-FORWARDED-FOR");
         ipAddress = ipAddress != null ? ipAddress : request.getHeader("X-Cluster-Client-IP");
         ipAddress = ipAddress != null ? ipAddress : request.getRemoteAddr();
@@ -304,7 +304,7 @@ public class DatasetController {
         result.put("cross_references", dataset.getCrossReferences());
         result.put("is_claimable", dataset.isClaimable());
         result.put("scores", dataset.getScores());
-        Map<String, List<String>> fileMap = datasetFileService.getFilesMap(acc, database);
+        Map<String, List<String>> fileMap = datasetFileService.getFilesMap(accession, database);
         String primaryAccession = getPreferableAccession(fileMap, ipAddress, dataset.getAccession());
         List<GalaxyFileExtension> galaxyFileExtensions = fileGroupService.findAllGalaxyExtensions();
         galaxyFileExtensions.sort((x1, x2) -> x2.getExtension().length() - x1.getExtension().length());
@@ -378,7 +378,7 @@ public class DatasetController {
     @ResponseBody
     public Map<String, Object> getMultipleDatasets(
             @ApiParam(value = "List of accessions, matching database by index")
-            @RequestParam(value = "acc") String[] accessions,
+            @RequestParam(value = "accessions") String[] accessions,
             @ApiParam(value = "List of databases, matching accession by index")
             @RequestParam(value = "database") String[] databases) {
         if (accessions.length != databases.length) {
@@ -424,7 +424,7 @@ public class DatasetController {
     @ResponseBody
     public DatasetDetail get(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "acc", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String acc,
             @ApiParam(value = "Database accession id, e.g: pride")
             @RequestParam(value = "database", required = true) String domain,
             HttpServletRequest httpServletRequest, HttpServletResponse resp) {
@@ -490,7 +490,7 @@ public class DatasetController {
     @ResponseBody
     public DataSetResult moreLikeThis(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "acc", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String acc,
             @ApiParam(value = "Database accession id, e.g : pride")
             @RequestParam(value = "database", required = true) String domain) {
 
@@ -553,7 +553,7 @@ public class DatasetController {
     @ResponseBody
     public List<String> getFileLinks(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "acc", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String acc,
             @ApiParam(value = "Database accession id, e.g : pride")
             @RequestParam(value = "database", required = true) String domain) {
         List<String> files = new ArrayList<>();
