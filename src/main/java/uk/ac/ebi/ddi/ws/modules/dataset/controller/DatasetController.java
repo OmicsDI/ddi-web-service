@@ -63,6 +63,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static uk.ac.ebi.ddi.ws.util.ArrayUtils.setToArray;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.tranformServletResquestToEvent;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.transformSimilarDatasetSummary;
@@ -150,7 +151,7 @@ public class DatasetController {
     //@CrossOrigin
     @ApiOperation(value = "Search for datasets in the resource", position = 1,
             notes = "Retrieve datasets in the resource using different queries")
-    @RequestMapping(value = "/search", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/search", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public DataSetResult search(
@@ -225,7 +226,7 @@ public class DatasetController {
 
 
     @ApiOperation(value = "Retrieve the list of dataset's file using positions", position = 1)
-    @RequestMapping(value = "/{database}/{accession}/files", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{database}/{accession}/files", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<Map<String, String>> getFilesAt(
@@ -261,7 +262,7 @@ public class DatasetController {
 
     @ApiOperation(value = "Retrieve the latest datasets in the repository", position = 1,
             notes = "Retrieve the latest datasets in the repository")
-    @RequestMapping(value = "/latest", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/latest", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public DataSetResult latest(
@@ -273,7 +274,7 @@ public class DatasetController {
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/{database}/{accession}", method = RequestMethod.GET,
+    @RequestMapping(value = "/{database}/{accession}", method = GET,
             produces = {APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
@@ -373,7 +374,7 @@ public class DatasetController {
     }
 
     @ApiOperation(value = "Retrieve a batch of datasets", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/batch", method = RequestMethod.GET, produces = {APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/batch", method = GET, produces = {APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public Map<String, Object> getMultipleDatasets(
@@ -419,7 +420,7 @@ public class DatasetController {
 
     @ApiIgnore
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/get", method = RequestMethod.GET, produces = {APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/get", method = GET, produces = {APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public DatasetDetail get(
@@ -454,7 +455,7 @@ public class DatasetController {
 
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/mostAccessed", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/mostAccessed", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public DataSetResult getMostAccessed(
@@ -485,7 +486,7 @@ public class DatasetController {
 
     @ApiOperation(value = "Retrieve the related datasets to one Dataset", position = 1,
             notes = "Retrieve the related datasets to one Dataset")
-    @RequestMapping(value = "/getSimilar", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getSimilar", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public DataSetResult moreLikeThis(
@@ -548,7 +549,7 @@ public class DatasetController {
 
     @ApiOperation(value = "Retrieve all file links for a given dataset", position = 1,
             notes = "Retrieve all file links for a given dataset")
-    @RequestMapping(value = "/getFileLinks", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getFileLinks", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<String> getFileLinks(
@@ -823,7 +824,7 @@ public class DatasetController {
 
     @ApiOperation(value = "Retrieve all similar dataset based on pubmed id",
             position = 1, notes = "Retrieve all datasets which have same pubmed id")
-    @RequestMapping(value = "/getSimilarByPubmed", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getSimilarByPubmed", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<Dataset> getSimilarDatasets(
@@ -833,7 +834,7 @@ public class DatasetController {
     }
 
     @ApiOperation(value = "Retrieve merge candidates", notes = "Retrieve merge candidates")
-    @RequestMapping(value = "/getMergeCandidates", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getMergeCandidates", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<MergeCandidate> getMergeCandidates(
@@ -887,7 +888,7 @@ public class DatasetController {
 
     @ApiIgnore
     @ApiOperation(value = "Retrieve merge candidate counts", notes = "Retrieve merge candidate counts")
-    @RequestMapping(value = "/getMergeCandidateCount", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getMergeCandidateCount", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public Integer getMergeCandidateCount(
@@ -901,7 +902,7 @@ public class DatasetController {
     @ApiIgnore
     @ApiOperation(value = "Retrieve all dataset counts by database", position = 1,
             notes = "Retrieve all datasets count by database")
-    @RequestMapping(value = "/getDbDatasetCount", method = RequestMethod.GET,
+    @RequestMapping(value = "/getDbDatasetCount", method = GET,
             produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
@@ -926,7 +927,7 @@ public class DatasetController {
 
     @ApiIgnore
     @ApiOperation(value = "Get all merged datasets", notes = "Get all merged datasets")
-    @RequestMapping(value = "/getAllmerged", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getAllmerged", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<UnMergeDatasets> getAllMergedDatasets(
@@ -938,7 +939,7 @@ public class DatasetController {
 
     @ApiIgnore
     @ApiOperation(value = "Get all datasets", notes = "Get all datasets in form of streams")
-    @RequestMapping(value = "/getAll", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getAll", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Stream<Dataset> getAllDatasets() {
@@ -948,7 +949,7 @@ public class DatasetController {
 
     @ApiIgnore
     @ApiOperation(value = "Get all datasets by pages.", notes = "Get all datasets by pages.")
-    @RequestMapping(value = "/getDatasetPage", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getDatasetPage", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Page<Dataset> getAllDatasetPage(
@@ -961,7 +962,7 @@ public class DatasetController {
 
     @ApiIgnore
     @ApiOperation(value = "Get all datasets by database", notes = "Get all datasets by database")
-    @RequestMapping(value = "/getDatasetByDB", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getDatasetByDB", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Page<Dataset> getAllDatasetsByDB(@ApiParam(value = "The name of database of which " +
