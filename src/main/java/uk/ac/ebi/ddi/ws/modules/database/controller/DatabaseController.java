@@ -1,5 +1,6 @@
 package uk.ac.ebi.ddi.ws.modules.database.controller;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -42,6 +43,7 @@ public class DatabaseController {
     @Autowired
     ServletContext servletContext;
 
+    @ApiIgnore
     @RequestMapping(value = "/{databaseName}/picture", method = RequestMethod.GET,
             produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] getDatabasePicture(@PathVariable String databaseName, final HttpServletResponse response)
@@ -91,6 +93,7 @@ public class DatabaseController {
         }
     }
 
+    @ApiIgnore
     @RequestMapping(value = "/db/picturebyte", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public void getStreamFromImage() throws IOException {
         DatabaseDetail databaseDetail = new DatabaseDetail();
