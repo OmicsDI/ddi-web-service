@@ -4,6 +4,7 @@ package uk.ac.ebi.ddi.ws.modules.dataset.controller;
  * @author Yasset Perez-Riverol ypriverol
  */
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.record.Location;
 import com.wordnik.swagger.annotations.Api;
@@ -61,6 +62,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.tranformServletResquestToEvent;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.transformSimilarDatasetSummary;
 
@@ -145,7 +147,7 @@ public class DatasetController {
     //@CrossOrigin
     @ApiOperation(value = "Search for datasets in the resource", position = 1,
             notes = "Retrieve datasets in the resource using different queries")
-    @RequestMapping(value = "/search", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/search", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public DataSetResult search(
@@ -220,17 +222,17 @@ public class DatasetController {
 
 
     @ApiOperation(value = "Retrieve the list of dataset's file using positions", position = 1)
-    @RequestMapping(value = "/{domain}/{acc}/files", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{database}/{accession}/files", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<Map<String, String>> getFilesAt(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @PathVariable(value = "acc") String acc,
+            @PathVariable(value = "accession") String accession,
             @ApiParam(value = "Database accession id, e.g: pride")
-            @PathVariable(value = "domain") String domain,
+            @PathVariable(value = "database") String database,
             @RequestParam(value = "position") List<Integer> positions) {
-        String database = databaseDetailService.retriveAnchorName(domain);
-        Dataset dataset = datasetService.read(acc, database);
+        database = databaseDetailService.retriveAnchorName(database);
+        Dataset dataset = datasetService.read(accession, database);
         List<String> files = new ArrayList<>();
         dataset.getFiles().keySet().forEach(x -> files.addAll(dataset.getFiles().get(x)));
         files.sort(Comparator.comparing(String::toString));
@@ -256,7 +258,7 @@ public class DatasetController {
 
     @ApiOperation(value = "Retrieve the latest datasets in the repository", position = 1,
             notes = "Retrieve the latest datasets in the repository")
-    @RequestMapping(value = "/latest", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/latest", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public DataSetResult latest(
@@ -268,20 +270,20 @@ public class DatasetController {
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/{domain}/{acc}", method = RequestMethod.GET,
+    @RequestMapping(value = "/{database}/{accession}", method = GET,
             produces = {APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public Map<String, Object> getDataset(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @PathVariable(value = "acc") String acc,
+            @PathVariable(value = "accession") String accession,
             @ApiParam(value = "Database accession id, e.g: pride")
-            @PathVariable(value = "domain") String domain,
+            @PathVariable(value = "database") String database,
             @RequestParam(value = "debug", defaultValue = "false", required = false) boolean debug,
             @RequestHeader HttpHeaders httpHeaders,
             HttpServletRequest request) {
-        String database = databaseDetailService.retriveAnchorName(domain);
-        Dataset dataset = datasetService.read(acc, database);
+        database = databaseDetailService.retriveAnchorName(database);
+        Dataset dataset = datasetService.read(accession, database);
         String ipAddress = request.getHeader("X-FORWARDED-FOR");
         ipAddress = ipAddress != null ? ipAddress : request.getHeader("X-Cluster-Client-IP");
         ipAddress = ipAddress != null ? ipAddress : request.getRemoteAddr();
@@ -366,7 +368,7 @@ public class DatasetController {
     }
 
     @ApiOperation(value = "Retrieve a batch of datasets", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/batch", method = RequestMethod.GET, produces = {APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/batch", method = GET, produces = {APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public Map<String, Object> getMultipleDatasets(
@@ -410,35 +412,37 @@ public class DatasetController {
         return result;
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/get", method = RequestMethod.GET, produces = {APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/get", method = GET, produces = {APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public DatasetDetail get(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "acc", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String accession,
             @ApiParam(value = "Database accession id, e.g: pride")
-            @RequestParam(value = "database", required = true) String domain,
+            @RequestParam(value = "database", required = true) String database,
             HttpServletRequest httpServletRequest, HttpServletResponse resp) {
-        acc = acc.replaceAll("\\s", "");
+        accession = accession.replaceAll("\\s", "");
 
         DatasetDetail datasetDetail = new DatasetDetail();
-        Dataset dsResult = datasetService.read(acc, databaseDetailService.retriveAnchorName(domain));
+        Dataset dsResult = datasetService.read(accession, databaseDetailService.retriveAnchorName(database));
 
         datasetDetail = getBasicDatasetInfo(datasetDetail, dsResult);
         datasetDetail = getDatasetInfo(datasetDetail, dsResult);
 
         // Trace the access to the dataset
-        DatasetResource resource = resourceService.read(acc, domain);
+        DatasetResource resource = resourceService.read(accession, database);
         if (resource == null) {
-                resource = new DatasetResource("http://www.omicsdi.org/" + domain + "/" + acc, acc, domain);
+                resource = new DatasetResource("http://www.omicsdi.org/" + database + "/" + accession, accession, database);
             resource = resourceService.save(resource);
         }
 
         HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
         event.setResource(resource);
         eventService.save(event);
-        DatasetSimilars similars = datasetSimilarsService.read(acc, databaseDetailService.retriveAnchorName(domain));
+        DatasetSimilars similars = datasetSimilarsService.read(accession,
+                databaseDetailService.retriveAnchorName(database));
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 
         return datasetDetail;
@@ -446,7 +450,7 @@ public class DatasetController {
 
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
-    @RequestMapping(value = "/mostAccessed", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/mostAccessed", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public DataSetResult getMostAccessed(
@@ -477,16 +481,16 @@ public class DatasetController {
 
     @ApiOperation(value = "Retrieve the related datasets to one Dataset", position = 1,
             notes = "Retrieve the related datasets to one Dataset")
-    @RequestMapping(value = "/getSimilar", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getSimilar", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public DataSetResult moreLikeThis(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "acc", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String accession,
             @ApiParam(value = "Database accession id, e.g : pride")
-            @RequestParam(value = "database", required = true) String domain) {
+            @RequestParam(value = "database", required = true) String database) {
 
-        SimilarResult queryResult = dataWsClient.getSimilarProjects(domain, acc, Constants.MORELIKE_FIELDS);
+        SimilarResult queryResult = dataWsClient.getSimilarProjects(database, accession, Constants.MORELIKE_FIELDS);
 
         DataSetResult result = new DataSetResult();
         List<DatasetSummary> datasetSummaryList = new ArrayList<>();
@@ -500,7 +504,7 @@ public class DatasetController {
                 if (entry.getId() != null && entry.getSource() != null) {
                     Map<String, String> ids = currentIds.get(entry.getSource());
                     ids = (ids != null) ? ids : new HashMap<>();
-                    if (!(entry.getId().equalsIgnoreCase(acc) && entry.getSource().equalsIgnoreCase(domain))) {
+                    if (!(entry.getId().equalsIgnoreCase(accession) && entry.getSource().equalsIgnoreCase(database))) {
                         ids.put(entry.getId(), entry.getScore());
                     }
                     if (!ids.isEmpty()) {
@@ -540,22 +544,22 @@ public class DatasetController {
 
     @ApiOperation(value = "Retrieve all file links for a given dataset", position = 1,
             notes = "Retrieve all file links for a given dataset")
-    @RequestMapping(value = "/getFileLinks", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getFileLinks", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<String> getFileLinks(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "acc", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String accession,
             @ApiParam(value = "Database accession id, e.g : pride")
-            @RequestParam(value = "database", required = true) String domain) {
+            @RequestParam(value = "database", required = true) String database) {
         List<String> files = new ArrayList<>();
 
         String[] fields = {Constants.DATASET_FILE};
 
-        Set<String> currentIds = Collections.singleton(acc);
+        Set<String> currentIds = Collections.singleton(accession);
 
         QueryResult datasetResult = dataWsClient.getDatasetsById(
-                databaseDetailService.retriveAnchorName(domain), fields, currentIds);
+                databaseDetailService.retriveAnchorName(database), fields, currentIds);
 
         if (datasetResult != null && datasetResult.getEntries() != null && datasetResult.getEntries().length > 0) {
             Entry entry = datasetResult.getEntries()[0];
@@ -571,6 +575,7 @@ public class DatasetController {
         return files;
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Get dataset by Url", notes = "Retrieve dataset by source url")
     @RequestMapping(value = "/getDatasetByUrl", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -818,7 +823,7 @@ public class DatasetController {
 
     @ApiOperation(value = "Retrieve all similar dataset based on pubmed id",
             position = 1, notes = "Retrieve all datasets which have same pubmed id")
-    @RequestMapping(value = "/getSimilarByPubmed", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getSimilarByPubmed", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<Dataset> getSimilarDatasets(
@@ -828,7 +833,7 @@ public class DatasetController {
     }
 
     @ApiOperation(value = "Retrieve merge candidates", notes = "Retrieve merge candidates")
-    @RequestMapping(value = "/getMergeCandidates", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getMergeCandidates", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<MergeCandidate> getMergeCandidates(
@@ -850,6 +855,7 @@ public class DatasetController {
         datasetService.mergeDatasets(mergeCandidate);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Skipping merge datasets", notes = "Skip merge datasets")
     @RequestMapping(value = "/skipMerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -859,6 +865,7 @@ public class DatasetController {
         datasetService.skipMerge(mergeCandidate);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Multiomics merging datasets", notes = "Multiomics merging datasets")
     @RequestMapping(value = "/multiomicsMerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -868,8 +875,9 @@ public class DatasetController {
         datasetService.addMultiomics(candidate);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Retrieve merge candidate counts", notes = "Retrieve merge candidate counts")
-    @RequestMapping(value = "/getMergeCandidateCount", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getMergeCandidateCount", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public Integer getMergeCandidateCount(@RequestHeader("x-auth-token") String accessToken) {
@@ -877,9 +885,10 @@ public class DatasetController {
         return datasetService.getMergeCandidateCount();
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Retrieve all dataset counts by database", position = 1,
             notes = "Retrieve all datasets count by database")
-    @RequestMapping(value = "/getDbDatasetCount", method = RequestMethod.GET,
+    @RequestMapping(value = "/getDbDatasetCount", method = GET,
             produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
@@ -888,6 +897,7 @@ public class DatasetController {
     }
 
 
+    @ApiIgnore
     @ApiOperation(value = "Unmerge datasets", notes = "Un-merge datasets")
     @RequestMapping(value = "/unmerge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -897,8 +907,9 @@ public class DatasetController {
         unMergeDatasetService.unmergeDataset(mergeCandidate);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Get all merged datasets", notes = "Get all merged datasets")
-    @RequestMapping(value = "/getAllmerged", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getAllmerged", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<UnMergeDatasets> getAllMergedDatasets(@RequestHeader("x-auth-token") String accessToken) {
@@ -906,16 +917,19 @@ public class DatasetController {
         return unMergeDatasetService.findAll();
     }
 
+
+    @ApiIgnore
     @ApiOperation(value = "Get all datasets", notes = "Get all datasets")
-    @RequestMapping(value = "/getAll", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getAll", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Stream<Dataset> getAllDatasets() {
         return datasetService.getAllData();
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Get all datasets by pages", notes = "Get all datasets by pages")
-    @RequestMapping(value = "/getDatasetPage", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getDatasetPage", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Page<Dataset> getAllDatasetPage(
