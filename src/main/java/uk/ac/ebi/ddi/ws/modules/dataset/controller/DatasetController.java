@@ -44,10 +44,7 @@ import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.security.UserPermissionService;
 import uk.ac.ebi.ddi.ws.services.LocationService;
-import uk.ac.ebi.ddi.ws.util.Constants;
-import uk.ac.ebi.ddi.ws.util.FileUtils;
-import uk.ac.ebi.ddi.ws.util.MapUtils;
-import uk.ac.ebi.ddi.ws.util.WsUtilities;
+import uk.ac.ebi.ddi.ws.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -162,7 +159,7 @@ public class DatasetController {
             @ApiParam(value = "The number of records to be retrieved, e.g: maximum 100")
             @RequestParam(value = "size", required = false, defaultValue = "20") int size,
             @ApiParam(value = "The starting point for the search, e.g: 0")
-            @RequestParam(value = "faceCount", required = false, defaultValue = "20") int facetCount) {
+            @RequestParam(value = "faceCount", required = false, defaultValue = "30") int facetCount) {
 
         query = (query == null || query.isEmpty()) ? "*:*" : query;
 
@@ -281,55 +278,60 @@ public class DatasetController {
             @PathVariable(value = "database") String database,
             @RequestParam(value = "debug", defaultValue = "false", required = false) boolean debug,
             @RequestHeader HttpHeaders httpHeaders,
-            HttpServletRequest request) {
-        database = databaseDetailService.retriveAnchorName(database);
-        Dataset dataset = datasetService.read(accession, database);
-        String ipAddress = request.getHeader("X-FORWARDED-FOR");
-        ipAddress = ipAddress != null ? ipAddress : request.getHeader("X-Cluster-Client-IP");
-        ipAddress = ipAddress != null ? ipAddress : request.getRemoteAddr();
-        Map<String, Set<String>> additional = dataset.getAdditional();
-        additional.remove(DSField.Additional.DATASET_FILE.getName());
-        additional.put(DSField.Additional.ADDITIONAL_ACCESSION.key(), dataset.getAllSecondaryAccessions());
-        additional.remove(DSField.Additional.SECONDARY_ACCESSION.key());
+            HttpServletRequest request) throws OmicsCustomException {
         Map<String, Object> result = new HashMap<>();
-        result.put("accession", dataset.getAccession());
-        result.put("name", dataset.getName());
-        result.put("database", dataset.getDatabase());
-        result.put("description", dataset.getDescription());
-        result.put("dates", MapUtils.eliminateSet(dataset.getDates()));
-        result.put("additional", additional);
-        result.put("cross_references", dataset.getCrossReferences());
-        result.put("is_claimable", dataset.isClaimable());
-        result.put("scores", dataset.getScores());
-        String primaryAccession = getPreferableAccession(dataset.getFiles(), ipAddress, dataset.getAccession());
-        List<GalaxyFileExtension> galaxyFileExtensions = fileGroupService.findAllGalaxyExtensions();
-        galaxyFileExtensions.sort((x1, x2) -> x2.getExtension().length() - x1.getExtension().length());
-        List<Object> files = dataset.getFiles().keySet().stream().map(x -> {
-            Map<String, Object> providers = new HashMap<>();
-            Map<String, List<String>> fileGroups = new HashMap<>();
-            dataset.getFiles().get(x).forEach(f -> {
-                String baseName = FileUtils.getFilenameFromUrl(f);
-                List<String> urls = new ArrayList<>(Collections.singleton(f));
-                String type = "Other";
-                for (GalaxyFileExtension extension : galaxyFileExtensions) {
-                    if (baseName.toLowerCase().contains(extension.getExtension())) {
-                        type = extension.getType().substring(0, 1).toUpperCase() + extension.getType().substring(1);
-                        break;
+        try {
+            database = databaseDetailService.retriveAnchorName(database);
+            Dataset dataset = datasetService.read(accession, database);
+            String ipAddress = request.getHeader("X-FORWARDED-FOR");
+            ipAddress = ipAddress != null ? ipAddress : request.getHeader("X-Cluster-Client-IP");
+            ipAddress = ipAddress != null ? ipAddress : request.getRemoteAddr();
+            Map<String, Set<String>> additional = dataset.getAdditional();
+            additional.remove(DSField.Additional.DATASET_FILE.getName());
+            additional.put(DSField.Additional.ADDITIONAL_ACCESSION.key(), dataset.getAllSecondaryAccessions());
+            additional.remove(DSField.Additional.SECONDARY_ACCESSION.key());
+            result.put("accession", dataset.getAccession());
+            result.put("name", dataset.getName());
+            result.put("database", dataset.getDatabase());
+            result.put("description", dataset.getDescription());
+            result.put("dates", MapUtils.eliminateSet(dataset.getDates()));
+            result.put("additional", additional);
+            result.put("cross_references", dataset.getCrossReferences());
+            result.put("is_claimable", dataset.isClaimable());
+            result.put("scores", dataset.getScores());
+            String primaryAccession = getPreferableAccession(dataset.getFiles(), ipAddress, dataset.getAccession());
+            List<GalaxyFileExtension> galaxyFileExtensions = fileGroupService.findAllGalaxyExtensions();
+            galaxyFileExtensions.sort((x1, x2) -> x2.getExtension().length() - x1.getExtension().length());
+            List<Object> files = dataset.getFiles().keySet().stream().map(x -> {
+                Map<String, Object> providers = new HashMap<>();
+                Map<String, List<String>> fileGroups = new HashMap<>();
+                dataset.getFiles().get(x).forEach(f -> {
+                    String baseName = FileUtils.getFilenameFromUrl(f);
+                    List<String> urls = new ArrayList<>(Collections.singleton(f));
+                    String type = "Other";
+                    for (GalaxyFileExtension extension : galaxyFileExtensions) {
+                        if (baseName.toLowerCase().contains(extension.getExtension())) {
+                            type = extension.getType().substring(0, 1).toUpperCase() + extension.getType().substring(1);
+                            break;
+                        }
                     }
-                }
-                if (fileGroups.containsKey(type)) {
-                    urls.addAll(fileGroups.get(type));
-                }
-                fileGroups.put(type, urls);
-            });
-            providers.put("files", fileGroups);
-            providers.put("type", x.equals(primaryAccession) ? "primary" : "mirror");
-            return providers;
-        }).collect(Collectors.toList());
-        result.put("file_versions", files);
-        if (debug) {
-            result.put("ip_address", ipAddress);
-            result.put("headers", httpHeaders.toSingleValueMap());
+                    if (fileGroups.containsKey(type)) {
+                        urls.addAll(fileGroups.get(type));
+                    }
+                    fileGroups.put(type, urls);
+                });
+                providers.put("files", fileGroups);
+                providers.put("type", x.equals(primaryAccession) ? "primary" : "mirror");
+                return providers;
+            }).collect(Collectors.toList());
+            result.put("file_versions", files);
+            if (debug) {
+                result.put("ip_address", ipAddress);
+                result.put("headers", httpHeaders.toSingleValueMap());
+            }
+        } catch (NullPointerException nlex) {
+            throw new OmicsCustomException("Either Accession or Database is not available, " +
+                    "Please provide correct data.");
         }
         return result;
     }
