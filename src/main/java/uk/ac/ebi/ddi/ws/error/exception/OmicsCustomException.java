@@ -1,4 +1,4 @@
-package uk.ac.ebi.ddi.ws.util;
+package uk.ac.ebi.ddi.ws.error.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
