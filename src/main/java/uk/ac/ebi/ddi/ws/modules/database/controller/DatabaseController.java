@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseService;
 import uk.ac.ebi.ddi.service.db.model.database.DatabaseDetail;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
+import uk.ac.ebi.ddi.ws.error.exception.OmicsCustomException;
+import uk.ac.ebi.ddi.ws.error.exception.OmicsDatabaseException;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
@@ -43,17 +45,24 @@ public class DatabaseController {
     @Autowired
     ServletContext servletContext;
 
-    @ApiIgnore
+    //@ApiIgnore
     @RequestMapping(value = "/{databaseName}/picture", method = RequestMethod.GET,
             produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] getDatabasePicture(@PathVariable String databaseName, final HttpServletResponse response)
             throws IOException {
+        byte[] image;
         response.setHeader("Cache-Control", "no-cache");
-        DatabaseDetail databaseDetail = databaseDetailService.findDatabaseByName(databaseName);
-        byte[] image = databaseDetail.getImage();
-        if (null == image) {
-            InputStream in = servletContext.getResourceAsStream("no_image.jpg");
-            image = IOUtils.toByteArray(in);
+        try {
+            DatabaseDetail databaseDetail = databaseDetailService.findDatabaseByName(databaseName);
+            image = databaseDetail.getImage();
+            if (null == image) {
+                InputStream in = servletContext.getResourceAsStream("resources/db-logos/pride_logo.jpg");
+                image = IOUtils.toByteArray(in);
+            }
+        }
+        catch(NullPointerException ex){
+            throw new OmicsDatabaseException("Database is not available, " +
+                    "Please provide correct database value.");
         }
         return image;
     }
