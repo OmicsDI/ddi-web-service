@@ -36,6 +36,7 @@ import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
 import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
 import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
+import uk.ac.ebi.ddi.ws.error.exception.OmicsCustomException;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
@@ -577,6 +578,7 @@ public class DatasetController {
         return files;
     }
 
+
     @ApiIgnore
     @ApiOperation(value = "Get dataset by Url", notes = "Retrieve dataset by source url")
     @RequestMapping(value = "/getDatasetByUrl", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
@@ -834,6 +836,7 @@ public class DatasetController {
         return datasetService.getSimilarByPubmed(pubmed);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Retrieve merge candidates", notes = "Retrieve merge candidates")
     @RequestMapping(value = "/getMergeCandidates", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -848,6 +851,7 @@ public class DatasetController {
         return datasetService.getMergeCandidates(start, size);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Merge datasets", notes = "Merge datasets")
     @RequestMapping(value = "/merge", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
