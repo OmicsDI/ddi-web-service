@@ -376,7 +376,7 @@ public class DatasetController {
     @ResponseBody
     public Map<String, Object> getMultipleDatasets(
             @ApiParam(value = "List of accessions, matching database by index")
-            @RequestParam(value = "acc") String[] accessions,
+            @RequestParam(value = "accession") String[] accessions,
             @ApiParam(value = "List of databases, matching accession by index")
             @RequestParam(value = "database") String[] databases) {
         if (accessions.length != databases.length) {

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseService;
 import uk.ac.ebi.ddi.service.db.model.database.DatabaseDetail;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
-import uk.ac.ebi.ddi.ws.error.exception.OmicsCustomException;
 import uk.ac.ebi.ddi.ws.error.exception.OmicsDatabaseException;
 
 import javax.imageio.ImageIO;
@@ -59,8 +58,7 @@ public class DatabaseController {
                 InputStream in = servletContext.getResourceAsStream("resources/db-logos/pride_logo.jpg");
                 image = IOUtils.toByteArray(in);
             }
-        }
-        catch(NullPointerException ex){
+        } catch (NullPointerException ex) {
             throw new OmicsDatabaseException("Database is not available, " +
                     "Please provide correct database value.");
         }

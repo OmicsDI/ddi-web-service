@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * My custom exception class.
  */
-@ResponseStatus(value= HttpStatus.NOT_FOUND,
+@ResponseStatus(value = HttpStatus.NOT_FOUND,
         reason = "Either Accession or Database is not available, Please provide correct data.")
 public class OmicsCustomException extends RuntimeException {
     public OmicsCustomException(String message) {
