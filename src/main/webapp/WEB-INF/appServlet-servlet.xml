@@ -34,6 +34,8 @@
     <bean id="ebeyeWsConfigDev" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigDev" />
     <bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd" />
 
+    <bean id="solrWsConfigDev" class="uk.ac.ebi.ddi.ebe.ws.dao.config.SolrWsConfigDev" />
+
     <!-- Swagger config (REST service documentation)-->
     <!-- Swagger beans -->
     <bean class="com.mangofactory.swagger.configuration.SpringSwaggerConfig" />
@@ -49,20 +51,25 @@
     <!-- Callback filter for cross server query support -->
     <bean class="uk.ac.ebi.pride.web.util.callback.filter.JsonpCallbackFilter" id="jsonpCallbackFilter"/>
 
-    <bean id="domainClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient">
-        <constructor-arg ref="ebeyeWsConfig"/>
+
+
+
+
+
+    <bean id="domainClient" class="uk.ac.ebi.ddi.ebe.ws.dao.solrClient.domain.DomainWsClient">
+        <constructor-arg ref="solrWsConfigDev"/>
     </bean>
 
-    <bean id="facetWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.facet.FacetWsClient">
-        <constructor-arg ref="ebeyeWsConfig"/>
+    <bean id="facetWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.solrClient.facet.FacetWsClient">
+        <constructor-arg ref="solrWsConfigDev"/>
     </bean>
 
-    <bean id="dataWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient">
-        <constructor-arg ref="ebeyeWsConfig"/>
+    <bean id="dataWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.solrClient.dataset.DatasetWsClient">
+        <constructor-arg ref="solrWsConfigDev"/>
     </bean>
 
-    <bean id="dictionaryClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient">
-        <constructor-arg ref="ebeyeWsConfig"/>
+    <bean id="dictionaryClient" class="uk.ac.ebi.ddi.ebe.ws.dao.solrClient.dictionary.DictionaryClient">
+        <constructor-arg ref="solrWsConfigDev"/>
     </bean>
 
     <bean id="publicationWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.publication.PublicationWsClient">

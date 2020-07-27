@@ -11,14 +11,15 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
-import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
-import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
-import uk.ac.ebi.ddi.ebe.ws.dao.client.facet.FacetWsClient;
+
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Facet;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.FacetValue;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.facet.FacetList;
+import uk.ac.ebi.ddi.ebe.ws.dao.solrClient.dataset.DatasetWsClient;
+import uk.ac.ebi.ddi.ebe.ws.dao.solrClient.domain.DomainWsClient;
+import uk.ac.ebi.ddi.ebe.ws.dao.solrClient.facet.FacetWsClient;
 import uk.ac.ebi.ddi.ws.modules.stats.model.DomainStats;
 import uk.ac.ebi.ddi.ws.modules.stats.model.StatOmicsRecord;
 import uk.ac.ebi.ddi.ws.modules.stats.model.StatRecord;

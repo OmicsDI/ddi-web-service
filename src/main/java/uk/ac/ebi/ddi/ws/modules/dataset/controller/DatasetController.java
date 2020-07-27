@@ -18,12 +18,13 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
-import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
-import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
-import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
+
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
+import uk.ac.ebi.ddi.ebe.ws.dao.solrClient.dataset.DatasetWsClient;
+import uk.ac.ebi.ddi.ebe.ws.dao.solrClient.dictionary.DictionaryClient;
+import uk.ac.ebi.ddi.ebe.ws.dao.solrClient.domain.DomainWsClient;
 import uk.ac.ebi.ddi.service.db.model.dataset.*;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
@@ -44,7 +45,7 @@ import uk.ac.ebi.ddi.ws.modules.dataset.model.Role;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.security.UserPermissionService;
-import uk.ac.ebi.ddi.ws.services.LocationService;
+//import uk.ac.ebi.ddi.ws.services.LocationService;
 import uk.ac.ebi.ddi.ws.util.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -99,8 +100,8 @@ public class DatasetController {
     @Autowired
     DatabaseDetailService databaseDetailService;
 
-    @Autowired
-    private LocationService locationService;
+//    @Autowired
+//    private LocationService locationService;
 
     @Autowired
     private FileGroupService fileGroupService;
@@ -300,7 +301,7 @@ public class DatasetController {
             result.put("cross_references", dataset.getCrossReferences());
             result.put("is_claimable", dataset.isClaimable());
             result.put("scores", dataset.getScores());
-            String primaryAccession = getPreferableAccession(dataset.getFiles(), ipAddress, dataset.getAccession());
+//            String primaryAccession = getPreferableAccession(dataset.getFiles(), ipAddress, dataset.getAccession());
             List<GalaxyFileExtension> galaxyFileExtensions = fileGroupService.findAllGalaxyExtensions();
             galaxyFileExtensions.sort((x1, x2) -> x2.getExtension().length() - x1.getExtension().length());
             List<Object> files = dataset.getFiles().keySet().stream().map(x -> {
@@ -322,7 +323,7 @@ public class DatasetController {
                     fileGroups.put(type, urls);
                 });
                 providers.put("files", fileGroups);
-                providers.put("type", x.equals(primaryAccession) ? "primary" : "mirror");
+//                providers.put("type", x.equals(primaryAccession) ? "primary" : "mirror");
                 return providers;
             }).collect(Collectors.toList());
             result.put("file_versions", files);
@@ -337,27 +338,27 @@ public class DatasetController {
         return result;
     }
 
-    private String getPreferableAccession(Map<String, Set<String>> files, String ipAddress, String defaultAccession) {
-        if (files.size() == 1) {
-            return files.keySet().iterator().next();
-        }
-        if (files.size() == 0) {
-            return defaultAccession;
-        }
-        try {
-            Map<String, Double> distances = new HashMap<>();
-            Location userLocation = locationService.getLocation(ipAddress);
-            for (String accession : files.keySet()) {
-                URI uri = new URI(files.get(accession).iterator().next());
-                Location serverLocation = locationService.getLocation(uri.getHost());
-                distances.put(accession, LocationService.distance(userLocation, serverLocation));
-            }
-            distances = MapUtils.sortByValue(distances);
-            return distances.keySet().iterator().next();
-        } catch (GeoIp2Exception | IOException | URISyntaxException e) {
-            return defaultAccession;
-        }
-    }
+//    private String getPreferableAccession(Map<String, Set<String>> files, String ipAddress, String defaultAccession) {
+//        if (files.size() == 1) {
+//            return files.keySet().iterator().next();
+//        }
+//        if (files.size() == 0) {
+//            return defaultAccession;
+//        }
+//        try {
+//            Map<String, Double> distances = new HashMap<>();
+//            Location userLocation = locationService.getLocation(ipAddress);
+//            for (String accession : files.keySet()) {
+//                URI uri = new URI(files.get(accession).iterator().next());
+//                Location serverLocation = locationService.getLocation(uri.getHost());
+//                distances.put(accession, LocationService.distance(userLocation, serverLocation));
+//            }
+//            distances = MapUtils.sortByValue(distances);
+//            return distances.keySet().iterator().next();
+//        } catch (GeoIp2Exception | IOException | URISyntaxException e) {
+//            return defaultAccession;
+//        }
+//    }
 
     private Map<String, String> getAvailableGroups() {
         List<FileGroup> fileGroups = fileGroupService.findAll();

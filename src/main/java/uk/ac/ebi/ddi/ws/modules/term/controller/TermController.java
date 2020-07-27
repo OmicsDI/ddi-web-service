@@ -11,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
-import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
-import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
+
+
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dictionary.DictWord;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
+import uk.ac.ebi.ddi.ebe.ws.dao.solrClient.dataset.DatasetWsClient;
+import uk.ac.ebi.ddi.ebe.ws.dao.solrClient.dictionary.DictionaryClient;
+import uk.ac.ebi.ddi.ebe.ws.dao.solrClient.domain.DomainWsClient;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.term.model.Term;
