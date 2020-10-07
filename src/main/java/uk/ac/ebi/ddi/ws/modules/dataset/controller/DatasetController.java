@@ -382,7 +382,7 @@ public class DatasetController {
             @ApiParam(value = "List of databases, matching accession by index")
             @RequestParam(value = "database") String[] databases) {
         if (accessions.length != databases.length) {
-            throw new IllegalArgumentException("The amounts of accessions and databases are not match");
+            throw new IllegalArgumentException("The amounts of accessions and databases are not match.");
         }
 
         Map<String, Object> result = new HashMap<>();
