@@ -304,14 +304,14 @@ public class DatasetController {
         result.put("cross_references", dataset.getCrossReferences());
         result.put("is_claimable", dataset.isClaimable());
         result.put("scores", dataset.getScores());
-        Map<String, List<String>> fileMap = datasetFileService.getFilesMap(accession, database);
-        String primaryAccession = getPreferableAccession(fileMap, ipAddress, dataset.getAccession());
+        //Map<String, List<String>> fileMap = datasetFileService.getFilesMap(accession, database);
+        String primaryAccession = getPreferableAccession(dataset.getFiles(), ipAddress, dataset.getAccession());
         List<GalaxyFileExtension> galaxyFileExtensions = fileGroupService.findAllGalaxyExtensions();
         galaxyFileExtensions.sort((x1, x2) -> x2.getExtension().length() - x1.getExtension().length());
-        List<Object> files = fileMap.keySet().stream().map(x -> {
+        List<Object> files = dataset.getFiles().keySet().stream().map(x -> {
             Map<String, Object> providers = new HashMap<>();
             Map<String, List<String>> fileGroups = new HashMap<>();
-            fileMap.get(x).forEach(f -> {
+            dataset.getFiles().get(x).forEach(f -> {
                 String baseName = FileUtils.getFilenameFromUrl(f);
                 List<String> urls = new ArrayList<>(Collections.singleton(f));
                 String type = "Other";
@@ -338,7 +338,7 @@ public class DatasetController {
         return result;
     }
 
-    private String getPreferableAccession(Map<String, List<String>> files, String ipAddress, String defaultAccession) {
+    private String getPreferableAccession(Map<String, Set<String>> files, String ipAddress, String defaultAccession) {
         if (files.size() == 1) {
             return files.keySet().iterator().next();
         }
