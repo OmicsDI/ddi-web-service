@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
@@ -37,10 +38,7 @@ import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
 import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
 import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.Role;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.*;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.security.UserPermissionService;
@@ -927,5 +925,26 @@ public class DatasetController {
             @ApiParam(value = "The number of records to be retrieved, e.g: maximum 100")
             @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
         return datasetService.getDatasetPage(start, size);
+    }
+
+    @ApiOperation(value = "Retrieve the related datasets to one Dataset", position = 1,
+            notes = "Retrieve the related datasets to one Dataset")
+    @RequestMapping(value = "/getDRS", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    @ResponseBody
+    public Content[] getDRSID(
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
+            @RequestParam(value = "accession", required = true) String acc,
+            @ApiParam(value = "Database accession id, e.g : pride")
+            @RequestParam(value = "database", required = true) String domain) {
+
+        RestTemplate restTemplate = new RestTemplate();
+        Content[] result =
+                restTemplate.getForObject(
+                        "http://hx-rke-wp-webadmin-21-master-1.caas.ebi.ac.uk:30008/datasets/{database}/{accession}",
+                        Content[].class,domain, acc
+                );
+
+        return result;
     }
 }
