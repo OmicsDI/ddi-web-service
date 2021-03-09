@@ -942,7 +942,7 @@ public class DatasetController {
         Content[] result =
                 restTemplate.getForObject(
                         "http://hx-rke-wp-webadmin-21-master-1.caas.ebi.ac.uk:30008/datasets/{database}/{accession}",
-                        Content[].class,domain, acc
+                        Content[].class, domain, acc
                 );
 
         return result;
