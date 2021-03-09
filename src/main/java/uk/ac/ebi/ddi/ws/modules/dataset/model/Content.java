@@ -4,6 +4,30 @@ public class Content {
 
     private String id;
 
+    private String name;
+
+    private String drsURI;
+
+    private String drsURL;
+
+    public String getDrsURI() {
+        return drsURI;
+    }
+
+    public void setDrsURI(String drsURI) {
+        this.drsURI = drsURI;
+    }
+
+    public String getDrsURL() {
+        return drsURL;
+    }
+
+    public void setDrsURL(String drsURL) {
+        this.drsURL = drsURL;
+    }
+
+
+
     public String getId() {
         return id;
     }
@@ -22,25 +46,4 @@ public class Content {
 
 
 
-    private String name;
-
-    public String getDrsURI() {
-        return drsURI;
-    }
-
-    public void setDrsURI(String drsURI) {
-        this.drsURI = drsURI;
-    }
-
-    public String getDrsURL() {
-        return drsURL;
-    }
-
-    public void setDrsURL(String drsURL) {
-        this.drsURL = drsURL;
-    }
-
-    private String drsURI;
-
-    private String drsURL;
 }
