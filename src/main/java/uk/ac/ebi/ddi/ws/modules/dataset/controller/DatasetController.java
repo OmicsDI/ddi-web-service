@@ -288,8 +288,7 @@ public class DatasetController {
             HttpServletRequest request) {
         String database = databaseDetailService.retriveAnchorName(domain);
         Dataset dataset = datasetService.read(accession, database);
-        if (dataset.getCurrentStatus().equals(DatasetCategory.DELETED.getType()))
-        {
+        if (dataset.getCurrentStatus().equals(DatasetCategory.DELETED.getType())) {
             throw new ResponseStatusException(HttpStatus.MOVED_PERMANENTLY, "This dataset is not available anymore");
         }
         String ipAddress = request.getHeader("X-FORWARDED-FOR");
