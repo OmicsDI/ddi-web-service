@@ -14,10 +14,8 @@ import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
 import uk.ac.ebi.ddi.service.db.utils.Tuple;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-
 /**
  * @author ypriverol
  */
@@ -251,13 +249,12 @@ public class WsUtilities {
         String[] specialCharacters = {"+", "-", "&", "|", "!", "(", ")", "{", "}", "[", "]", "^",
                 "\"", "~", "*", "?", ":", "\\", "/" };
         String outputString = searchInput;
-        if(searchInput != "*:*" ) {
+        if (searchInput != "*:*") {
             for (String spclChar : specialCharacters) {
                 if (searchInput.contains(spclChar)) {
                     outputString = searchInput.replace(spclChar, "\\" + spclChar);
                 }
-            }
-        }
+            } }
        /* if(searchInput != "*:*" ) {
             if (searchInput.contains("/")) {
                 outputString = searchInput.replace("/", "\\/");
