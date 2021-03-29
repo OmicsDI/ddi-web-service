@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
@@ -38,6 +39,7 @@ import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
 import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
 import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
+import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.*;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
@@ -166,6 +168,7 @@ public class DatasetController {
 
         query = (query == null || query.isEmpty()) ? "*:*" : query;
 
+        query = WsUtilities.escapeSpecialCharacters(query);
         query = query + " NOT (isprivate:true)";
         query = modifyIfSearchByYear(query);
 
@@ -285,6 +288,10 @@ public class DatasetController {
             HttpServletRequest request) {
         String database = databaseDetailService.retriveAnchorName(domain);
         Dataset dataset = datasetService.read(accession, database);
+        if (dataset.getCurrentStatus().equals(DatasetCategory.DELETED.getType()))
+        {
+            throw new ResponseStatusException(HttpStatus.MOVED_PERMANENTLY, "This dataset is not available anymore");
+        }
         String ipAddress = request.getHeader("X-FORWARDED-FOR");
         ipAddress = ipAddress != null ? ipAddress : request.getHeader("X-Cluster-Client-IP");
         ipAddress = ipAddress != null ? ipAddress : request.getRemoteAddr();

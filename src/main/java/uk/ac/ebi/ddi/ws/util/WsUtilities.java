@@ -245,4 +245,33 @@ public class WsUtilities {
 
     private WsUtilities() {
     }
+
+    public static String escapeSpecialCharacters(String searchInput) {
+       // + - & | ! ( ) { } [ ] ^ " ~ * ? : \ /
+        String[] specialCharacters = {"+", "-", "&", "|", "!", "(", ")", "{", "}", "[", "]", "^",
+                "\"", "~", "*", "?", ":", "\\", "/" };
+        String outputString = searchInput;
+        if(searchInput != "*:*" ) {
+            for (String spclChar : specialCharacters) {
+                if (searchInput.contains(spclChar)) {
+                    outputString = searchInput.replace(spclChar, "\\" + spclChar);
+                }
+            }
+        }
+       /* if(searchInput != "*:*" ) {
+            if (searchInput.contains("/")) {
+                outputString = searchInput.replace("/", "\\/");
+            }
+            if (searchInput.contains(":")) {
+                outputString = outputString.replace(":", "\\:");
+            }
+            if (searchInput.contains("|")) {
+                outputString = outputString.replace(":", "\\|");
+            }
+            if (searchInput.contains("*")) {
+                outputString = outputString.replace(":", "\\*");
+            }
+        }*/
+        return outputString;
+    }
 }
