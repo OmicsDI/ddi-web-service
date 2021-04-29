@@ -945,7 +945,7 @@ public class DatasetController {
             @RequestParam(value = "database", required = true) String domain) {
 
         RestTemplate restTemplate = new RestTemplate();
-        Content[] result = new Content[1];
+        Content[] result = new Content[0];
 
         try {
 
