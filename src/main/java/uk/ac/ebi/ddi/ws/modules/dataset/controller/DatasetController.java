@@ -945,12 +945,17 @@ public class DatasetController {
             @RequestParam(value = "database", required = true) String domain) {
 
         RestTemplate restTemplate = new RestTemplate();
-        Content[] result =
-                restTemplate.getForObject(
-                        "http://hx-rke-wp-webadmin-21-master-1.caas.ebi.ac.uk:30008/datasets/{database}/{accession}",
-                        Content[].class, domain, acc
-                );
+        Content[] result = new Content[1];
 
+        try {
+
+            result = restTemplate.getForObject(
+                    "http://hx-rke-wp-webadmin-21-master-1.caas.ebi.ac.uk:30008/datasets/{database}/{accession}",
+                    Content[].class, domain, acc
+            );
+        } catch (Exception ex) {
+            LOGGER.error("exception caught in getdrs request");
+        }
         return result;
     }
 }
