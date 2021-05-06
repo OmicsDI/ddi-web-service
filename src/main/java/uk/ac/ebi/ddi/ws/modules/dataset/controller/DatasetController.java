@@ -454,6 +454,7 @@ public class DatasetController {
         DatasetSimilars similars = datasetSimilarsService.read(acc, databaseDetailService.retriveAnchorName(domain));
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 
+        //404 exception
         if(datasetDetail. getId() == null) {
             throw new ResourceNotFoundException("Dataset not found");
         }
