@@ -252,7 +252,7 @@ public class WsUtilities {
         if (searchInput != "*:*") {
             for (String spclChar : specialCharacters) {
                 if (searchInput.contains(spclChar)) {
-                    outputString = searchInput.replace(spclChar, "\\" + spclChar);
+                    outputString = outputString.replace(spclChar, "\\" + spclChar);
                 }
             } }
        /* if(searchInput != "*:*" ) {
