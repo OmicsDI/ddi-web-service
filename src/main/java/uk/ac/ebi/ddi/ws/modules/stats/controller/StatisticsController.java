@@ -191,7 +191,7 @@ public class StatisticsController {
         String order = Constants.ORDER_ASCENDING;
         int start = 0;
         int size = 1;
-        int facetCount = 20;
+        int facetCount = 25;
 
         String proteomicsQuery   =    "*:* AND omics_type:\"Proteomics\"";
         String metabolomicsQuery =    "*:* AND omics_type:\"Metabolomics\"";
