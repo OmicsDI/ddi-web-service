@@ -10,6 +10,8 @@ import com.maxmind.geoip2.record.Location;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
@@ -26,6 +29,9 @@ import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
 import uk.ac.ebi.ddi.service.db.model.dataset.*;
 import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
+
+//import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
+//import uk.ac.ebi.ddi.service.db.model.logger.DatasetResource;
 import uk.ac.ebi.ddi.service.db.model.logger.HttpEvent;
 import uk.ac.ebi.ddi.service.db.repo.facetsettings.FacetSettingsRepository;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
@@ -37,6 +43,7 @@ import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
 import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
 import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
 import uk.ac.ebi.ddi.ws.error.exception.OmicsCustomException;
+import uk.ac.ebi.ddi.ws.error.exception.ResourceNotFoundException;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
@@ -58,10 +65,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.Content;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.tranformServletResquestToEvent;
+//import static uk.ac.ebi.ddi.ws.util.WsUtilities.tranformServletResquestToEvent;
+
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.transformSimilarDatasetSummary;
 
 
@@ -116,6 +126,8 @@ public class DatasetController {
     @Autowired
     UserPermissionService userPermissionService;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatasetController.class);
+
     @Autowired
     public DatasetController(CitationService citationService,
                              EBIPubmedSearchService ebiPubmedSearchService,
@@ -163,6 +175,8 @@ public class DatasetController {
             @RequestParam(value = "faceCount", required = false, defaultValue = "30") int facetCount) {
 
         query = (query == null || query.isEmpty()) ? "*:*" : query;
+
+        query = WsUtilities.escapeSpecialCharacters(query);
 
         query = query + " NOT (isprivate:true)";
         query = modifyIfSearchByYear(query);
@@ -415,7 +429,7 @@ public class DatasetController {
         return result;
     }
 
-    @ApiIgnore
+    //@ApiIgnore
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
     @RequestMapping(value = "/get", method = GET, produces = {APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
@@ -433,17 +447,25 @@ public class DatasetController {
 
         datasetDetail = getBasicDatasetInfo(datasetDetail, dsResult);
         datasetDetail = getDatasetInfo(datasetDetail, dsResult);
-
+        try {
         // Trace the access to the dataset
         DatasetResource resource = resourceService.read(accession, database);
         if (resource == null) {
-                resource = new DatasetResource("http://www.omicsdi.org/" + database + "/" + accession, accession, database);
+            resource = new DatasetResource("http://www.omicsdi.org/" + database + "/" + accession, accession, database);
             resource = resourceService.save(resource);
         }
 
-        HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
-        event.setResource(resource);
-        eventService.save(event);
+            HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
+            event.setResource(resource);
+            eventService.save(event);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage() + " in logger service");
+        }
+
+        if (datasetDetail.getId() == null) {
+            throw new ResourceNotFoundException("Dataset not found");
+        }
+
         DatasetSimilars similars = datasetSimilarsService.read(accession,
                 databaseDetailService.retriveAnchorName(database));
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
@@ -944,5 +966,48 @@ public class DatasetController {
             @ApiParam(value = "The number of records to be retrieved, e.g: maximum 100")
             @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
         return datasetService.getDatasetPage(start, size);
+    }
+
+
+    @ApiIgnore
+    @SuppressWarnings("checkstyle:linelength")
+    @ApiOperation(value = "Get all datasets by database", notes = "Get all datasets by database")
+    @RequestMapping(value = "/getDatasetByDB", method = GET, produces = APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public Page<Dataset> getAllDatasetsByDB(@ApiParam(value = "The name of database of which " +
+            "datasets need to be retrieved.")@RequestParam(value = "database", required = true) String database,
+            @ApiParam(value = "The starting point for the search, e.g: 0")
+            @RequestParam(value = "start", required = false, defaultValue = "0") int start,
+            @ApiParam(value = "The number of records to be retrieved, e.g: maximum 100.")
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+        Page<Dataset> data = datasetService.readDatasetsByDatabase(database, start, size);
+        return data;
+    }
+
+    @ApiOperation(value = "Retrieve the related datasets to one Dataset", position = 1,
+            notes = "Retrieve the related datasets to one Dataset")
+    @RequestMapping(value = "/getDRS", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    @ResponseBody
+    public Content[] getDRSID(
+            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
+            @RequestParam(value = "accession", required = true) String acc,
+            @ApiParam(value = "Database accession id, e.g : pride")
+            @RequestParam(value = "database", required = true) String domain) {
+
+        RestTemplate restTemplate = new RestTemplate();
+        Content[] result = new Content[0];
+        try {
+
+            result = restTemplate.getForObject(
+                    "http://hx-rke-wp-webadmin-21-master-1.caas.ebi.ac.uk:30008/datasets/{database}/{accession}",
+                    Content[].class, domain, acc
+            );
+        } catch (Exception ex) {
+            LOGGER.error("exception caught in getdrs request");
+        }
+
+        return result;
     }
 }
