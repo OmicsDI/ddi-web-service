@@ -459,7 +459,7 @@ public class DatasetController {
             event.setResource(resource);
             eventService.save(event);
         } catch (Exception ex) {
-            System.out.println(ex.getMessage() + " in logger service");
+            LOGGER.error(ex.getMessage() + " in logger service");
         }
 
         if (datasetDetail.getId() == null) {
