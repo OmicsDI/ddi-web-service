@@ -27,6 +27,7 @@ import uk.ac.ebi.ddi.ws.util.Constants;
 import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Controller for accessing the statistics
@@ -221,6 +222,10 @@ public class StatisticsController {
         List<String> distinctYears = WsUtilities.distinctYears(publicationDateFacetValueOfG,
                 publicationDateFacetValueOfM, publicationDateFacetValueOfP, publicationDateFacetValueOfT);
 
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        distinctYears = distinctYears.stream().filter(r -> (Integer.parseInt(r) <= currentYear)).
+                collect(Collectors.toList());
         distinctYears.sort(Collections.reverseOrder());
 
         for (int i = 0; i < 4; i++) {  //latest 4 years

@@ -274,11 +274,17 @@ public class DatasetController {
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public DataSetResult latest(
-            @ApiParam(value = "Number of terms to be retrieved, e.g : maximum 100, default 20")
-            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+            @ApiParam(value = "Number of terms to be retrieved, e.g : maximum 100, default 30")
+            @RequestParam(value = "size", required = false, defaultValue = "30") int size) {
 
         String query = "*:*";
-        return search(query, Constants.PUB_DATE_FIELD, "descending", 0, size, 10);
+        Calendar calendar = Calendar.getInstance();
+        Integer nextYear = calendar.get(Calendar.YEAR) + 1;
+        DataSetResult dataSetResult = search(query, Constants.PUB_DATE_FIELD, "descending", 0, size, 10);
+        dataSetResult.setDatasets(dataSetResult.getDatasets().stream().
+                filter(r -> !r.getPublicationDate().contains(nextYear.toString())).collect(Collectors.toList()));
+        //dataSetResult = dataSetResult.getDatasets().stream().filter(r -> !r.getPublicationDate().contains("2022")).;
+        return dataSetResult;
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
@@ -485,7 +491,9 @@ public class DatasetController {
             DataSetResult result = new DataSetResult();
             List<DatasetSummary> datasetSummaryList = new ArrayList<>();
             Page<MostAccessedDatasets> datasets = mostAccessedDatasetService.readAll(0, size);
+            //datasets.map(r -> )
             for (MostAccessedDatasets dataset : datasets.getContent()) {
+                            //if(dataset.getDates().values().stream().filter(r-> r.contains("20")))
                     DatasetSummary datasetSummary = new DatasetSummary();
                     datasetSummary.setTitle(dataset.getName());
                     datasetSummary.setViewsCount(dataset.getTotal());
