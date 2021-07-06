@@ -26,7 +26,7 @@
 
     <context:component-scan base-package="uk.ac.ebi.ddi.ws.modules"/>
     <context:component-scan base-package="uk.ac.ebi.ddi.ws.services"/>
-
+    <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
 
     <bean id="ebeyeWsConfigDev" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigDev" />
     <bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd" />
@@ -82,11 +82,13 @@
                               read-preference="PRIMARY_PREFERRED"/>
     </mongo:mongo-client>
 
-    <mongo:db-factory dbname="${ddi.mongo.app.db}" port="${ddi.mongo.app.port}" mongo-ref="mongoClient"/>
+    <mongo:db-factory dbname="${ddi.mongo.app.db}" mongo-ref="mongoClient"/>
 
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
         <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
     </bean>
 
+    <bean id="bioStudiesParserService" class="uk.ac.ebi.ddi.service.db.service.biostudies.StudiesParserService"/>
+    <!--<bean id="datasetService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetService"/>-->
     <bean class="uk.ac.ebi.ddi.service.db.utils.CascadingMongoEventListener" />
 </beans>
