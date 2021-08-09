@@ -2,8 +2,7 @@ FROM maven:3.5.0-jdk-8-alpine as builder
 
 WORKDIR /root
 COPY ./ /root/
-
-
+#updated location of file geoloite
 ADD http://ftp.ebi.ac.uk/pub/databases/omicsdi/geolite/GeoLite2-City.mmdb /root/
 
 #RUN tar -xvf GeoLite2-City.tar.gz --strip 1
