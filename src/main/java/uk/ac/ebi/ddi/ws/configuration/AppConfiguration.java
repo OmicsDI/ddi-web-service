@@ -18,7 +18,6 @@ import uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd;
 @EnableMongoRepositories(value = "uk.ac.ebi.ddi.service.db.repo")
 @ComponentScan({"uk.ac.ebi.ddi.service.db"})
 public class AppConfiguration {
-
     //private EbeyeWsConfigProd configProd = new EbeyeWsConfigProd();
 
     private EbeyeWsConfigDev configProd = new EbeyeWsConfigDev();
