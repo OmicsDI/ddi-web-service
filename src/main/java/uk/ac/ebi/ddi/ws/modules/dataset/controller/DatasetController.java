@@ -17,11 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-//import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
 import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
@@ -41,9 +38,10 @@ import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
 import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
 import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
-import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
-import uk.ac.ebi.ddi.ws.error.exception.ResourceNotFoundException;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.*;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.Role;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.security.UserPermissionService;
@@ -172,7 +170,6 @@ public class DatasetController {
 
         query = (query == null || query.isEmpty()) ? "*:*" : query;
 
-        query = WsUtilities.escapeSpecialCharacters(query);
         query = query + " NOT (isprivate:true)";
         query = modifyIfSearchByYear(query);
 
@@ -269,17 +266,11 @@ public class DatasetController {
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public DataSetResult latest(
-            @ApiParam(value = "Number of terms to be retrieved, e.g : maximum 100, default 30")
-            @RequestParam(value = "size", required = false, defaultValue = "30") int size) {
+            @ApiParam(value = "Number of terms to be retrieved, e.g : maximum 100, default 20")
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
 
         String query = "*:*";
-        Calendar calendar = Calendar.getInstance();
-        Integer nextYear = calendar.get(Calendar.YEAR) + 1;
-        DataSetResult dataSetResult = search(query, Constants.PUB_DATE_FIELD, "descending", 0, size, 10);
-        dataSetResult.setDatasets(dataSetResult.getDatasets().stream().
-                filter(r -> !r.getPublicationDate().contains(nextYear.toString())).collect(Collectors.toList()));
-        //dataSetResult = dataSetResult.getDatasets().stream().filter(r -> !r.getPublicationDate().contains("2022")).;
-        return dataSetResult;
+        return search(query, Constants.PUB_DATE_FIELD, "descending", 0, size, 10);
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
@@ -297,9 +288,6 @@ public class DatasetController {
             HttpServletRequest request) {
         database = databaseDetailService.retriveAnchorName(database);
         Dataset dataset = datasetService.read(accession, database);
-        if (dataset.getCurrentStatus().equals(DatasetCategory.DELETED.getType())) {
-            throw new ResponseStatusException(HttpStatus.MOVED_PERMANENTLY, "This dataset is not available anymore");
-        }
         String ipAddress = request.getHeader("X-FORWARDED-FOR");
         ipAddress = ipAddress != null ? ipAddress : request.getHeader("X-Cluster-Client-IP");
         ipAddress = ipAddress != null ? ipAddress : request.getRemoteAddr();
@@ -317,14 +305,14 @@ public class DatasetController {
         result.put("cross_references", dataset.getCrossReferences());
         result.put("is_claimable", dataset.isClaimable());
         result.put("scores", dataset.getScores());
-        //Map<String, List<String>> fileMap = datasetFileService.getFilesMap(accession, database);
-        String primaryAccession = getPreferableAccession(dataset.getFiles(), ipAddress, dataset.getAccession());
+        Map<String, List<String>> fileMap = datasetFileService.getFilesMap(accession, database);
+        String primaryAccession = getPreferableAccession(fileMap, ipAddress, dataset.getAccession());
         List<GalaxyFileExtension> galaxyFileExtensions = fileGroupService.findAllGalaxyExtensions();
         galaxyFileExtensions.sort((x1, x2) -> x2.getExtension().length() - x1.getExtension().length());
-        List<Object> files = dataset.getFiles().keySet().stream().map(x -> {
+        List<Object> files = fileMap.keySet().stream().map(x -> {
             Map<String, Object> providers = new HashMap<>();
             Map<String, List<String>> fileGroups = new HashMap<>();
-            dataset.getFiles().get(x).forEach(f -> {
+            fileMap.get(x).forEach(f -> {
                 String baseName = FileUtils.getFilenameFromUrl(f);
                 List<String> urls = new ArrayList<>(Collections.singleton(f));
                 String type = "Other";
@@ -351,7 +339,7 @@ public class DatasetController {
         return result;
     }
 
-    private String getPreferableAccession(Map<String, Set<String>> files, String ipAddress, String defaultAccession) {
+    private String getPreferableAccession(Map<String, List<String>> files, String ipAddress, String defaultAccession) {
         if (files.size() == 1) {
             return files.keySet().iterator().next();
         }
@@ -395,7 +383,7 @@ public class DatasetController {
             @ApiParam(value = "List of databases, matching accession by index")
             @RequestParam(value = "database") String[] databases) {
         if (accessions.length != databases.length) {
-            throw new IllegalArgumentException("The amounts of accessions and databases are not match.");
+            throw new IllegalArgumentException("The amounts of accessions and databases are not match");
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -430,6 +418,7 @@ public class DatasetController {
         return result;
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
     @RequestMapping(value = "/get", method = GET, produces = {APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.OK) // 200
@@ -461,10 +450,6 @@ public class DatasetController {
         DatasetSimilars similars = datasetSimilarsService.read(acc, databaseDetailService.retriveAnchorName(domain));
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 
-        //404 exception
-        if (datasetDetail.getId() == null) {
-            throw new ResourceNotFoundException("Dataset not found");
-        }
         return datasetDetail;
     }
 
@@ -989,31 +974,5 @@ public class DatasetController {
             @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
         Page<Dataset> data = datasetService.readDatasetsByDatabase(database, start, size);
         return data;
-    }
-
-    @ApiOperation(value = "Retrieve the related datasets to one Dataset", position = 1,
-            notes = "Retrieve the related datasets to one Dataset")
-    @RequestMapping(value = "/getDRS", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    @ResponseBody
-    public Content[] getDRSID(
-            @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "accession", required = true) String acc,
-            @ApiParam(value = "Database accession id, e.g : pride")
-            @RequestParam(value = "database", required = true) String domain) {
-
-        RestTemplate restTemplate = new RestTemplate();
-        Content[] result = new Content[0];
-
-        try {
-
-            result = restTemplate.getForObject(
-                    "http://hx-rke-wp-webadmin-21-master-1.caas.ebi.ac.uk:30008/datasets/{database}/{accession}",
-                    Content[].class, domain, acc
-            );
-        } catch (Exception ex) {
-            LOGGER.error("exception caught in getdrs request");
-        }
-        return result;
     }
 }
