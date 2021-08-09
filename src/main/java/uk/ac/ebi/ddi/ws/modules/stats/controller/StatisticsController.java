@@ -1,5 +1,6 @@
 package uk.ac.ebi.ddi.ws.modules.stats.controller;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -120,6 +121,7 @@ public class StatisticsController {
         return RepoStatsToWsStatsMapper.asFacetCount(diseases, DSField.Additional.DISEASE_FIELD.key());
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Get current webservice version", position = 1, notes = "Get current webservice version")
     @RequestMapping(value = "/version", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
@@ -130,6 +132,7 @@ public class StatisticsController {
         return res;
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Return General statistics about the Services", position = 1,
             notes = "Return General statistics about the Services")
     @RequestMapping(value = "/general", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -174,6 +177,7 @@ public class StatisticsController {
         return resultStat;
     }
 
+    @ApiIgnore
     @ApiOperation(value = "Return statistics about the number of datasets By Omics type on recent 5 years ",
             position = 1, notes = "Return statistics about the number of datasets per OmicsType on recent 5 years ")
     @RequestMapping(value = "/omicsByYear", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
