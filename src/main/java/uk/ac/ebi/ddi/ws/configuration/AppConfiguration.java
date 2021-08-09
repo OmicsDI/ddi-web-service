@@ -10,7 +10,6 @@ import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.facet.FacetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.publication.PublicationWsClient;
-import uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigDev;
 import uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd;
 
 @Configuration
@@ -18,10 +17,7 @@ import uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd;
 @EnableMongoRepositories(value = "uk.ac.ebi.ddi.service.db.repo")
 @ComponentScan({"uk.ac.ebi.ddi.service.db"})
 public class AppConfiguration {
-
-    //private EbeyeWsConfigProd configProd = new EbeyeWsConfigProd();
-
-    private EbeyeWsConfigDev configProd = new EbeyeWsConfigDev();
+    private EbeyeWsConfigProd configProd = new EbeyeWsConfigProd();
 
     @Bean
     public DatasetWsClient datasetWsClient() {
