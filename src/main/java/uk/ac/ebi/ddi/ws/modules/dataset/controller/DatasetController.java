@@ -436,29 +436,29 @@ public class DatasetController {
     @ResponseBody
     public DatasetDetail get(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "accession", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String accession,
             @ApiParam(value = "Database accession id, e.g: pride")
-            @RequestParam(value = "database", required = true) String domain,
+            @RequestParam(value = "database", required = true) String database,
             HttpServletRequest httpServletRequest, HttpServletResponse resp) {
-        acc = acc.replaceAll("\\s", "");
+        accession = accession.replaceAll("\\s", "");
 
         DatasetDetail datasetDetail = new DatasetDetail();
-        Dataset dsResult = datasetService.read(acc, databaseDetailService.retriveAnchorName(domain));
+        Dataset dsResult = datasetService.read(accession, databaseDetailService.retriveAnchorName(database));
 
         datasetDetail = getBasicDatasetInfo(datasetDetail, dsResult);
         datasetDetail = getDatasetInfo(datasetDetail, dsResult);
 
         // Trace the access to the dataset
-        DatasetResource resource = resourceService.read(acc, domain);
+        DatasetResource resource = resourceService.read(accession, database);
         if (resource == null) {
-                resource = new DatasetResource("http://www.omicsdi.org/" + domain + "/" + acc, acc, domain);
+                resource = new DatasetResource("http://www.omicsdi.org/" + database + "/" + accession, accession, database);
             resource = resourceService.save(resource);
         }
 
         HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
         event.setResource(resource);
         eventService.save(event);
-        DatasetSimilars similars = datasetSimilarsService.read(acc, databaseDetailService.retriveAnchorName(domain));
+        DatasetSimilars similars = datasetSimilarsService.read(accession, databaseDetailService.retriveAnchorName(database));
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 
         //404 exception
@@ -998,9 +998,9 @@ public class DatasetController {
     @ResponseBody
     public Content[] getDRSID(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "accession", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String accession,
             @ApiParam(value = "Database accession id, e.g : pride")
-            @RequestParam(value = "database", required = true) String domain) {
+            @RequestParam(value = "database", required = true) String database) {
 
         RestTemplate restTemplate = new RestTemplate();
         Content[] result = new Content[0];
@@ -1009,7 +1009,7 @@ public class DatasetController {
 
             result = restTemplate.getForObject(
                     "http://hx-rke-wp-webadmin-21-master-1.caas.ebi.ac.uk:30008/datasets/{database}/{accession}",
-                    Content[].class, domain, acc
+                    Content[].class, database, accession
             );
         } catch (Exception ex) {
             LOGGER.error("exception caught in getdrs request");
