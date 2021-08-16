@@ -22,7 +22,6 @@ public class LocationService {
 
     @Autowired
     public LocationService(@Value("${ddi.maxmind.db.path}") String maxmindDbFile) throws IOException {
-        //maxmindDbFile = "resources/GeoLite2-City.mmdb";
         LOGGER.info("Initialising LocationService...");
         File database = new File(maxmindDbFile);
         databaseReader = new DatabaseReader.Builder(database).build();

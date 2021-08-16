@@ -13,14 +13,12 @@ import uk.ac.ebi.ddi.ebe.ws.dao.client.publication.PublicationWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigDev;
 //import uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd;
 
+
 @Configuration
 @EnableSwagger
 @EnableMongoRepositories(value = "uk.ac.ebi.ddi.service.db.repo")
 @ComponentScan({"uk.ac.ebi.ddi.service.db"})
 public class AppConfiguration {
-
-    //private EbeyeWsConfigProd configProd = new EbeyeWsConfigProd();
-
     private EbeyeWsConfigDev configProd = new EbeyeWsConfigDev();
 
     @Bean
