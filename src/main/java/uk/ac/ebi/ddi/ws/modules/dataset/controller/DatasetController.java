@@ -491,11 +491,11 @@ public class DatasetController {
     @ResponseBody
     public DataSetResult moreLikeThis(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "accession", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String accession,
             @ApiParam(value = "Database accession id, e.g : pride")
-            @RequestParam(value = "database", required = true) String domain) {
+            @RequestParam(value = "database", required = true) String database) {
 
-        SimilarResult queryResult = dataWsClient.getSimilarProjects(domain, acc, Constants.MORELIKE_FIELDS);
+        SimilarResult queryResult = dataWsClient.getSimilarProjects(database, accession, Constants.MORELIKE_FIELDS);
 
         DataSetResult result = new DataSetResult();
         List<DatasetSummary> datasetSummaryList = new ArrayList<>();
@@ -509,7 +509,7 @@ public class DatasetController {
                 if (entry.getId() != null && entry.getSource() != null) {
                     Map<String, String> ids = currentIds.get(entry.getSource());
                     ids = (ids != null) ? ids : new HashMap<>();
-                    if (!(entry.getId().equalsIgnoreCase(acc) && entry.getSource().equalsIgnoreCase(domain))) {
+                    if (!(entry.getId().equalsIgnoreCase(accession) && entry.getSource().equalsIgnoreCase(database))) {
                         ids.put(entry.getId(), entry.getScore());
                     }
                     if (!ids.isEmpty()) {
@@ -554,17 +554,17 @@ public class DatasetController {
     @ResponseBody
     public List<String> getFileLinks(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "accession", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String accession,
             @ApiParam(value = "Database accession id, e.g : pride")
-            @RequestParam(value = "database", required = true) String domain) {
+            @RequestParam(value = "database", required = true) String database) {
         List<String> files = new ArrayList<>();
 
         String[] fields = {Constants.DATASET_FILE};
 
-        Set<String> currentIds = Collections.singleton(acc);
+        Set<String> currentIds = Collections.singleton(accession);
 
         QueryResult datasetResult = dataWsClient.getDatasetsById(
-                databaseDetailService.retriveAnchorName(domain), fields, currentIds);
+                databaseDetailService.retriveAnchorName(database), fields, currentIds);
 
         if (datasetResult != null && datasetResult.getEntries() != null && datasetResult.getEntries().length > 0) {
             Entry entry = datasetResult.getEntries()[0];
