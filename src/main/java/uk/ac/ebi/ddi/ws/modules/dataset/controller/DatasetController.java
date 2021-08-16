@@ -458,7 +458,8 @@ public class DatasetController {
         HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
         event.setResource(resource);
         eventService.save(event);
-        DatasetSimilars similars = datasetSimilarsService.read(accession, databaseDetailService.retriveAnchorName(database));
+        DatasetSimilars similars = datasetSimilarsService.
+                read(accession, databaseDetailService.retriveAnchorName(database));
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 
         //404 exception
