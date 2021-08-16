@@ -436,29 +436,29 @@ public class DatasetController {
     @ResponseBody
     public DatasetDetail get(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "accession", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String accession,
             @ApiParam(value = "Database accession id, e.g: pride")
-            @RequestParam(value = "database", required = true) String domain,
+            @RequestParam(value = "database", required = true) String database,
             HttpServletRequest httpServletRequest, HttpServletResponse resp) {
-        acc = acc.replaceAll("\\s", "");
+        accession = accession.replaceAll("\\s", "");
 
         DatasetDetail datasetDetail = new DatasetDetail();
-        Dataset dsResult = datasetService.read(acc, databaseDetailService.retriveAnchorName(domain));
+        Dataset dsResult = datasetService.read(accession, databaseDetailService.retriveAnchorName(database));
 
         datasetDetail = getBasicDatasetInfo(datasetDetail, dsResult);
         datasetDetail = getDatasetInfo(datasetDetail, dsResult);
 
         // Trace the access to the dataset
-        DatasetResource resource = resourceService.read(acc, domain);
+        DatasetResource resource = resourceService.read(accession, database);
         if (resource == null) {
-                resource = new DatasetResource("http://www.omicsdi.org/" + domain + "/" + acc, acc, domain);
+                resource = new DatasetResource("http://www.omicsdi.org/" + database + "/" + accession, accession, database);
             resource = resourceService.save(resource);
         }
 
         HttpEvent event = tranformServletResquestToEvent(httpServletRequest);
         event.setResource(resource);
         eventService.save(event);
-        DatasetSimilars similars = datasetSimilarsService.read(acc, databaseDetailService.retriveAnchorName(domain));
+        DatasetSimilars similars = datasetSimilarsService.read(accession, databaseDetailService.retriveAnchorName(database));
         datasetDetail = WsUtilities.mapSimilarsToDatasetDetails(datasetDetail, similars);
 
         //404 exception
@@ -506,11 +506,11 @@ public class DatasetController {
     @ResponseBody
     public DataSetResult moreLikeThis(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "accession", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String accession,
             @ApiParam(value = "Database accession id, e.g : pride")
-            @RequestParam(value = "database", required = true) String domain) {
+            @RequestParam(value = "database", required = true) String database) {
 
-        SimilarResult queryResult = dataWsClient.getSimilarProjects(domain, acc, Constants.MORELIKE_FIELDS);
+        SimilarResult queryResult = dataWsClient.getSimilarProjects(database, accession, Constants.MORELIKE_FIELDS);
 
         DataSetResult result = new DataSetResult();
         List<DatasetSummary> datasetSummaryList = new ArrayList<>();
@@ -524,7 +524,7 @@ public class DatasetController {
                 if (entry.getId() != null && entry.getSource() != null) {
                     Map<String, String> ids = currentIds.get(entry.getSource());
                     ids = (ids != null) ? ids : new HashMap<>();
-                    if (!(entry.getId().equalsIgnoreCase(acc) && entry.getSource().equalsIgnoreCase(domain))) {
+                    if (!(entry.getId().equalsIgnoreCase(accession) && entry.getSource().equalsIgnoreCase(database))) {
                         ids.put(entry.getId(), entry.getScore());
                     }
                     if (!ids.isEmpty()) {
@@ -569,17 +569,17 @@ public class DatasetController {
     @ResponseBody
     public List<String> getFileLinks(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "accession", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String accession,
             @ApiParam(value = "Database accession id, e.g : pride")
-            @RequestParam(value = "database", required = true) String domain) {
+            @RequestParam(value = "database", required = true) String database) {
         List<String> files = new ArrayList<>();
 
         String[] fields = {Constants.DATASET_FILE};
 
-        Set<String> currentIds = Collections.singleton(acc);
+        Set<String> currentIds = Collections.singleton(accession);
 
         QueryResult datasetResult = dataWsClient.getDatasetsById(
-                databaseDetailService.retriveAnchorName(domain), fields, currentIds);
+                databaseDetailService.retriveAnchorName(database), fields, currentIds);
 
         if (datasetResult != null && datasetResult.getEntries() != null && datasetResult.getEntries().length > 0) {
             Entry entry = datasetResult.getEntries()[0];
@@ -998,9 +998,9 @@ public class DatasetController {
     @ResponseBody
     public Content[] getDRSID(
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
-            @RequestParam(value = "accession", required = true) String acc,
+            @RequestParam(value = "accession", required = true) String accession,
             @ApiParam(value = "Database accession id, e.g : pride")
-            @RequestParam(value = "database", required = true) String domain) {
+            @RequestParam(value = "database", required = true) String database) {
 
         RestTemplate restTemplate = new RestTemplate();
         Content[] result = new Content[0];
@@ -1009,7 +1009,7 @@ public class DatasetController {
 
             result = restTemplate.getForObject(
                     "http://hx-rke-wp-webadmin-21-master-1.caas.ebi.ac.uk:30008/datasets/{database}/{accession}",
-                    Content[].class, domain, acc
+                    Content[].class, database, accession
             );
         } catch (Exception ex) {
             LOGGER.error("exception caught in getdrs request");
