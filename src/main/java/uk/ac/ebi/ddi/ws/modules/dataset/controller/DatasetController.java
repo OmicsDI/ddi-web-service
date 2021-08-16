@@ -828,7 +828,7 @@ public class DatasetController {
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<Dataset> getSimilarDatasets(
-            @ApiParam(value = "Pubmed Id of the Dataset in the resource, e.g : 16585740")
+            @ApiParam(value = "Pubmed Id of the Dataset in the resource, e.g: 16585740")
             @RequestParam(value = "pubmed", required = true) String pubmed) {
         return datasetService.getSimilarByPubmed(pubmed);
     }
