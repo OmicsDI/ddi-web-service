@@ -54,7 +54,7 @@ public class DatasetControllerTest {
 
     @Test
     public void testGet() throws Exception{
-        mockMvc.perform(get("/dataset/get?acc=PXD000210&database=pride")).andExpect(status().isOk());
+        mockMvc.perform(get("/dataset/get?accession=PXD000210&database=pride")).andExpect(status().isOk());
     }
 
     @Test
@@ -64,7 +64,7 @@ public class DatasetControllerTest {
 
     @Test
     public void testDataset()throws Exception{
-        mockMvc.perform(get("/dataset/get?acc=PXD001416&database=pride")).andExpect(status().isOk());
+        mockMvc.perform(get("/dataset/get?accession=PXD001416&database=pride")).andExpect(status().isOk());
     }
 
     @Test

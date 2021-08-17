@@ -142,7 +142,8 @@ public class RepoDatasetMapper {
         }
 
         if (hasValue(fields, DSField.Additional.CITATION_COUNT.key())) {
-            datasetSummary.setCitationsCount(Integer.valueOf(fields.get(DSField.Additional.CITATION_COUNT.key())[0]));
+            datasetSummary.setCitationsCount(Integer.valueOf(
+                    fields.get(DSField.Additional.CITATION_COUNT.key())[0].replace(".00", "")));
         }
 
         if (hasValue(fields, DSField.Additional.SEARCH_COUNT.key())) {
@@ -150,12 +151,14 @@ public class RepoDatasetMapper {
         }
 
         if (hasValue(fields, DSField.Additional.VIEW_COUNT.key())) {
-            datasetSummary.setViewsCount(Integer.valueOf(fields.get(DSField.Additional.VIEW_COUNT.key())[0]));
+            datasetSummary.setViewsCount(Integer.valueOf(fields.get(DSField.Additional.VIEW_COUNT.key())[0]
+                    .replace(".00", "")));
         }
 
         if (hasValue(fields, DSField.Additional.REANALYSIS_COUNT.key())) {
             datasetSummary.setReanalysisCount(
-                    Integer.valueOf(fields.get(DSField.Additional.REANALYSIS_COUNT.key())[0]));
+                    Integer.valueOf(fields.get(DSField.Additional.REANALYSIS_COUNT.key())[0]
+                            .replace(".00", "")));
         }
 
         if (hasValue(fields, DSField.Additional.DOWNLOAD_COUNT.key())) {
