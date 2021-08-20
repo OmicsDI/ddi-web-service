@@ -13,4 +13,4 @@ spec:
           - path: /ws(/|$)(.*)
             backend:
               serviceName: omicsdi-ddi-webservice
-              servicePort: 8080
+              servicePort: 8090
