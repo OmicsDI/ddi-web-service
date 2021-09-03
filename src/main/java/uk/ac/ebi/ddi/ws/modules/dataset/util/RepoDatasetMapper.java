@@ -142,20 +142,22 @@ public class RepoDatasetMapper {
         }
 
         if (hasValue(fields, DSField.Additional.CITATION_COUNT.key())) {
-            datasetSummary.setCitationsCount(Integer.valueOf(fields.get(DSField.Additional.CITATION_COUNT.key())[0]));
+            datasetSummary.setCitationsCount(Double.valueOf(
+                    fields.get(DSField.Additional.CITATION_COUNT.key())[0]).intValue());
         }
 
         if (hasValue(fields, DSField.Additional.SEARCH_COUNT.key())) {
-            datasetSummary.setConnectionsCount(Integer.valueOf(fields.get(DSField.Additional.SEARCH_COUNT.key())[0]));
+            datasetSummary.setConnectionsCount(Double.valueOf(
+                    fields.get(DSField.Additional.SEARCH_COUNT.key())[0]).intValue());
         }
 
         if (hasValue(fields, DSField.Additional.VIEW_COUNT.key())) {
-            datasetSummary.setViewsCount(Integer.valueOf(fields.get(DSField.Additional.VIEW_COUNT.key())[0]));
+            datasetSummary.setViewsCount(Double.valueOf(fields.get(DSField.Additional.VIEW_COUNT.key())[0]).intValue());
         }
 
         if (hasValue(fields, DSField.Additional.REANALYSIS_COUNT.key())) {
             datasetSummary.setReanalysisCount(
-                    Integer.valueOf(fields.get(DSField.Additional.REANALYSIS_COUNT.key())[0]));
+                    Double.valueOf(fields.get(DSField.Additional.REANALYSIS_COUNT.key())[0]).intValue());
         }
 
         if (hasValue(fields, DSField.Additional.DOWNLOAD_COUNT.key())) {

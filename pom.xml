@@ -6,7 +6,7 @@
     <parent>
         <groupId>uk.ac.ebi.ddi.maven</groupId>
         <artifactId>ddi-base-master</artifactId>
-        <version>1.5</version>
+        <version>1.7</version>
     </parent>
 
     <groupId>uk.ac.ebi.ddi</groupId>

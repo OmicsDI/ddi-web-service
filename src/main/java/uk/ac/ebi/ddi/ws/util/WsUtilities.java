@@ -248,7 +248,7 @@ public class WsUtilities {
 
     public static String escapeSpecialCharacters(String searchInput) {
         // + - & | ! ( ) { } [ ] ^ " ~ * ? : \ /
-        String[] specialCharacters = {"+", "&", "|", "!", "{", "}", "[", "]", "^", "~", "*", "?", "\\", "/" };
+        String[] specialCharacters = {"+", "&", "|", "!", "{", "}", "~", "?", "\\", "/" };
         String outputString = searchInput;
         if (searchInput != "*:*") {
             for (String spclChar : specialCharacters) {
