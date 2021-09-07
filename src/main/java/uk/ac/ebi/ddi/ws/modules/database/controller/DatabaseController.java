@@ -98,7 +98,7 @@ public class DatabaseController {
     public void getStreamFromImage() throws IOException {
         DatabaseDetail databaseDetail = new DatabaseDetail();
         BufferedImage bi = ImageIO.read(new File("/home/gaur/Downloads/EGA_LOGO.png"));
-        databaseDetail.setDatabaseName("Test");
+        databaseDetail.setDatabaseName("Test1");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(bi, "png", baos);
         baos.flush();
