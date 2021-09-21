@@ -40,7 +40,7 @@ import uk.ac.ebi.ddi.service.db.service.similarity.CitationService;
 import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
 import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.*;
-import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
+//import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.security.UserPermissionService;
 import uk.ac.ebi.ddi.ws.services.LocationService;
