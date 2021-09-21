@@ -162,9 +162,9 @@ public class DatasetController {
             @ApiParam(value = "The starting point for the search, e.g: 0")
             @RequestParam(value = "start", required = false, defaultValue = "0") int start,
             @ApiParam(value = "The number of records to be retrieved, e.g: maximum 100")
-            @RequestParam(value = "size", required = false, defaultValue = "20") int size,
+            @RequestParam(value = "size", required = false, defaultValue = "30") int size,
             @ApiParam(value = "The starting point for the search, e.g: 0")
-            @RequestParam(value = "faceCount", required = false, defaultValue = "20") int facetCount) {
+            @RequestParam(value = "faceCount", required = false, defaultValue = "30") int facetCount) {
 
         query = (query == null || query.isEmpty()) ? "*:*" : query;
 
@@ -204,7 +204,8 @@ public class DatasetController {
         }
 
         if (queryResult.getCount() > 0) {
-            queryResult.setFacets((new FacetViewAdapter(facetSettingsRepository)).process(queryResult.getFacets()));
+            queryResult.setFacets(queryResult.getFacets());
+            //queryResult.setFacets((new FacetViewAdapter(facetSettingsRepository)).process(queryResult.getFacets()));
         }
 
         return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
