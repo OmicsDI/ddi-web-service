@@ -269,7 +269,7 @@ public class DatasetController {
             @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
 
         String query = "*:*";
-        return search(query, Constants.PUB_DATE_FIELD, "descending", 0, size, 10);
+        return search(query, Constants.PUB_DATE_FIELD, "descending", 0, size, 0);
     }
 
     @ApiOperation(value = "Retrieve an Specific Dataset", position = 1, notes = "Retrieve an specific dataset")
