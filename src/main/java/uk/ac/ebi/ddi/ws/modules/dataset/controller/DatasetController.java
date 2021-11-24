@@ -296,9 +296,9 @@ public class DatasetController {
         DataSetResult dataSetResult = null;
         if (domain != Constants.MAIN_DOMAIN) {
             dataSetResult = search(query, Constants.MODELEXCHANGE_DOMAIN, Constants.PUB_DATE_FIELD,
-                    "descending", 0, size, 10);
+                    "descending", 0, size, 0);
         } else {
-            dataSetResult = search(query, Constants.MAIN_DOMAIN, Constants.PUB_DATE_FIELD, "descending", 0, size, 10);
+            dataSetResult = search(query, Constants.MAIN_DOMAIN, Constants.PUB_DATE_FIELD, "descending", 0, size, 0);
         }
         dataSetResult.setDatasets(dataSetResult.getDatasets().stream().
                 filter(r -> !r.getPublicationDate().contains(nextYear.toString())).collect(Collectors.toList()));
