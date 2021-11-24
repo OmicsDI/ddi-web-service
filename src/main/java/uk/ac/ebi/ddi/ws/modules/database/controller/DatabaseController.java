@@ -2,6 +2,8 @@ package uk.ac.ebi.ddi.ws.modules.database.controller;
 
 import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,12 +15,15 @@ import uk.ac.ebi.ddi.service.db.service.database.DatabaseService;
 import uk.ac.ebi.ddi.service.db.model.database.DatabaseDetail;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
 import uk.ac.ebi.ddi.ws.error.exception.OmicsDatabaseException;
+import uk.ac.ebi.ddi.ws.error.exception.ResourceNotFoundException;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
+//import javax.xml.crypto.Data;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,13 +41,42 @@ public class DatabaseController {
     @Autowired
     DatabaseService databaseService;
 
+    @Autowired
+    ServletContext servletContext;
+
     @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public List<DatabaseDetail> getDatabaseList() {
         return databaseDetailService.getDatabaseList();
     }
-    @Autowired
-    ServletContext servletContext;
+
+    @RequestMapping(value = "/modelexchange", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public List<DatabaseDetail> getModelExchangeDatabaseList() {
+        List<String> database = Arrays.asList("FAIRDOMHub", "Physiome Model Repository",
+                "BioModels", "Cell Collective");
+        return databaseDetailService.findModelExchangeDatabase(database);
+    }
+
+    @ApiOperation(value = "updateDb", notes = "updateDb")
+    @RequestMapping(value = "/updateDb", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 20
+    @ResponseBody
+    public DatabaseDetail updateDatabase(
+            @ApiParam(value = " example request {\"databaseName\":\"EVA\"" +
+                     "lastUpdated\":\"2021-09-30\"}")
+            @RequestBody() DatabaseDetail databaseDetail
+            ) {
+        DatabaseDetail databaseInfo = databaseDetailService.findDatabaseById(databaseDetail.getDatabaseName());
+        if (databaseInfo.getDatabaseName() != null) {
+            databaseInfo.setLastUpdated(databaseDetail.getLastUpdated());
+            databaseDetailService.saveDatabase(databaseInfo);
+        } else {
+            throw new ResourceNotFoundException("Database not found");
+        }
+        return databaseInfo;
+    }
+
 
     //@ApiIgnore
     @RequestMapping(value = "/{databaseName}/picture", method = RequestMethod.GET,

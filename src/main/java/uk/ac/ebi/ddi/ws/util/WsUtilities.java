@@ -181,7 +181,7 @@ public class WsUtilities {
         return new ArrayList<>(finalYears);
     }
 
-    private static List<String> addFacetValues(FacetValue[] facetValues) {
+    public static List<String> addFacetValues(FacetValue[] facetValues) {
         List<String> facetList = new ArrayList<>();
         if (facetValues != null && facetValues.length > 0) {
             for (FacetValue facetValue: facetValues) {

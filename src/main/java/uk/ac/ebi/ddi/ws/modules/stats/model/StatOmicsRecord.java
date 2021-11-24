@@ -14,6 +14,7 @@ public class StatOmicsRecord {
     private String metabolomics;
     private String proteomics;
     private String transcriptomics;
+    private String models;
 
     public StatOmicsRecord(String year, String genomicsNo, String metabolomicsNo, String proteomicsNo,
                            String transcriptomicsNo) {
@@ -23,7 +24,15 @@ public class StatOmicsRecord {
         this.proteomics = proteomicsNo;
         this.transcriptomics = transcriptomicsNo;
     }
-
+    public StatOmicsRecord(String year, String genomicsNo, String metabolomicsNo, String proteomicsNo,
+                           String transcriptomicsNo, String models) {
+        this.year = year;
+        this.genomics = genomicsNo;
+        this.metabolomics = metabolomicsNo;
+        this.proteomics = proteomicsNo;
+        this.transcriptomics = transcriptomicsNo;
+        this.models = models;
+    }
     public String getYear() {
         return year;
     }
@@ -62,5 +71,13 @@ public class StatOmicsRecord {
 
     public void setTranscriptomics(String transcriptomics) {
         this.transcriptomics = transcriptomics;
+    }
+
+    public String getModels() {
+        return models;
+    }
+
+    public void setModels(String models) {
+        this.models = models;
     }
 }

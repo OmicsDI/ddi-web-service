@@ -12,6 +12,7 @@ public class Constants {
 
     public static final String ENTRY_COUNT = "Number of entries";
     public static final String MAIN_DOMAIN = "omics";
+    public static final String MODELEXCHANGE_DOMAIN = "modelexchange";
     public static final String REPOSITORY_TAG = "Repositories";
     public static final String PUB_DATE_FIELD = "publication_date";
     public static final String[] PUB_DATES = new String[] {PUB_DATE_FIELD, DSField.Date.PUBLICATION.key()};
@@ -25,6 +26,8 @@ public class Constants {
     public static final String UNIPROT = "UNIPROT";
 
     public static final String CHEBI = "CHEBI";
+
+    public static final String BIOMODELS = "BioModels";
 
     public static final String[] DATASET_SUMMARY = {
             DSField.DESCRIPTION.key(),

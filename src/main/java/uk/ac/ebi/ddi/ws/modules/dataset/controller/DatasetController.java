@@ -163,6 +163,8 @@ public class DatasetController {
     public DataSetResult search(
             @ApiParam(value = "General search term against multiple fields including, e.g: cancer human")
             @RequestParam(value = "query", required = false, defaultValue = "") String query,
+            @ApiParam(value = "domain for which it will search for, e.g: omics")
+            @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain,
             @ApiParam(value = "Field to sort the output of the search results, e.g:  id, publication_date")
             @RequestParam(value = "sortfield", required = false, defaultValue = "") String sortfield,
             @ApiParam(value = "Type of sorting ascending or descending, e.g: ascending")
@@ -181,8 +183,16 @@ public class DatasetController {
         query = query + " NOT (isprivate:true)";
         query = modifyIfSearchByYear(query);
 
-        QueryResult queryResult = dataWsClient.getDatasets(
-                Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
+        QueryResult queryResult = null;
+
+        if (domain != Constants.MAIN_DOMAIN) {
+            queryResult = dataWsClient.getDatasets(
+                    Constants.MODELEXCHANGE_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size,
+                    facetCount);
+        } else {
+            queryResult = dataWsClient.getDatasets(
+                    Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
+        }
 
         QueryResult taxonomies = null;
 
@@ -275,12 +285,21 @@ public class DatasetController {
     @ResponseBody
     public DataSetResult latest(
             @ApiParam(value = "Number of terms to be retrieved, e.g : maximum 100, default 30")
-            @RequestParam(value = "size", required = false, defaultValue = "30") int size) {
+            @RequestParam(value = "size", required = false, defaultValue = "30") int size,
+            @ApiParam(value = "domain for search results, e.g : ")
+            @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain) {
 
         String query = "*:*";
         Calendar calendar = Calendar.getInstance();
         Integer nextYear = calendar.get(Calendar.YEAR) + 1;
-        DataSetResult dataSetResult = search(query, Constants.PUB_DATE_FIELD, "descending", 0, size, 10);
+
+        DataSetResult dataSetResult = null;
+        if (domain != Constants.MAIN_DOMAIN) {
+            dataSetResult = search(query, Constants.MODELEXCHANGE_DOMAIN, Constants.PUB_DATE_FIELD,
+                    "descending", 0, size, 10);
+        } else {
+            dataSetResult = search(query, Constants.MAIN_DOMAIN, Constants.PUB_DATE_FIELD, "descending", 0, size, 10);
+        }
         dataSetResult.setDatasets(dataSetResult.getDatasets().stream().
                 filter(r -> !r.getPublicationDate().contains(nextYear.toString())).collect(Collectors.toList()));
         //dataSetResult = dataSetResult.getDatasets().stream().filter(r -> !r.getPublicationDate().contains("2022")).;
@@ -486,13 +505,22 @@ public class DatasetController {
     @ResponseBody
     public DataSetResult getMostAccessed(
             @ApiParam(value = "The most accessed datasets size, e.g: 20")
-            @RequestParam(value = "size", required = true, defaultValue = "20") int size) {
+            @RequestParam(value = "size", required = true, defaultValue = "20") int size,
+            @ApiParam(value = "domain for search results, e.g : ")
+            @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain) {
 
             DataSetResult result = new DataSetResult();
             List<DatasetSummary> datasetSummaryList = new ArrayList<>();
-            Page<MostAccessedDatasets> datasets = mostAccessedDatasetService.readAll(0, size);
+            List<MostAccessedDatasets> datasets;
+            if (domain != Constants.MAIN_DOMAIN) {
+                List<String> database = Arrays.asList("FAIRDOMHub", "Physiome Model Repository",
+                        "BioModels", "Cell Collective");
+                datasets = mostAccessedDatasetService.getMostAccessedByDatabase(database);
+            } else {
+                datasets = mostAccessedDatasetService.readAll(0, size).getContent();
+            }
             //datasets.map(r -> )
-            for (MostAccessedDatasets dataset : datasets.getContent()) {
+            for (MostAccessedDatasets dataset : datasets) {
                             //if(dataset.getDates().values().stream().filter(r-> r.contains("20")))
                     DatasetSummary datasetSummary = new DatasetSummary();
                     datasetSummary.setTitle(dataset.getName());
@@ -521,9 +549,12 @@ public class DatasetController {
             @ApiParam(value = "Accession of the Dataset in the resource, e.g : PXD000210")
             @RequestParam(value = "accession", required = true) String accession,
             @ApiParam(value = "Database accession id, e.g : pride")
-            @RequestParam(value = "database", required = true) String database) {
+            @RequestParam(value = "database", required = true) String database,
+            @ApiParam(value = "domain for search results, e.g : ")
+            @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain) {
 
-        SimilarResult queryResult = dataWsClient.getSimilarProjects(database, accession, Constants.MORELIKE_FIELDS);
+        SimilarResult queryResult = dataWsClient.getSimilarProjectsByDomain(database, accession,
+                Constants.MORELIKE_FIELDS, domain);
 
         DataSetResult result = new DataSetResult();
         List<DatasetSummary> datasetSummaryList = new ArrayList<>();

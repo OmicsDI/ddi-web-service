@@ -81,7 +81,11 @@ public class TermController {
             String[] subdomains = WsUtilities.getSubdomainList(domainList);
             domain = WsUtilities.validateDomain(subdomains, domain);
         }
-
+        if (Constants.MODELEXCHANGE_DOMAIN.equalsIgnoreCase(domain)) {
+            DomainList domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
+            String[] subdomains = WsUtilities.getSubdomainList(domainList);
+            domain = WsUtilities.validateDomain(subdomains, domain);
+        }
         TermResult termResult = null;
 
         if (domain != null) {
