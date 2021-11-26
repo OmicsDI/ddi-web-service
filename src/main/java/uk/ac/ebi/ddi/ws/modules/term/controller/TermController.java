@@ -16,12 +16,10 @@ import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dictionary.DictWord;
-import uk.ac.ebi.ddi.ebe.ws.dao.model.domain.DomainList;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.term.model.Term;
 import uk.ac.ebi.ddi.ws.util.Constants;
-import uk.ac.ebi.ddi.ws.util.WsUtilities;
 
 import java.util.List;
 
@@ -76,7 +74,7 @@ public class TermController {
             @RequestParam(value = "field", required = true, defaultValue = "description") String field) {
 
 
-        if (!Constants.MAIN_DOMAIN.equalsIgnoreCase(domain)) {
+        /*if (Constants.MAIN_DOMAIN.equalsIgnoreCase(domain)) {
             DomainList domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
             String[] subdomains = WsUtilities.getSubdomainList(domainList);
             domain = WsUtilities.validateDomain(subdomains, domain);
@@ -85,7 +83,7 @@ public class TermController {
             DomainList domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
             String[] subdomains = WsUtilities.getSubdomainList(domainList);
             domain = WsUtilities.validateDomain(subdomains, domain);
-        }
+        }*/
         TermResult termResult = null;
 
         if (domain != null) {
