@@ -185,7 +185,7 @@ public class DatasetController {
 
         QueryResult queryResult = null;
 
-        if (domain != Constants.MAIN_DOMAIN) {
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
             queryResult = dataWsClient.getDatasets(
                     Constants.MODELEXCHANGE_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size,
                     facetCount);
@@ -294,7 +294,7 @@ public class DatasetController {
         Integer nextYear = calendar.get(Calendar.YEAR) + 1;
 
         DataSetResult dataSetResult = null;
-        if (domain != Constants.MAIN_DOMAIN) {
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
             dataSetResult = search(query, Constants.MODELEXCHANGE_DOMAIN, Constants.PUB_DATE_FIELD,
                     "descending", 0, size, 0);
         } else {
@@ -512,7 +512,7 @@ public class DatasetController {
             DataSetResult result = new DataSetResult();
             List<DatasetSummary> datasetSummaryList = new ArrayList<>();
             List<MostAccessedDatasets> datasets;
-            if (domain != Constants.MAIN_DOMAIN) {
+            if (!domain.equals(Constants.MAIN_DOMAIN)) {
                 List<String> database = Arrays.asList("FAIRDOMHub", "Physiome Model Repository",
                         "BioModels", "Cell Collective");
                 datasets = mostAccessedDatasetService.getMostAccessedByDatabase(database);

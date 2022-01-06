@@ -66,14 +66,14 @@ public class StatisticsController {
         int size = 1;
         int facetCount = 25;
         DomainList domainList;
-        if (domain != Constants.MAIN_DOMAIN) {
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
             domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
         } else {
             domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
         }
         String privateModelQuery = "(isprivate:true)";
         QueryResult queryResultOfPrivateModel;
-        if (domain != Constants.MAIN_DOMAIN) {
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
             queryResultOfPrivateModel = dataWsClient.getDatasets(Constants.MODELEXCHANGE_DOMAIN,
                     privateModelQuery,
                     Constants.DATASET_SUMMARY, null, order, start, size, facetCount);
@@ -103,7 +103,7 @@ public class StatisticsController {
             @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain) {
 
         DomainList domainList = null;
-        if (domain != Constants.MAIN_DOMAIN) {
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
             domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
         } else {
             domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
@@ -125,7 +125,7 @@ public class StatisticsController {
             @ApiParam(value = "domain to find the information, e.g: omics")
             @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain) {
         DomainList domainList = null;
-        if (domain != Constants.MAIN_DOMAIN) {
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
             domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
         } else {
             domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
@@ -175,7 +175,7 @@ public class StatisticsController {
             @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain) {
 
         DomainList domainList = null;
-         if (domain != Constants.MAIN_DOMAIN) {
+         if (!domain.equals(Constants.MAIN_DOMAIN)) {
              domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
          } else {
              domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
@@ -210,7 +210,7 @@ public class StatisticsController {
     ) {
 
         DomainList domainList = null;
-        if (domain != Constants.MAIN_DOMAIN) {
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
             domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
         } else {
             domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
@@ -223,7 +223,7 @@ public class StatisticsController {
         resultStat.add(new StatRecord("Different Datasets", String.valueOf(numberOfDatasets), null));
 
         FacetList facet;
-        if (domain != Constants.MAIN_DOMAIN) {
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
             facet = facetWsClient.getFacetEntriesByDomains(
                     Constants.MODELEXCHANGE_DOMAIN, subdomains, DSField.Additional.DISEASE_FIELD.key(), 100);
         } else {
@@ -237,7 +237,7 @@ public class StatisticsController {
                         String.valueOf(facet.getFacets()[0].getTotal()), null));
         }
 
-        if (domain != Constants.MAIN_DOMAIN) {
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
             facet = facetWsClient.getFacetEntriesByDomains(
                     Constants.MODELEXCHANGE_DOMAIN, subdomains, DSField.Additional.TISSUE_FIELD.key(), 100);
         } else {
@@ -250,7 +250,7 @@ public class StatisticsController {
                     String.valueOf(facet.getFacets()[0].getTotal()), null));
         }
 
-        if (domain != Constants.MAIN_DOMAIN) {
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
             facet = facetWsClient.getFacetEntriesByDomains(
                     Constants.MODELEXCHANGE_DOMAIN, subdomains, DSField.CrossRef.TAXONOMY.key(), 100);
         } else {
