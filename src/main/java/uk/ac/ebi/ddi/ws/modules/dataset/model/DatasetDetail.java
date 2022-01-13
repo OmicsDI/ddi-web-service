@@ -91,6 +91,8 @@ public class DatasetDetail implements Serializable {
 
     double downloadCountScaled;
 
+    String currentStatus;
+
     /**
      * Keywords related wit the type of the experiment, this keywords are
      * assigned by the DDI system
@@ -150,6 +152,14 @@ public class DatasetDetail implements Serializable {
     Boolean isClaimable;
 
     Scores scores;
+
+    public String getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public void setCurrentStatus(String currentStatus) {
+        this.currentStatus = currentStatus;
+    }
 
     public Set<String> getRepositories() {
         return repositories;

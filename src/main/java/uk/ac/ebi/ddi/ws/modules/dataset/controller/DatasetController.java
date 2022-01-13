@@ -674,6 +674,7 @@ public class DatasetController {
         datasetDetail.setClaimable(argDataset.isClaimable());
         datasetDetail.setOmics_type(new ArrayList<>(omicsType));
         datasetDetail.setScores(argDataset.getScores());
+        datasetDetail.setCurrentStatus(argDataset.getCurrentStatus());
 
         if (publicationDates != null && !publicationDates.isEmpty()) {
             datasetDetail.setPublicationDate(publicationDates.iterator().next());
