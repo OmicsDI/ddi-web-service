@@ -188,6 +188,51 @@ public class StatisticsController {
         return RepoStatsToWsStatsMapper.asFacetCount(diseases, DSField.Additional.DISEASE_FIELD.key());
     }
 
+    @ApiOperation(value = "Return statistics about the number of datasets per repository", position = 1,
+            notes = "Return statistics about the number of datasets per diseases")
+    @RequestMapping(value = "/repository", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    @ResponseBody
+    public List<StatRecord> getRepositories(
+            @ApiParam(value = "Repository to be retrieved: maximum 100")
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size,
+            @ApiParam(value = "domain to find the information, e.g: omics")
+            @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain) {
+
+        DomainList domainList = null;
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
+            domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
+        } else {
+            domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+        }
+
+        String[] subdomains  = WsUtilities.getSubdomainList(domainList);
+        FacetList repository =
+                facetWsClient.getFacetEntriesByDomains(
+                        Constants.MAIN_DOMAIN, subdomains, DSField.Additional.REPOSITORY.key(), size);
+
+        String privateModelQuery = "(isprivate:true)";
+        QueryResult queryResultOfPrivateModel;
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
+            queryResultOfPrivateModel = dataWsClient.getDatasets(Constants.MODELEXCHANGE_DOMAIN,
+                    privateModelQuery,
+                    Constants.DATASET_SUMMARY, null, Constants.ORDER_ASCENDING, 0, size, 100);
+        } else {
+            queryResultOfPrivateModel = dataWsClient.getDatasets(Constants.MAIN_DOMAIN,
+                    privateModelQuery,
+                    Constants.DATASET_SUMMARY, null, Constants.ORDER_ASCENDING, 0, size, 100);
+        }
+        Integer privateCount = queryResultOfPrivateModel.getCount();
+        FacetValue facetValue = Arrays.stream(repository.getFacets()[0].getFacetValues()).
+                filter(r -> r.getLabel().equals(Constants.BIOMODELS)).findFirst().get();
+        Integer modelCount = Integer.parseInt(facetValue.getCount());
+        Integer nonPrivateCount = modelCount - privateCount;
+        facetValue.setCount(nonPrivateCount.toString());
+
+
+        return RepoStatsToWsStatsMapper.asFacetCount(repository, DSField.Additional.REPOSITORY.key());
+    }
+
     @ApiIgnore
     @ApiOperation(value = "Get current webservice version", position = 1, notes = "Get current webservice version")
     @RequestMapping(value = "/version", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
