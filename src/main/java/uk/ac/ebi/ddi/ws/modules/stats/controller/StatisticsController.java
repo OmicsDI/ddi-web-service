@@ -141,10 +141,17 @@ public class StatisticsController {
     @RequestMapping(value = "/omics", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
-    public List<StatRecord> getOmics() {
+    public List<StatRecord> getOmics(
+            @ApiParam(value = "domain to find the information, e.g: omics")
+            @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain) {
 
-        DomainList domain = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
-        String[] dubdomains  = WsUtilities.getSubdomainList(domain);
+        DomainList domainList = null;
+        if (!domain.equals(Constants.MAIN_DOMAIN)) {
+            domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
+        } else {
+            domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+        }
+        String[] dubdomains  = WsUtilities.getSubdomainList(domainList);
         FacetList omics = facetWsClient.getFacetEntriesByDomains(
                 Constants.MAIN_DOMAIN, dubdomains, DSField.Additional.OMICS.key(), 100);
         return RepoStatsToWsStatsMapper.asFacetCount(omics, DSField.Additional.OMICS.key());
@@ -190,7 +197,7 @@ public class StatisticsController {
 
     @ApiOperation(value = "Return statistics about the number of datasets per repository", position = 1,
             notes = "Return statistics about the number of datasets per diseases")
-    @RequestMapping(value = "/repository", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/repositories", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     @ResponseBody
     public List<StatRecord> getRepositories(
