@@ -20,11 +20,14 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.dictionary.DictionaryClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Entry;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.Facet;
+import uk.ac.ebi.ddi.ebe.ws.dao.model.common.FacetValue;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.common.QueryResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.SimilarResult;
 import uk.ac.ebi.ddi.service.db.model.dataset.*;
@@ -56,18 +59,21 @@ import uk.ac.ebi.ddi.ws.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import uk.ac.ebi.ddi.ws.modules.dataset.model.Content;
+import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
+import uk.ac.ebi.ddi.xml.validator.utils.Tuple;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.*;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static uk.ac.ebi.ddi.ws.util.WsUtilities.tranformServletResquestToEvent;
 //import static uk.ac.ebi.ddi.ws.util.WsUtilities.tranformServletResquestToEvent;
@@ -222,6 +228,17 @@ public class DatasetController {
         } else if (taxonomyIds.size() > 0) {
            taxonomies = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, taxonomyIds);
         }
+
+        Facet[] facets = queryResult.getFacets();
+
+        for (Facet facet : facets) {
+            if (facet.getId().equals("omics_type") && domain.equals(Constants.MODELEXCHANGE_DOMAIN.toString())) {
+                FacetValue[] nonMultiomics = Arrays.stream(facet.getFacetValues()).
+                        filter(rt -> !rt.getLabel().equals("Multiomics")).toArray(FacetValue[]::new);
+                facet.setFacetValues(nonMultiomics);
+            }
+        }
+
 
         if (queryResult.getCount() > 0) {
             queryResult.setFacets((new FacetViewAdapter(facetSettingsRepository)).process(queryResult.getFacets()));
@@ -656,7 +673,85 @@ public class DatasetController {
         return getDatasetInfo(datasetDetail, dsResult);
     }
 
+    @ApiOperation(value = "check file validaton", notes = "check file validation url")
+    @RequestMapping(value = "/checkfile", method = RequestMethod.POST, consumes = MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    @ResponseBody
+    public List<String> checkFile(
+            @ApiParam(value = "small sample xml file to be validated for omicsdi or by covid portal, "
+                    + "e.g :omicsdidata.xml")
+            @RequestParam(value = "file", required = true) MultipartFile file,
+            @ApiParam(value = "domain of the validator , "
+                    + "e.g :omicsdi, bycovid")
+            @RequestParam(value = "validatorType", required = false, defaultValue = "omicsdi")
+                    String validatorType,
+            @ApiParam(value = "errors or errors and warnings, "
+                        + "e.g :true or false")
+            @RequestParam(value = "isError", required = false, defaultValue = "true")
+                    boolean isError) throws IOException {
 
+            System.out.println(file.getInputStream().read());
+        //File targetFile = new File("/partition/tmp/up/temp.xml");
+        File targetFile = File.createTempFile("temp", ".xml");
+
+        java.nio.file.Files.copy(
+                file.getInputStream(),
+                targetFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING);
+        targetFile.isFile();
+        OmicsXMLFile.validateSchema(targetFile);
+        List<String> errorList = new LinkedList<String>();
+
+            List<Tuple> errors = OmicsXMLFile.validateSemantic(targetFile);
+            System.out.println(errors);
+
+            if (!isError) {
+                errorList = errors.stream().map(rt -> updateMessage(rt.getValue().toString(), validatorType)).
+                        filter(r -> filterBycovidWarnings(r)).collect(Collectors.toList());
+            } else {
+                errorList = errors.stream().filter(r -> (r.getKey().equals("Error") &&
+                        !r.getValue().toString().contains("Publication") &&
+                        !r.getValue().toString().contains("cvc-complex") &&
+                        !r.getValue().toString().contains("Experiment") &&
+                        //!r.getValue().toString().contains("Omics Type") &&
+                        //!r.getValue().toString().contains("Submitter") &&
+                        filterBycovidMsg(r.getValue().toString(), validatorType))
+                ).map(rt -> updateMessage(rt.getValue().toString(), validatorType)).collect(Collectors.toList());
+            }
+         return errorList;
+    }
+
+    private boolean filterBycovidWarnings(String message) {
+        if (message.contains("[Warning]")) {
+            if (message.contains("Dataset Abstract Sample Protocol") ||
+                    message.contains("Dataset Abstract Sample Protocol") || message.contains("Instrument Platform")) {
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private String updateMessage(String message, String validatorType) {
+
+        if (validatorType.equals("bycovid")) {
+            if (message.contains("Dataset Omics Type") || message.contains("Submitter")) {
+                message = message.replaceAll("Error", "Warning");
+            }
+            /*if (message.contains("Submitter")) {
+                message = message.replaceAll("Error", "Warn");
+            }*/
+        }
+        return message;
+    }
+
+    private boolean filterBycovidMsg(String message, String validatorType) {
+        if (validatorType.equals("bycovid")) {
+            return (message.contains("Dataset Omics Type") || message.contains("Submitter")) ? false : true;
+        } else {
+            return true;
+        }
+    }
     private DatasetDetail getBasicDatasetInfo(DatasetDetail datasetDetail, Dataset argDataset) {
         if (argDataset == null) {
             return datasetDetail;
@@ -1050,4 +1145,5 @@ public class DatasetController {
 
         return result;
     }
+
 }

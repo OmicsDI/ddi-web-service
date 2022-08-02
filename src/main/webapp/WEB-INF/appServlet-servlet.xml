@@ -88,7 +88,7 @@
     <bean id="publicationWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.publication.PublicationWsClient">
         <constructor-arg ref="solrWsConfigDev"/>
     </bean>-->
-    <!--<bean id="domainClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient">
+   <!-- <bean id="domainClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient">
         <constructor-arg ref="ebeyeWsConfigDev"/>
     </bean>
 
@@ -106,8 +106,8 @@
 
     <bean id="publicationWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.publication.PublicationWsClient">
         <constructor-arg ref="ebeyeWsConfigDev"/>
-    </bean>-->
-
+    </bean>
+-->
     <!-- Maven information an autowired classes -->
 
     <mongo:repositories base-package="uk.ac.ebi.ddi.service.db.repo" />
@@ -134,4 +134,12 @@
     <!--<bean class="uk.ac.ebi.ddi.service.db.utils.CascadingMongoEventListener" />-->
     <bean id="eventService" class="uk.ac.ebi.ddi.service.db.service.logger.HttpEventService" />
     <bean id="resourceService" class="uk.ac.ebi.ddi.service.db.service.logger.DatasetResourceService" />
+<!--    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="1000000"/>
+        <property name="uploadTempDir" value="resources/validate"/>
+    </bean>-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="268435456"/>
+        <!--<property name="uploadTempDir" value="resources/validate"/>-->
+    </bean>
 </beans>
