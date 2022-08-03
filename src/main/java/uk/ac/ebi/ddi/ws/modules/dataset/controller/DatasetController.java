@@ -703,6 +703,7 @@ public class DatasetController {
         List<String> errorList = new LinkedList<String>();
 
             List<Tuple> errors = OmicsXMLFile.validateSemantic(targetFile);
+            //errors.addAll(OmicsXMLFile.validateSchema(targetFile));
             System.out.println(errors);
 
             if (!isError) {
@@ -723,10 +724,10 @@ public class DatasetController {
 
     private boolean filterBycovidWarnings(String message) {
         if (message.contains("[Warning]")) {
-            if (message.contains("Dataset Abstract Sample Protocol") ||
+            /*if (message.contains("Dataset Abstract Sample Protocol") ||
                     message.contains("Dataset Abstract Sample Protocol") || message.contains("Instrument Platform")) {
                 return true;
-            }
+            }*/
             return false;
         }
         return true;
