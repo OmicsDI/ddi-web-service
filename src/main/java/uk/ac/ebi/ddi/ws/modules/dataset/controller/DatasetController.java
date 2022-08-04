@@ -690,7 +690,7 @@ public class DatasetController {
             @RequestParam(value = "isError", required = false, defaultValue = "true")
                     boolean isError) throws IOException {
 
-            System.out.println(file.getInputStream().read());
+        //System.out.println(file.getInputStream().read());
         //File targetFile = new File("/partition/tmp/up/temp.xml");
         File targetFile = File.createTempFile("temp", ".xml");
 
@@ -699,8 +699,9 @@ public class DatasetController {
                 targetFile.toPath(),
                 StandardCopyOption.REPLACE_EXISTING);
         targetFile.isFile();
-        OmicsXMLFile.validateSchema(targetFile);
+        //OmicsXMLFile.validateSchema(targetFile);
         List<String> errorList = new LinkedList<String>();
+
 
             List<Tuple> errors = OmicsXMLFile.validateSemantic(targetFile);
             //errors.addAll(OmicsXMLFile.validateSchema(targetFile));
@@ -717,7 +718,8 @@ public class DatasetController {
                         //!r.getValue().toString().contains("Omics Type") &&
                         //!r.getValue().toString().contains("Submitter") &&
                         filterBycovidMsg(r.getValue().toString(), validatorType))
-                ).map(rt -> updateMessage(rt.getValue().toString(), validatorType)).collect(Collectors.toList());
+                ).map(rt -> updateMessage(rt.getValue().toString(), validatorType))
+                        .distinct().collect(Collectors.toList());
             }
          return errorList;
     }
