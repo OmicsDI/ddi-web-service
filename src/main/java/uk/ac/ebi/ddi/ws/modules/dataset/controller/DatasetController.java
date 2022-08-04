@@ -703,16 +703,16 @@ public class DatasetController {
         List<String> errorList = new LinkedList<String>();
 
 
-            List<Tuple> errors = OmicsXMLFile.validateSemantic(targetFile);
+            Set<Tuple> errors = OmicsXMLFile.validateSemantic(targetFile);
             //errors.addAll(OmicsXMLFile.validateSchema(targetFile));
-            System.out.println(errors);
+            errors.stream().forEach(r -> System.out.println(r.getValue()));
 
             if (!isError) {
                 errorList = errors.stream().map(rt -> updateMessage(rt.getValue().toString(), validatorType)).
                         filter(r -> filterBycovidWarnings(r)).collect(Collectors.toList());
             } else {
                 errorList = errors.stream().filter(r -> (r.getKey().equals("Error") &&
-                        !r.getValue().toString().contains("Publication") &&
+                        //!r.getValue().toString().contains("Publication") &&
                         !r.getValue().toString().contains("cvc-complex") &&
                         !r.getValue().toString().contains("Experiment") &&
                         //!r.getValue().toString().contains("Omics Type") &&
@@ -726,6 +726,10 @@ public class DatasetController {
 
     private boolean filterBycovidWarnings(String message) {
         if (message.contains("[Warning]")) {
+            if (message.contains("Dataset Abstract Sample Protocol") ||
+                    message.contains("Dataset Abstract Sample Protocol") || message.contains("Instrument Platform")) {
+                return true;
+            }
             /*if (message.contains("Dataset Abstract Sample Protocol") ||
                     message.contains("Dataset Abstract Sample Protocol") || message.contains("Instrument Platform")) {
                 return true;
