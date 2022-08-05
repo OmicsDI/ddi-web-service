@@ -709,7 +709,7 @@ public class DatasetController {
 
             if (!isError) {
                 errorList = errors.stream().map(rt -> updateMessage(rt.getValue().toString(), validatorType)).
-                        filter(r -> filterBycovidWarnings(r)).collect(Collectors.toList());
+                        filter(r -> filterBycovidWarnings(r,validatorType)).collect(Collectors.toList());
             } else {
                 errorList = errors.stream().filter(r -> (r.getKey().equals("Error") &&
                         //!r.getValue().toString().contains("Publication") &&
@@ -724,10 +724,12 @@ public class DatasetController {
          return errorList;
     }
 
-    private boolean filterBycovidWarnings(String message) {
-        if (message.contains("[Warning]")) {
-            if (message.contains("Dataset Abstract Sample Protocol") ||
-                    message.contains("Dataset Abstract Sample Protocol") || message.contains("Instrument Platform")) {
+    private boolean filterBycovidWarnings(String message, String validatorType) {
+        if (message.contains("[Warning]") && validatorType.equals("bycovid")) {
+            if (message.contains("Database Description") ||
+                    message.contains("Database Release Date") || message.contains("Database Entries Count")
+                || message.contains("Database Keywords") || message.contains("Database URL")
+            ) {
                 return true;
             }
             /*if (message.contains("Dataset Abstract Sample Protocol") ||
