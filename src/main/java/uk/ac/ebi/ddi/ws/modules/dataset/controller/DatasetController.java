@@ -703,13 +703,13 @@ public class DatasetController {
         List<String> errorList = new LinkedList<String>();
 
 
-            Set<Tuple> errors = OmicsXMLFile.validateSemantic(targetFile);
+            List<Tuple> errors = OmicsXMLFile.validateSemantic(targetFile);
             //errors.addAll(OmicsXMLFile.validateSchema(targetFile));
             errors.stream().forEach(r -> System.out.println(r.getValue()));
 
             if (!isError) {
                 errorList = errors.stream().map(rt -> updateMessage(rt.getValue().toString(), validatorType)).
-                        filter(r -> filterBycovidWarnings(r, validatorType)).collect(Collectors.toList());
+                        filter(r -> filterBycovidWarnings(r, validatorType)).distinct().collect(Collectors.toList());
             } else {
                 errorList = errors.stream().filter(r -> (r.getKey().equals("Error") &&
                         //!r.getValue().toString().contains("Publication") &&
