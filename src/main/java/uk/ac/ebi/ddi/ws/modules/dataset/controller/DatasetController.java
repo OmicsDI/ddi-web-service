@@ -769,7 +769,7 @@ public class DatasetController {
         Map<String, Set<String>> fields = argDataset.getAdditional();
         Map<String, Set<String>> crossFields = argDataset.getCrossReferences();
         Set<String> omicsType = argDataset.getAdditional().get(DSField.Additional.OMICS.key());
-        Set<String> publicationDates = argDataset.getDates().get("publication");
+        Set<String> publicationDates = argDataset.getDates().get(DSField.Date.PUBLICATION.key());
 
         datasetDetail.setId(argDataset.getAccession());
         datasetDetail.setSource(databaseDetailService.retriveSolrName(argDataset.getDatabase()));
