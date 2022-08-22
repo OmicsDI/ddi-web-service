@@ -310,16 +310,23 @@ public class DatasetController {
         Calendar calendar = Calendar.getInstance();
         Integer nextYear = calendar.get(Calendar.YEAR) + 1;
 
-        DataSetResult dataSetResult = null;
-        if (!domain.equals(Constants.MAIN_DOMAIN)) {
-            dataSetResult = search(query, Constants.MODELEXCHANGE_DOMAIN, Constants.PUB_DATE_FIELD,
-                    "descending", 0, size, 0);
-        } else {
-            dataSetResult = search(query, Constants.MAIN_DOMAIN, Constants.PUB_DATE_FIELD, "descending", 0, size, 0);
+        DataSetResult dataSetResult = new DataSetResult();
+        try {
+            if (!domain.equals(Constants.MAIN_DOMAIN)) {
+                dataSetResult = search(query, Constants.MODELEXCHANGE_DOMAIN, Constants.PUB_DATE_FIELD,
+                        "descending", 0, size, 0);
+            } else {
+                dataSetResult = search(query, Constants.MAIN_DOMAIN, Constants.PUB_DATE_FIELD,
+                        "descending", 0, size, 0);
+            }
+            dataSetResult.setDatasets(dataSetResult.getDatasets().stream().
+                    filter(r -> !r.getPublicationDate().
+                            contains(nextYear.toString())).collect(Collectors.toList()));
+            //dataSetResult = dataSetResult.getDatasets().stream().
+            // filter(r -> !r.getPublicationDate().contains("2022")).;
+        } catch (Exception ex) {
+            LOGGER.error("exception in latest api in data controller", ex.getMessage());
         }
-        dataSetResult.setDatasets(dataSetResult.getDatasets().stream().
-                filter(r -> !r.getPublicationDate().contains(nextYear.toString())).collect(Collectors.toList()));
-        //dataSetResult = dataSetResult.getDatasets().stream().filter(r -> !r.getPublicationDate().contains("2022")).;
         return dataSetResult;
     }
 
@@ -527,18 +534,19 @@ public class DatasetController {
             @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain) {
 
             DataSetResult result = new DataSetResult();
-            List<DatasetSummary> datasetSummaryList = new ArrayList<>();
-            List<MostAccessedDatasets> datasets;
-            if (!domain.equals(Constants.MAIN_DOMAIN)) {
-                List<String> database = Arrays.asList("FAIRDOMHub", "Physiome Model Repository",
-                        "BioModels", "Cell Collective");
-                datasets = mostAccessedDatasetService.getMostAccessedByDatabase(database);
-            } else {
-                datasets = mostAccessedDatasetService.readAll(0, size).getContent();
-            }
-            //datasets.map(r -> )
-            for (MostAccessedDatasets dataset : datasets) {
-                            //if(dataset.getDates().values().stream().filter(r-> r.contains("20")))
+            try {
+                List<DatasetSummary> datasetSummaryList = new ArrayList<>();
+                List<MostAccessedDatasets> datasets;
+                if (!domain.equals(Constants.MAIN_DOMAIN)) {
+                    List<String> database = Arrays.asList("FAIRDOMHub", "Physiome Model Repository",
+                            "BioModels", "Cell Collective");
+                    datasets = mostAccessedDatasetService.getMostAccessedByDatabase(database);
+                } else {
+                    datasets = mostAccessedDatasetService.readAll(0, size).getContent();
+                }
+                //datasets.map(r -> )
+                for (MostAccessedDatasets dataset : datasets) {
+                    //if(dataset.getDates().values().stream().filter(r-> r.contains("20")))
                     DatasetSummary datasetSummary = new DatasetSummary();
                     datasetSummary.setTitle(dataset.getName());
                     datasetSummary.setViewsCount(dataset.getTotal());
@@ -550,9 +558,12 @@ public class DatasetController {
                         datasetSummary.setOmicsType(omicsType);
                     }
                     datasetSummaryList.add(datasetSummary);
+                }
+                result.setDatasets(datasetSummaryList);
+                result.setCount(size);
+            } catch (Exception ex) {
+                LOGGER.error("error occured in mostaccessed", ex.getMessage());
             }
-            result.setDatasets(datasetSummaryList);
-            result.setCount(size);
             return result;
     }
 

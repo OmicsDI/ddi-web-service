@@ -7,22 +7,24 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import uk.ac.ebi.ddi.service.db.service.database.DatabaseService;
 import uk.ac.ebi.ddi.service.db.model.database.DatabaseDetail;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
+import uk.ac.ebi.ddi.service.db.service.database.DatabaseService;
 import uk.ac.ebi.ddi.ws.error.exception.OmicsDatabaseException;
 import uk.ac.ebi.ddi.ws.error.exception.ResourceNotFoundException;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
-//import javax.xml.crypto.Data;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,10 +46,18 @@ public class DatabaseController {
     @Autowired
     ServletContext servletContext;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseController.class);
+
     @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public List<DatabaseDetail> getDatabaseList() {
-        return databaseDetailService.getDatabaseList();
+        List<DatabaseDetail> databaseDetails = new ArrayList<>();
+        try {
+            databaseDetails = databaseDetailService.getDatabaseList();
+        } catch (Exception ex) {
+            LOGGER.error("error in all api of dataset controller", ex.getMessage());
+        }
+        return databaseDetails;
     }
 
     @RequestMapping(value = "/modelexchange", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
