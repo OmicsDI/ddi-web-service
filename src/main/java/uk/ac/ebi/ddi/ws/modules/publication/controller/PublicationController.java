@@ -8,6 +8,8 @@ import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,6 +37,8 @@ public class PublicationController {
     @Autowired
     PublicationWsClient publicationWsClient;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PublicationController.class);
+
     @ApiOperation(value = "Retrieve a set of publications by Ids", position = 1,
             notes = "Retrieve a set of publications by Ids")
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -45,6 +49,7 @@ public class PublicationController {
             @RequestParam(value = "acc", required = true) String[] accs) {
 
         PublicationResult publicationResult = new PublicationResult();
+        try {
         if (accs != null && accs.length > 0) {
             Set<String> ids = new HashSet<>();
             for (String acc: accs) {
@@ -59,7 +64,9 @@ public class PublicationController {
             publicationResult.setPublications(publications);
             publicationResult.setCount(publications.size());
         }
-
+        } catch (Exception ex) {
+            LOGGER.error("error in list api of publication controller", ex.getMessage());
+        }
         return publicationResult;
     }
 }

@@ -4,6 +4,8 @@ import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -49,6 +51,8 @@ public class StatisticsController {
     @Autowired
     FacetWsClient facetWsClient;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsController.class);
+
     @Value("${app.version}")
     private String version;
 
@@ -61,34 +65,40 @@ public class StatisticsController {
             @ApiParam(value = "domain for search results, e.g : ")
             @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain
     ) {
-        String order = Constants.ORDER_ASCENDING;
-        int start = 0;
-        int size = 1;
-        int facetCount = 25;
-        DomainList domainList;
-        if (!domain.equals(Constants.MAIN_DOMAIN)) {
-            domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
-        } else {
-            domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+        List<DomainStats> domainStats = new ArrayList<>();
+        try {
+            String order = Constants.ORDER_ASCENDING;
+            int start = 0;
+            int size = 1;
+            int facetCount = 25;
+            DomainList domainList;
+            if (!domain.equals(Constants.MAIN_DOMAIN)) {
+                domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
+            } else {
+                domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+            }
+            String privateModelQuery = "(isprivate:true)";
+            QueryResult queryResultOfPrivateModel;
+            if (!domain.equals(Constants.MAIN_DOMAIN)) {
+                queryResultOfPrivateModel = dataWsClient.getDatasets(Constants.MODELEXCHANGE_DOMAIN,
+                        privateModelQuery,
+                        Constants.DATASET_SUMMARY, null, order, start, size, facetCount);
+            } else {
+                queryResultOfPrivateModel = dataWsClient.getDatasets(Constants.MAIN_DOMAIN,
+                        privateModelQuery,
+                        Constants.DATASET_SUMMARY, null, order, start, size, facetCount);
+            }
+            Integer privateCount = queryResultOfPrivateModel.getCount();
+            IndexInfo biomodelInfo = Arrays.stream(domainList.getList()).filter(r -> r.getName().
+                    equals(Constants.BIOMODELS)).findFirst().get().getIndexInfo()[0];
+            Integer modelCount = Integer.parseInt(biomodelInfo.getValue());
+            Integer nonPrivateCount = modelCount - privateCount;
+            biomodelInfo.setValue(nonPrivateCount.toString());
+            domainStats = RepoStatsToWsStatsMapper.asDomainStatsList(domainList);
+        } catch (Exception ex) {
+            LOGGER.error("error in domain api of Statistic controller", ex.getMessage());
         }
-        String privateModelQuery = "(isprivate:true)";
-        QueryResult queryResultOfPrivateModel;
-        if (!domain.equals(Constants.MAIN_DOMAIN)) {
-            queryResultOfPrivateModel = dataWsClient.getDatasets(Constants.MODELEXCHANGE_DOMAIN,
-                    privateModelQuery,
-                    Constants.DATASET_SUMMARY, null, order, start, size, facetCount);
-        } else {
-            queryResultOfPrivateModel = dataWsClient.getDatasets(Constants.MAIN_DOMAIN,
-                    privateModelQuery,
-                    Constants.DATASET_SUMMARY, null, order, start, size, facetCount);
-        }
-        Integer privateCount = queryResultOfPrivateModel.getCount();
-        IndexInfo biomodelInfo = Arrays.stream(domainList.getList()).filter(r -> r.getName().
-                equals(Constants.BIOMODELS)).findFirst().get().getIndexInfo()[0];
-        Integer modelCount = Integer.parseInt(biomodelInfo.getValue());
-        Integer nonPrivateCount = modelCount - privateCount;
-        biomodelInfo.setValue(nonPrivateCount.toString());
-        return RepoStatsToWsStatsMapper.asDomainStatsList(domainList);
+        return domainStats;
     }
 
     @ApiOperation(value = "Return statistics about the number of datasets per Organisms", position = 1,
@@ -145,16 +155,23 @@ public class StatisticsController {
             @ApiParam(value = "domain to find the information, e.g: omics")
             @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain) {
 
-        DomainList domainList = null;
-        if (!domain.equals(Constants.MAIN_DOMAIN)) {
-            domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
-        } else {
-            domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+
+        List<StatRecord> statRecords = new ArrayList<StatRecord>();
+        try {
+            DomainList domainList = null;
+            if (!domain.equals(Constants.MAIN_DOMAIN)) {
+                domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
+            } else {
+                domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+            }
+            String[] dubdomains = WsUtilities.getSubdomainList(domainList);
+            FacetList omics = facetWsClient.getFacetEntriesByDomains(
+                    Constants.MAIN_DOMAIN, dubdomains, DSField.Additional.OMICS.key(), 100);
+            statRecords = RepoStatsToWsStatsMapper.asFacetCount(omics, DSField.Additional.OMICS.key());
+        } catch (Exception ex) {
+            LOGGER.error("exception in omics api in statistic controller", ex.getMessage());
         }
-        String[] dubdomains  = WsUtilities.getSubdomainList(domainList);
-        FacetList omics = facetWsClient.getFacetEntriesByDomains(
-                Constants.MAIN_DOMAIN, dubdomains, DSField.Additional.OMICS.key(), 100);
-        return RepoStatsToWsStatsMapper.asFacetCount(omics, DSField.Additional.OMICS.key());
+        return statRecords;
     }
 
     @ApiOperation(value = "Return statistics about the number of datasets per Omics Type", position = 1,
@@ -260,62 +277,66 @@ public class StatisticsController {
             @ApiParam(value = "domain to find the information, e.g: omics")
             @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain
     ) {
-
-        DomainList domainList = null;
-        if (!domain.equals(Constants.MAIN_DOMAIN)) {
-            domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
-        } else {
-            domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
-        }
-        String[] subdomains  = WsUtilities.getSubdomainList(domainList);
         List<StatRecord> resultStat = new ArrayList<>();
-        resultStat.add(new StatRecord("Different Repositories/Databases",
-                String.valueOf(subdomains.length), null));
-        Integer numberOfDatasets = WsUtilities.getNumberofEntries(domainList);
-        resultStat.add(new StatRecord("Different Datasets", String.valueOf(numberOfDatasets), null));
 
-        FacetList facet;
-        if (!domain.equals(Constants.MAIN_DOMAIN)) {
-            facet = facetWsClient.getFacetEntriesByDomains(
-                    Constants.MODELEXCHANGE_DOMAIN, subdomains, DSField.Additional.DISEASE_FIELD.key(), 100);
-        } else {
-            facet = facetWsClient.getFacetEntriesByDomains(
-                    Constants.MAIN_DOMAIN, subdomains, DSField.Additional.DISEASE_FIELD.key(), 100);
-        }
+        try {
+            DomainList domainList = null;
+            if (!domain.equals(Constants.MAIN_DOMAIN)) {
+                domainList = domainWsClient.getDomainByName(Constants.MODELEXCHANGE_DOMAIN);
+            } else {
+                domainList = domainWsClient.getDomainByName(Constants.MAIN_DOMAIN);
+            }
+            String[] subdomains = WsUtilities.getSubdomainList(domainList);
 
-        if (facet.getFacets() != null && facet.getFacets().length > 0 && facet.getFacets()[0] != null
-                && facet.getFacets()[0].getFacetValues() != null) {
+            resultStat.add(new StatRecord("Different Repositories/Databases",
+                    String.valueOf(subdomains.length), null));
+            Integer numberOfDatasets = WsUtilities.getNumberofEntries(domainList);
+            resultStat.add(new StatRecord("Different Datasets", String.valueOf(numberOfDatasets), null));
+
+            FacetList facet;
+            if (!domain.equals(Constants.MAIN_DOMAIN)) {
+                facet = facetWsClient.getFacetEntriesByDomains(
+                        Constants.MODELEXCHANGE_DOMAIN, subdomains, DSField.Additional.DISEASE_FIELD.key(), 100);
+            } else {
+                facet = facetWsClient.getFacetEntriesByDomains(
+                        Constants.MAIN_DOMAIN, subdomains, DSField.Additional.DISEASE_FIELD.key(), 100);
+            }
+
+            if (facet.getFacets() != null && facet.getFacets().length > 0 && facet.getFacets()[0] != null
+                    && facet.getFacets()[0].getFacetValues() != null) {
                 resultStat.add(new StatRecord("Different Diseases",
                         String.valueOf(facet.getFacets()[0].getTotal()), null));
-        }
+            }
 
-        if (!domain.equals(Constants.MAIN_DOMAIN)) {
-            facet = facetWsClient.getFacetEntriesByDomains(
-                    Constants.MODELEXCHANGE_DOMAIN, subdomains, DSField.Additional.TISSUE_FIELD.key(), 100);
-        } else {
-            facet = facetWsClient.getFacetEntriesByDomains(
-                    Constants.MAIN_DOMAIN, subdomains, DSField.Additional.TISSUE_FIELD.key(), 100);
-        }
-        if (facet.getFacets() != null && facet.getFacets().length > 0 && facet.getFacets()[0] != null
-                && facet.getFacets()[0].getFacetValues() != null) {
-            resultStat.add(new StatRecord("Different Tissues",
-                    String.valueOf(facet.getFacets()[0].getTotal()), null));
-        }
+            if (!domain.equals(Constants.MAIN_DOMAIN)) {
+                facet = facetWsClient.getFacetEntriesByDomains(
+                        Constants.MODELEXCHANGE_DOMAIN, subdomains, DSField.Additional.TISSUE_FIELD.key(), 100);
+            } else {
+                facet = facetWsClient.getFacetEntriesByDomains(
+                        Constants.MAIN_DOMAIN, subdomains, DSField.Additional.TISSUE_FIELD.key(), 100);
+            }
+            if (facet.getFacets() != null && facet.getFacets().length > 0 && facet.getFacets()[0] != null
+                    && facet.getFacets()[0].getFacetValues() != null) {
+                resultStat.add(new StatRecord("Different Tissues",
+                        String.valueOf(facet.getFacets()[0].getTotal()), null));
+            }
 
-        if (!domain.equals(Constants.MAIN_DOMAIN)) {
-            facet = facetWsClient.getFacetEntriesByDomains(
-                    Constants.MODELEXCHANGE_DOMAIN, subdomains, DSField.CrossRef.TAXONOMY.key(), 100);
-        } else {
-            facet = facetWsClient.getFacetEntriesByDomains(
-                    Constants.MAIN_DOMAIN, subdomains, DSField.CrossRef.TAXONOMY.key(), 100);
-        }
+            if (!domain.equals(Constants.MAIN_DOMAIN)) {
+                facet = facetWsClient.getFacetEntriesByDomains(
+                        Constants.MODELEXCHANGE_DOMAIN, subdomains, DSField.CrossRef.TAXONOMY.key(), 100);
+            } else {
+                facet = facetWsClient.getFacetEntriesByDomains(
+                        Constants.MAIN_DOMAIN, subdomains, DSField.CrossRef.TAXONOMY.key(), 100);
+            }
 
-        if (facet.getFacets() != null && facet.getFacets().length > 0 && facet.getFacets()[0] != null
-                && facet.getFacets()[0].getFacetValues() != null) {
-            resultStat.add(new StatRecord("Different Species/Organisms",
-                    String.valueOf(facet.getFacets()[0].getTotal()), null));
+            if (facet.getFacets() != null && facet.getFacets().length > 0 && facet.getFacets()[0] != null
+                    && facet.getFacets()[0].getFacetValues() != null) {
+                resultStat.add(new StatRecord("Different Species/Organisms",
+                        String.valueOf(facet.getFacets()[0].getTotal()), null));
+            }
+        } catch (Exception ex) {
+            LOGGER.error("exception in latest api in data controller", ex.getMessage());
         }
-
         return resultStat;
     }
 
