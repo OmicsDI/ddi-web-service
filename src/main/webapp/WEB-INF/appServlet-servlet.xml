@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 
-
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xmlns:jpa="http://www.springframework.org/schema/data/mongo"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
 	   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
@@ -69,7 +69,7 @@
     <bean id="publicationWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.publication.PublicationWsClient">
         <constructor-arg ref="ebeyeWsConfig"/>
     </bean>
-    <!--<bean id="domainClient" class="uk.ac.ebi.ddi.ebe.ws.dao.solrClient.domain.DomainWsClient">
+   <!-- <bean id="domainClient" class="uk.ac.ebi.ddi.ebe.ws.dao.solrClient.domain.DomainWsClient">
         <constructor-arg ref="solrWsConfigDev"/>
     </bean>
 
@@ -88,7 +88,7 @@
     <bean id="publicationWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.publication.PublicationWsClient">
         <constructor-arg ref="solrWsConfigDev"/>
     </bean>-->
-   <!-- <bean id="domainClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient">
+    <!--<bean id="domainClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient">
         <constructor-arg ref="ebeyeWsConfigDev"/>
     </bean>
 
@@ -106,8 +106,7 @@
 
     <bean id="publicationWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.publication.PublicationWsClient">
         <constructor-arg ref="ebeyeWsConfigDev"/>
-    </bean>
--->
+    </bean>-->
     <!-- Maven information an autowired classes -->
 
     <mongo:repositories base-package="uk.ac.ebi.ddi.service.db.repo" />
@@ -142,4 +141,6 @@
         <property name="maxUploadSize" value="268435456"/>
         <!--<property name="uploadTempDir" value="resources/validate"/>-->
     </bean>
+
+
 </beans>

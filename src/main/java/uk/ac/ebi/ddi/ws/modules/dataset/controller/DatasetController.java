@@ -47,10 +47,7 @@ import uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService;
 import uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService;
 import uk.ac.ebi.ddi.ws.error.exception.OmicsCustomException;
 import uk.ac.ebi.ddi.ws.error.exception.ResourceNotFoundException;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DataSetResult;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetDetail;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.DatasetSummary;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.Role;
+import uk.ac.ebi.ddi.ws.modules.dataset.model.*;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.FacetViewAdapter;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.security.UserPermissionService;
@@ -69,7 +66,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import uk.ac.ebi.ddi.ws.modules.dataset.model.Content;
+
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
 import uk.ac.ebi.ddi.xml.validator.utils.Tuple;
 
@@ -736,7 +733,7 @@ public class DatasetController {
     }
 
     private boolean filterBycovidWarnings(String message, String validatorType) {
-        if (message.contains("[Warning]") && validatorType.equals("bycovid")) {
+        if (message.contains("[Warning]") && validatorType.equals(Constants.BYCOVID)) {
             if (message.contains("Database Description") ||
                     message.contains("Database Release Date") || message.contains("Database Entries Count")
                 || message.contains("Database Keywords") || message.contains("Database URL")
@@ -754,7 +751,7 @@ public class DatasetController {
 
     private String updateMessage(String message, String validatorType) {
 
-        if (validatorType.equals("bycovid")) {
+        if (validatorType.equals(Constants.BYCOVID)) {
             if (message.contains("Dataset Omics Type") || message.contains("Submitter")) {
                 message = message.replaceAll("Error", "Warning");
             }
@@ -766,7 +763,7 @@ public class DatasetController {
     }
 
     private boolean filterBycovidMsg(String message, String validatorType) {
-        if (validatorType.equals("bycovid")) {
+        if (validatorType.equals(Constants.BYCOVID)) {
             return (message.contains("Dataset Omics Type") || message.contains("Submitter")) ? false : true;
         } else {
             return true;
@@ -931,6 +928,13 @@ public class DatasetController {
         Set<String> labHeadMail = fields.get(Constants.LAB_HEAD_MAIL_FIELD);
         if ((labHeadMail != null) && (labHeadMail.size() > 0)) {
             datasetDetail.setLabHeadMail(labHeadMail);
+        }
+
+        Set<String> organismsSet = fields.get(DSField.Additional.SPECIE_FIELD.getName());
+        if ((organismsSet != null) && (organismsSet.size() > 0)) {
+            List<Organism> organisms = fields.get(DSField.Additional.SPECIE_FIELD.getName()).
+                    parallelStream().map(r -> new Organism("", r)).collect(Collectors.toList());
+            datasetDetail.setOrganisms(organisms);
         }
 
         Set<String> taxonomyIds = argDataset.getCrossReferences().get(DSField.CrossRef.TAXONOMY.key());
@@ -1154,13 +1158,15 @@ public class DatasetController {
         RestTemplate restTemplate = new RestTemplate();
         Content[] result = new Content[0];
         try {
-
-            result = restTemplate.getForObject(
+            if (result.length == 0) {
+                System.out.println("drs is not continued");
+            }
+           /* result = restTemplate.getForObject(
                     "http://hx-rke-wp-webadmin-21-master-1.caas.ebi.ac.uk:30008/datasets/{database}/{accession}",
                     Content[].class, domain, acc
-            );
+            );*/
         } catch (Exception ex) {
-            LOGGER.error("exception caught in getdrs request");
+            LOGGER.error("exception caught in getdrs request", ex.getMessage());
         }
 
         return result;

@@ -302,7 +302,7 @@ public class RepoDatasetMapper {
                 }
             }
         }
-        datasetDetail.setOrganisms(organismList);
+        //datasetDetail.setOrganisms(organismList);
         return datasetDetail;
     }
 }

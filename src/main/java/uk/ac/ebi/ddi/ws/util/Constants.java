@@ -169,6 +169,8 @@ public class Constants {
 
     public static final String PUBMED_AFFILATION_FIELD = "affiliation";
 
+    public static final String BYCOVID = "bycovid";
+
 
     public static final String[] PUBLICATION_SUMMARY = {Constants.PUBMED_ABSTRACT_FIELD,
             Constants.PUBMED_AUTHOR_FIELD,

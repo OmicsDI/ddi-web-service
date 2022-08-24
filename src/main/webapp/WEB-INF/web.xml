@@ -21,7 +21,6 @@
         <filter-name>corsFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
     <!-- Processes application requests -->
     <servlet>
         <servlet-name>appServlet</servlet-name>
