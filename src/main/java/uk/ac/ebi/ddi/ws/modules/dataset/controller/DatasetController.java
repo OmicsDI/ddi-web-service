@@ -214,12 +214,21 @@ public class DatasetController {
                 } else {
                     currentIds = new HashSet<>(list.subList(i, taxonomyIds.size() - 1));
                 }
-                results.add(
-                        dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, currentIds));
+                try {
+                    if (currentIds.size() > 0) {
+                        QueryResult queryResult1 = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN,
+                                Constants.TAXONOMY_FIELDS, currentIds);
+                        results.add(queryResult1);
+                    }
+                } catch (Exception ex) {
+                    LOGGER.error("exception while getting taxonomy ids data", ex.getMessage());
+                }
                 count = i;
             }
-            Set<String> currentIds = new HashSet<>(list.subList(count, taxonomyIds.size() - 1));
-            results.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, currentIds));
+            //Set<String> currentIds = new HashSet<>
+            // (list.subList(count, taxonomyIds.size() - 1));
+            //results.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN,
+            // Constants.TAXONOMY_FIELDS, currentIds));
             taxonomies = RepoDatasetMapper.mergeQueryResult(results);
 
         } else if (taxonomyIds.size() > 0) {

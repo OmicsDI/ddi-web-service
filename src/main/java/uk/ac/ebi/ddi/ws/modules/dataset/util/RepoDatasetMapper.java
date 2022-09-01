@@ -18,6 +18,7 @@ import uk.ac.ebi.ddi.ws.util.Constants;
 
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author Yasset Perez-Riverol ypriverol
@@ -198,14 +199,22 @@ public class RepoDatasetMapper {
             datasetSummary.setKeywords(arrayKeywords);
         }
 
-        List<Organism> organisms = new ArrayList<>();
+        //List<Organism> organisms = new ArrayList<>();
 
-        if (hasValue(fields, DSField.CrossRef.TAXONOMY.key())) {
+
+
+        if (hasValue(fields, DSField.Additional.SPECIE_FIELD.key())) {
+            List<Organism> organisms = Arrays.stream(fields.get(DSField.Additional.SPECIE_FIELD.getName()))
+                    .map(r -> new Organism("", r)).collect(Collectors.toList());
+            datasetSummary.setOrganisms(organisms);
+        }
+
+      /*  if (hasValue(fields, DSField.CrossRef.TAXONOMY.key())) {
             for (String taxonomyId: fields.get(DSField.CrossRef.TAXONOMY.key())) {
                 organisms.add(new Organism(taxonomyId, taxonomyMap.get(taxonomyId)));
             }
         }
-        datasetSummary.setOrganisms(organisms);
+        datasetSummary.setOrganisms(organisms);*/
 
         return datasetSummary;
     }

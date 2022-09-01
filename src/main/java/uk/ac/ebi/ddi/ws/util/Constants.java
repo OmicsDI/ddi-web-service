@@ -33,6 +33,7 @@ public class Constants {
             DSField.DESCRIPTION.key(),
             DSField.NAME.key(),
             DSField.Additional.SUBMITTER_KEYWORDS.key(),
+            DSField.Additional.SPECIE_FIELD.key(),
             DSField.Additional.CURATOR_KEYWORDS.key(),
             Constants.PUB_DATE_FIELD,
             DSField.CrossRef.TAXONOMY.key(),
