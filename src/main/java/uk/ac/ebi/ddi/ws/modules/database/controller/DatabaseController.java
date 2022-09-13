@@ -88,7 +88,7 @@ public class DatabaseController {
     }
 
 
-    //@ApiIgnore
+    @ApiIgnore
     @RequestMapping(value = "/{databaseName}/picture", method = RequestMethod.GET,
             produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] getDatabasePicture(@PathVariable String databaseName, final HttpServletResponse response)
@@ -99,7 +99,7 @@ public class DatabaseController {
             DatabaseDetail databaseDetail = databaseDetailService.findDatabaseByName(databaseName);
             image = databaseDetail.getImage();
             if (null == image) {
-                InputStream in = servletContext.getResourceAsStream("resources/db-logos/pride_logo.jpg");
+                InputStream in = servletContext.getResourceAsStream("/home/gaur/Desktop/iprox.png");
                 image = IOUtils.toByteArray(in);
             }
         } catch (NullPointerException ex) {
@@ -148,7 +148,7 @@ public class DatabaseController {
     @RequestMapping(value = "/db/picturebyte", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public void getStreamFromImage() throws IOException {
         DatabaseDetail databaseDetail = new DatabaseDetail();
-        BufferedImage bi = ImageIO.read(new File("/home/gaur/Downloads/EGA_LOGO.png"));
+        BufferedImage bi = ImageIO.read(new File("/home/gaur/Desktop/iprox.png"));
         databaseDetail.setDatabaseName("Test");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(bi, "png", baos);
