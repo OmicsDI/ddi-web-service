@@ -42,6 +42,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Controller
 @RequestMapping(value = "/enrichment")
 @ApiIgnore
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class EnrichmentController {
 
     @Autowired

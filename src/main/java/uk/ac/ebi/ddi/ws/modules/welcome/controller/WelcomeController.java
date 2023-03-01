@@ -2,6 +2,7 @@ package uk.ac.ebi.ddi.ws.modules.welcome.controller;
 
 import com.mangofactory.swagger.annotations.ApiIgnore;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 @ApiIgnore
 @RequestMapping(value = {"", "/"})
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class WelcomeController {
 
     @ApiIgnore

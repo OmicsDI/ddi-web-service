@@ -35,6 +35,7 @@ import java.util.List;
 @Api(value = "database", description = "Retrieve information about databases")
 @RestController
 @RequestMapping("/database")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class DatabaseController {
 
     @Autowired

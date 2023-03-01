@@ -30,6 +30,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
         + "functionalities", position = 0)
 @Controller
 @RequestMapping(value = "/term")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TermController {
 
     @Autowired

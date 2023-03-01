@@ -23,6 +23,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 @Controller
 @RequestMapping(value = "/dblucene")
 @ApiIgnore
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class DbLuceneMappingController {
 
     @Autowired
