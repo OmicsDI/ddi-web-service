@@ -31,6 +31,7 @@ import java.util.Map;
 @Api(value = "seo", description = "Retrieve SEO data")
 @Controller
 @RequestMapping(value = "/seo")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class StructuredDataController {
     @Autowired
     IDatasetService datasetService;

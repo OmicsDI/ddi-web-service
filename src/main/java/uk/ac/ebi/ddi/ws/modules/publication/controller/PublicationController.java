@@ -31,7 +31,7 @@ import java.util.Set;
         description = "Retrieve the information about the publication including search functionalities")
 @Controller
 @RequestMapping(value = "/publication")
-
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PublicationController {
 
     @Autowired

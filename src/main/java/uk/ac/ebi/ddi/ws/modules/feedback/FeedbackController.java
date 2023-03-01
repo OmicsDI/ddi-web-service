@@ -24,6 +24,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 @Controller
 @RequestMapping(value = "/feedback")
 @ApiIgnore
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class FeedbackController {
 
     @Autowired

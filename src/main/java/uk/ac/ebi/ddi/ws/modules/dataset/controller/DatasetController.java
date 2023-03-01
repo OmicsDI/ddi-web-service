@@ -81,6 +81,7 @@ import static uk.ac.ebi.ddi.ws.util.WsUtilities.transformSimilarDatasetSummary;
 @Api(value = "dataset", description = "Retrieve the information about the dataset including search functionalities")
 @Controller
 @RequestMapping(value = "/dataset")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class DatasetController {
 
     @Autowired

@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 @Api(value = "statistics", description = "retrieve statistics about the DDI repositories, access, etc")
 @Controller
 @RequestMapping(value = "/statistics")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class StatisticsController {
 
     @Autowired
