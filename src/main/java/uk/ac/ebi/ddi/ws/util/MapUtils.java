@@ -18,9 +18,12 @@ public class MapUtils {
 
     public static Map<String, String> eliminateSet(Map<String, Set<String>> input) {
         Map<String, String> result = new HashMap<>();
-        for (String key : input.keySet()) {
-            result.put(key, input.get(key).iterator().next());
+        input.forEach((key, value) -> {
+            if (input.get(key).iterator().hasNext()) {
+                result.put(key, input.get(key).iterator().next());
+            }
         }
+        );
         return result;
     }
 
