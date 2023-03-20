@@ -1,6 +1,7 @@
 package uk.ac.ebi.ddi.ws.util;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MapUtils {
 
@@ -17,11 +18,10 @@ public class MapUtils {
     }
 
     public static Map<String, String> eliminateSet(Map<String, Set<String>> input) {
-        Map<String, String> result = new HashMap<>();
-        for (String key : input.keySet()) {
-            result.put(key, input.get(key).iterator().next());
-        }
-        return result;
+        return input.keySet().stream()
+                .filter(k -> input.get(k) != null)
+                .filter(k -> input.get(k).size() > 0)
+                .collect(Collectors.toMap(k -> k, k -> input.get(k).iterator().next()));
     }
 
     public static String getFirst(Map<String, Set<String>> input, String key) {
