@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 public class MapUtils {
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+        if (map == null) {
+            return null;
+        }
         List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());
         list.sort(Map.Entry.comparingByValue(Comparator.naturalOrder()));
 
@@ -18,16 +21,13 @@ public class MapUtils {
     }
 
     public static Map<String, String> eliminateSet(Map<String, Set<String>> input) {
+        if (input == null) {
+            return null;
+        }
         return input.keySet().stream()
                 .filter(k -> input.get(k) != null)
-                .filter(k -> input.get(k).size() > 0)
+                .filter(k -> !input.get(k).isEmpty())
                 .collect(Collectors.toMap(k -> k, k -> input.get(k).iterator().next()));
     }
 
-    public static String getFirst(Map<String, Set<String>> input, String key) {
-        if (input.containsKey(key)) {
-            return input.get(key).iterator().next();
-        }
-        return null;
-    }
 }
