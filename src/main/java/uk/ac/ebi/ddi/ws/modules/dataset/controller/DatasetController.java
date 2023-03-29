@@ -179,8 +179,8 @@ public class DatasetController {
             @RequestParam(value = "size", required = false, defaultValue = "20") int size,
             @ApiParam(value = "The starting point for the search, e.g: 0")
             @RequestParam(value = "faceCount", required = false, defaultValue = "30") int facetCount) {
-
-        query = (query == null || query.isEmpty()) ? "*:*" : query;
+        try {
+            query = (query == null || query.isEmpty()) ? "*:*" : query;
 
         query = WsUtilities.escapeSpecialCharacters(query);
 
@@ -251,7 +251,11 @@ public class DatasetController {
             queryResult.setFacets((new FacetViewAdapter(facetSettingsRepository)).process(queryResult.getFacets()));
         }
 
-        return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
+            return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
+        } catch (Exception e) {
+            LOGGER.error("Error in calling search method " + e.getMessage());
+            throw new OmicsCustomException(e.getMessage());
+        }
     }
 
 
@@ -588,11 +592,11 @@ public class DatasetController {
             @ApiParam(value = "domain for search results, e.g : ")
             @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain) {
 
-        SimilarResult queryResult = dataWsClient.getSimilarProjectsByDomain(database, accession,
-                Constants.MORELIKE_FIELDS, domain);
-
-        DataSetResult result = new DataSetResult();
-        List<DatasetSummary> datasetSummaryList = new ArrayList<>();
+        try {
+            SimilarResult queryResult = dataWsClient.getSimilarProjectsByDomain(database, accession,
+                    Constants.MORELIKE_FIELDS, domain);
+            DataSetResult result = new DataSetResult();
+            List<DatasetSummary> datasetSummaryList = new ArrayList<>();
 
         Map<String, Map<String, String>> currentIds = new HashMap<>();
 
@@ -634,7 +638,11 @@ public class DatasetController {
             result.setDatasets(datasetSummaryList);
             result.setCount(datasetSummaryList.size());
 
-            return result;
+                return result;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error in calling moreLikeThis method " + e.getMessage());
+            throw  new OmicsCustomException(e.getMessage());
         }
 
         return null;
@@ -1169,7 +1177,7 @@ public class DatasetController {
         Content[] result = new Content[0];
         try {
             if (result.length == 0) {
-                System.out.println("drs is not continued");
+                LOGGER.info("drs is not continued");
             }
            /* result = restTemplate.getForObject(
                     "http://hx-rke-wp-webadmin-21-master-1.caas.ebi.ac.uk:30008/datasets/{database}/{accession}",
