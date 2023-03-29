@@ -33,7 +33,7 @@
 
     <bean id="ebeyeWsConfigDev" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigDev" />
     <bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd" />
-    <bean id="solrWsConfigDev" class="uk.ac.ebi.ddi.ebe.ws.dao.config.SolrWsConfigDev" />
+    <!--<bean id="solrWsConfigDev" class="uk.ac.ebi.ddi.ebe.ws.dao.config.SolrWsConfigDev" />-->
     <!-- Swagger config (REST service documentation)-->
     <!-- Swagger beans -->
     <bean class="com.mangofactory.swagger.configuration.SpringSwaggerConfig" />

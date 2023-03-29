@@ -179,79 +179,83 @@ public class DatasetController {
             @RequestParam(value = "size", required = false, defaultValue = "20") int size,
             @ApiParam(value = "The starting point for the search, e.g: 0")
             @RequestParam(value = "faceCount", required = false, defaultValue = "30") int facetCount) {
+        try {
+            query = (query == null || query.isEmpty()) ? "*:*" : query;
 
-        query = (query == null || query.isEmpty()) ? "*:*" : query;
+            query = WsUtilities.escapeSpecialCharacters(query);
 
-        query = WsUtilities.escapeSpecialCharacters(query);
+            query = query + " NOT (isprivate:true)";
+            query = modifyIfSearchByYear(query);
 
-        query = query + " NOT (isprivate:true)";
-        query = modifyIfSearchByYear(query);
+            QueryResult queryResult = null;
 
-        QueryResult queryResult = null;
+            if (!domain.equals(Constants.MAIN_DOMAIN)) {
+                queryResult = dataWsClient.getDatasets(
+                        Constants.MODELEXCHANGE_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size,
+                        facetCount);
+            } else {
+                queryResult = dataWsClient.getDatasets(
+                        Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
+            }
 
-        if (!domain.equals(Constants.MAIN_DOMAIN)) {
-            queryResult = dataWsClient.getDatasets(
-                    Constants.MODELEXCHANGE_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size,
-                    facetCount);
-        } else {
-            queryResult = dataWsClient.getDatasets(
-                    Constants.MAIN_DOMAIN, query, Constants.DATASET_SUMMARY, sortfield, order, start, size, facetCount);
-        }
+            QueryResult taxonomies = null;
 
-        QueryResult taxonomies = null;
+            Set<String> taxonomyIds = RepoDatasetMapper.getTaxonomyIds(queryResult);
 
-        Set<String> taxonomyIds = RepoDatasetMapper.getTaxonomyIds(queryResult);
-
-        // The number of queries should be controlled using the maximum QUERY threshold in this case 100 entries
-        // for the EBE web service.
-        if (taxonomyIds.size() > Constants.HIGH_QUERY_THRESHOLD) {
-            List<QueryResult> results = new ArrayList<>();
-            List<String> list = new ArrayList<>(taxonomyIds);
-            int count = 0;
-            for (int i = 0; i < taxonomyIds.size(); i += Constants.HIGH_QUERY_THRESHOLD) {
-                Set<String> currentIds;
-                if ((i + Constants.HIGH_QUERY_THRESHOLD) < taxonomyIds.size()) {
-                    currentIds = new HashSet<>(list.subList(i, i + Constants.HIGH_QUERY_THRESHOLD));
-                } else {
-                    currentIds = new HashSet<>(list.subList(i, taxonomyIds.size() - 1));
-                }
-                try {
-                    if (currentIds.size() > 0) {
-                        QueryResult queryResult1 = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN,
-                                Constants.TAXONOMY_FIELDS, currentIds);
-                        results.add(queryResult1);
+            // The number of queries should be controlled using the maximum QUERY threshold in this case 100 entries
+            // for the EBE web service.
+            if (taxonomyIds.size() > Constants.HIGH_QUERY_THRESHOLD) {
+                List<QueryResult> results = new ArrayList<>();
+                List<String> list = new ArrayList<>(taxonomyIds);
+                int count = 0;
+                for (int i = 0; i < taxonomyIds.size(); i += Constants.HIGH_QUERY_THRESHOLD) {
+                    Set<String> currentIds;
+                    if ((i + Constants.HIGH_QUERY_THRESHOLD) < taxonomyIds.size()) {
+                        currentIds = new HashSet<>(list.subList(i, i + Constants.HIGH_QUERY_THRESHOLD));
+                    } else {
+                        currentIds = new HashSet<>(list.subList(i, taxonomyIds.size() - 1));
                     }
-                } catch (Exception ex) {
-                    LOGGER.error("exception while getting taxonomy ids data", ex.getMessage());
+                    try {
+                        if (currentIds.size() > 0) {
+                            QueryResult queryResult1 = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN,
+                                    Constants.TAXONOMY_FIELDS, currentIds);
+                            results.add(queryResult1);
+                        }
+                    } catch (Exception ex) {
+                        LOGGER.error("exception while getting taxonomy ids data", ex.getMessage());
+                    }
+                    count = i;
                 }
-                count = i;
+                //Set<String> currentIds = new HashSet<>
+                // (list.subList(count, taxonomyIds.size() - 1));
+                //results.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN,
+                // Constants.TAXONOMY_FIELDS, currentIds));
+                taxonomies = RepoDatasetMapper.mergeQueryResult(results);
+
+            } else if (taxonomyIds.size() > 0) {
+                taxonomies = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, taxonomyIds);
             }
-            //Set<String> currentIds = new HashSet<>
-            // (list.subList(count, taxonomyIds.size() - 1));
-            //results.add(dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN,
-            // Constants.TAXONOMY_FIELDS, currentIds));
-            taxonomies = RepoDatasetMapper.mergeQueryResult(results);
 
-        } else if (taxonomyIds.size() > 0) {
-           taxonomies = dataWsClient.getDatasetsById(Constants.TAXONOMY_DOMAIN, Constants.TAXONOMY_FIELDS, taxonomyIds);
-        }
+            Facet[] facets = queryResult.getFacets();
 
-        Facet[] facets = queryResult.getFacets();
-
-        for (Facet facet : facets) {
-            if (facet.getId().equals("omics_type") && domain.equals(Constants.MODELEXCHANGE_DOMAIN.toString())) {
-                FacetValue[] nonMultiomics = Arrays.stream(facet.getFacetValues()).
-                        filter(rt -> !rt.getLabel().equals("Multiomics")).toArray(FacetValue[]::new);
-                facet.setFacetValues(nonMultiomics);
+            for (Facet facet : facets) {
+                if (facet.getId().equals("omics_type") && domain.equals(Constants.MODELEXCHANGE_DOMAIN.toString())) {
+                    FacetValue[] nonMultiomics = Arrays.stream(facet.getFacetValues()).
+                            filter(rt -> !rt.getLabel().equals("Multiomics")).toArray(FacetValue[]::new);
+                    facet.setFacetValues(nonMultiomics);
+                }
             }
+
+
+            if (queryResult.getCount() > 0) {
+                queryResult.setFacets((new FacetViewAdapter(facetSettingsRepository)).process(queryResult.getFacets()));
+            }
+
+            return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
+        } catch (Exception e) {
+            LOGGER.error("Error in calling search method " + e.getMessage());
+            throw new OmicsCustomException(e.getMessage());
         }
-
-
-        if (queryResult.getCount() > 0) {
-            queryResult.setFacets((new FacetViewAdapter(facetSettingsRepository)).process(queryResult.getFacets()));
-        }
-
-        return RepoDatasetMapper.asDataSummary(queryResult, taxonomies);
     }
 
 
@@ -588,54 +592,59 @@ public class DatasetController {
             @ApiParam(value = "domain for search results, e.g : ")
             @RequestParam(value = "domain", required = false, defaultValue = "omics") String domain) {
 
-        SimilarResult queryResult = dataWsClient.getSimilarProjectsByDomain(database, accession,
-                Constants.MORELIKE_FIELDS, domain);
+        try {
+            SimilarResult queryResult = dataWsClient.getSimilarProjectsByDomain(database, accession,
+                    Constants.MORELIKE_FIELDS, domain);
+            DataSetResult result = new DataSetResult();
+            List<DatasetSummary> datasetSummaryList = new ArrayList<>();
 
-        DataSetResult result = new DataSetResult();
-        List<DatasetSummary> datasetSummaryList = new ArrayList<>();
-
-        Map<String, Map<String, String>> currentIds = new HashMap<>();
+            Map<String, Map<String, String>> currentIds = new HashMap<>();
 
 
-        if (queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0) {
+            if (queryResult != null && queryResult.getEntries() != null && queryResult.getEntries().length > 0) {
 
-            for (Entry entry: queryResult.getEntries()) {
-                if (entry.getId() != null && entry.getSource() != null) {
-                    Map<String, String> ids = currentIds.get(entry.getSource());
-                    ids = (ids != null) ? ids : new HashMap<>();
-                    if (!(entry.getId().equalsIgnoreCase(accession) && entry.getSource().equalsIgnoreCase(database))) {
-                        ids.put(entry.getId(), entry.getScore());
-                    }
-                    if (!ids.isEmpty()) {
-                        currentIds.put(entry.getSource(), ids);
+                for (Entry entry: queryResult.getEntries()) {
+                    if (entry.getId() != null && entry.getSource() != null) {
+                        Map<String, String> ids = currentIds.get(entry.getSource());
+                        ids = (ids != null) ? ids : new HashMap<>();
+                        if (!(entry.getId().equalsIgnoreCase(accession) && entry.getSource().equalsIgnoreCase(database))) {
+                            ids.put(entry.getId(), entry.getScore());
+                        }
+                        if (!ids.isEmpty()) {
+                            currentIds.put(entry.getSource(), ids);
+                        }
                     }
                 }
-            }
 
-            for (String currentDomain: currentIds.keySet()) {
-                QueryResult datasetResult = dataWsClient.getDatasetsById(
-                        currentDomain, Constants.DATASET_DETAIL, currentIds.get(currentDomain).keySet());
-                datasetSummaryList.addAll(transformSimilarDatasetSummary(
-                        datasetResult, currentDomain, currentIds.get(currentDomain)));
-            }
-
-            datasetSummaryList.sort((o1, o2) -> {
-                Double value1 = Double.valueOf(o1.getScore());
-                Double value2 = Double.valueOf(o2.getScore());
-                if (value1 < value2) {
-                    return 1;
-                } else if (Objects.equals(value1, value2)) {
-                    return 0;
-                } else {
-                    return -1;
+                for (String currentDomain: currentIds.keySet()) {
+                    QueryResult datasetResult = dataWsClient.getDatasetsById(
+                            currentDomain, Constants.DATASET_DETAIL, currentIds.get(currentDomain).keySet());
+                    datasetSummaryList.addAll(transformSimilarDatasetSummary(
+                            datasetResult, currentDomain, currentIds.get(currentDomain)));
                 }
-            });
 
-            result.setDatasets(datasetSummaryList);
-            result.setCount(datasetSummaryList.size());
+                datasetSummaryList.sort((o1, o2) -> {
+                    Double value1 = Double.valueOf(o1.getScore());
+                    Double value2 = Double.valueOf(o2.getScore());
+                    if (value1 < value2) {
+                        return 1;
+                    } else if (Objects.equals(value1, value2)) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                });
 
-            return result;
+                result.setDatasets(datasetSummaryList);
+                result.setCount(datasetSummaryList.size());
+
+                return result;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error in calling moreLikeThis method " + e.getMessage());
+            throw  new OmicsCustomException(e.getMessage());
         }
+
 
         return null;
     }
@@ -1169,7 +1178,7 @@ public class DatasetController {
         Content[] result = new Content[0];
         try {
             if (result.length == 0) {
-                System.out.println("drs is not continued");
+                LOGGER.info("drs is not continued");
             }
            /* result = restTemplate.getForObject(
                     "http://hx-rke-wp-webadmin-21-master-1.caas.ebi.ac.uk:30008/datasets/{database}/{accession}",
