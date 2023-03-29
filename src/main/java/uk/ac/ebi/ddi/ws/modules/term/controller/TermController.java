@@ -7,6 +7,8 @@ package uk.ac.ebi.ddi.ws.modules.term.controller;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -17,6 +19,7 @@ import uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dataset.TermResult;
 import uk.ac.ebi.ddi.ebe.ws.dao.model.dictionary.DictWord;
 import uk.ac.ebi.ddi.service.db.service.logger.HttpEventService;
+import uk.ac.ebi.ddi.ws.error.exception.OmicsCustomException;
 import uk.ac.ebi.ddi.ws.modules.dataset.util.RepoDatasetMapper;
 import uk.ac.ebi.ddi.ws.modules.term.model.Term;
 import uk.ac.ebi.ddi.ws.util.Constants;
@@ -45,6 +48,7 @@ public class TermController {
     @Autowired
     private DictionaryClient dictionaryClient;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TermController.class);
 
     @ApiOperation(value = "Search dictionary Terms", position = 1, notes = "retrieve the Terms for a pattern")
     @RequestMapping(value = "/getTermByPattern", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
@@ -56,7 +60,12 @@ public class TermController {
             @ApiParam(value = "the number of records to be retrieved, e.g: maximum 100")
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         if (q.length() > 2) {
-            return dictionaryClient.getWordsDomains(Constants.INITIAL_DOMAINS, q, size);
+            try {
+                return dictionaryClient.getWordsDomains(Constants.INITIAL_DOMAINS, q, size);
+            } catch (Exception e) {
+                LOGGER.error("Error while calling getTermByPattern " + e.getMessage());
+                throw new OmicsCustomException(e.getMessage());
+            }
         }
         return new DictWord();
     }
